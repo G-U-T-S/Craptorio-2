@@ -45,6 +45,136 @@ window.addEventListener("keyup", (ev) => {
         }
     }
 });
+class Ui {
+    draw_logo() {
+        drawBg("gray");
+    }
+    draw_menu() {
+        const middleScreen = {
+            x: CVS.width / 2, y: CVS.height / 2
+        };
+        if (state === 'start') {
+            this.draw_logo();
+            if (this.draw_text_button(middleScreen.x - 50, 100, 8, 8, "blue", "black", "darkBlue", { text: '  Start  ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
+                state = 'game';
+                drawBg("black");
+            }
+            if (this.draw_text_button(120 - (('  Controls  '.length + 2) / 2), 110, 8, 8, "blue", "black", "darkBlue", { text: '  Controls  ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
+                state = 'help';
+            }
+        }
+        else if (state === 'help') {
+            const info = [
+                ['W A S D', 'Move PLAYER'],
+                ['ESC', 'Exit game'],
+                ['CTRL + R', 'Reload game'],
+                ['I or TAB', 'Toggle inventory window'],
+                ['C', 'Toggle crafting window'],
+                ['T', 'Toggle research window'],
+                ['R', 'Rotate held item or hovered object'],
+                ['Q', 'Pipette tool - copy/swap objects'],
+                ['Left-click', 'Place/deposit item/open machine'],
+                ['Right-click hold', 'Mine resource or destroy object'],
+                ['Scroll +/-', 'Scroll active hotbar slot']
+            ];
+            this.draw_panel(0, 0, 240, 136, "white", "black", { text: 'Controls', bg: "blue", fg: "red" }, "black");
+            for (let i = 0; i < info.length; i++) {
+                prints(info[i][2], 3, 10 + ((i - 1) * 7), "blue", "darkBlue", { x: 0, y: 0 });
+                prints(info[i][1], 150, 10 + ((i - 1) * 7), "blue", "darkBlue", { x: 0, y: 0 });
+            }
+            if (this.draw_button(240 - 12, 1, 1, "", "", "")) {
+                drawBg("black");
+                state = 'start';
+                return;
+            }
+        }
+    }
+    draw_endgame_window() {
+        drawBg("black");
+        if (tick % 60 > 30) {
+            drawText('Congratulations!', 31, 44, "white");
+            drawText('Congratulations!', 30, 44, "white");
+            drawText('You won the game!', 11, 64, "white");
+            drawText('You won the game!', 10, 64, "white");
+        }
+        if (this.draw_text_button(120 - ((' Continue '.length / 2) - 2), 84, 113, 8, "blue", "black", "darkBlue", { text: ' Continue ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
+            state = 'game';
+        }
+    }
+    draw_button(x, y, flip, color, shadow_color, hover_color) {
+        const _mouse = { x: CURSOR.x, y: CURSOR.y };
+        const _box = { x: x, y: y, w: 8, h: 8 };
+        const hov = hovered(_mouse, _box);
+        if (hov && CURSOR.l && !CURSOR.ll) {
+            return true;
+        }
+        return false;
+    }
+    draw_text_button(x, y, width, height, main_color, shadow_color, hover_color, label, locked) {
+        if (label !== undefined) {
+            const w = label.text.length;
+            if (w + 2 > width) {
+                width = w + 2;
+            }
+        }
+        const _mouse = { x: CURSOR.x, y: CURSOR.y };
+        const _box = { x: x, y: y, w: width, h: height };
+        const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
+        const ck = 1;
+        const lines = [
+            { x1: x, y1: y + height, x2: x + width, y2: y + height },
+            { x1: x, y1: y, x2: x + width, y2: y }
+        ];
+        if (label !== undefined && width > 8) {
+            if (!locked && hov && !CURSOR.l) {
+                drawRect(x + 4, y, width - 8, height - 1, hover_color);
+                drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+            }
+            else if (!locked && hov && CURSOR.l) {
+                drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
+                label.y = label.y + 1;
+            }
+            else {
+                drawRect(x + 4, y, width - 8, height - 1, main_color);
+                drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+            }
+        }
+        if (label !== undefined) {
+            prints(label.text, x + label.x, y + label.y, label.bg, label.fg, label.shadow);
+        }
+        if (hov && CURSOR.l && !CURSOR.ll) {
+            return true;
+        }
+        return false;
+    }
+    draw_panel(x, y, w, h, bg, fg, label, shadow_color) {
+        const width = label.text.length;
+        if (width > w + 7) {
+            w = width + 7;
+        }
+        drawRect(x + 2, y + 2, w - 4, h - 4, bg);
+        if (label !== undefined) {
+            drawRect(x, y + 6, w, 3, fg);
+            drawRect(x + 2, y + h - 3, w - 4, 1, fg);
+            drawRect(x + 6, y + 2, w - 12, 4, fg);
+            if (label !== undefined) {
+                prints(label.text, x + w / 2 - width / 2, y + 2, label.bg, label.fg, { x: 0, y: 0 });
+            }
+        }
+        else {
+        }
+        drawRect(x + 6, y, w - 12, 2, fg);
+        drawRect(x, y + 6, 2, h - 12, fg);
+        drawRect(x + w - 2, y + 6, 2, h - 12, fg);
+        drawRect(x + 6, y + h - 2, w - 12, 2, fg);
+        if (shadow_color === "") {
+            drawLine(x + 4, y + h, x + w - 3, y + h, shadow_color);
+            drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color);
+            drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color);
+        }
+    }
+}
+;
 class Vec2 {
     x;
     y;
@@ -220,16 +350,6 @@ const OPENSiES = {
     'bio_refinery': true,
     'rocket_silo': true
 };
-const UI = {
-    draw_logo: () => {
-    },
-    draw_menu: () => {
-        if (state === 'start') {
-        }
-        else if (state == 'help') {
-        }
-    },
-};
 const PLAYER = {
     x: 100 * 8, y: 50 * 8, spr: 362,
     lx: 0, ly: 0, shadow: 382,
@@ -289,6 +409,7 @@ const KEYBOARD = {
     "8": false,
     "9": false,
 };
+const UI = new Ui();
 let biome = 1;
 let db_time = 0.0;
 let launched = false;
@@ -537,6 +658,41 @@ function dispatch_input() {
         CURSOR.drag = false;
     }
 }
+function resizeCanvas() {
+    CVS.width = window.innerWidth;
+    CVS.height = window.innerHeight;
+    drawBg("black");
+}
+function randRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function hovered(mouse, box) {
+    return mouse.x >= box.x && mouse.x < box.x + box.w && mouse.y >= box.y && mouse.y < box.y + box.h;
+}
+function drawRect(x, y, w, h, color) {
+    CTX.fillStyle = color;
+    CTX.fillRect(x, y, w, h);
+}
+function drawLine(x1, y1, x2, y2, color) {
+    CTX.strokeStyle = color;
+    CTX.moveTo(x1, y1);
+    CTX.lineTo(x2, y2);
+}
+function drawText(text, x, y, color) {
+    CTX.fillStyle = color;
+    CTX.fillText(text, x, y);
+}
+function clearScreen() {
+    CTX.clearRect(0, 0, CVS.width, CVS.height);
+}
+function drawBg(color) {
+    CTX.fillStyle = color;
+    CTX.fillRect(0, 0, CVS.width, CVS.height);
+}
+function prints(text, x, y, bg, fg, shadow_offset) {
+    drawText(text, x + shadow_offset.x, y + shadow_offset.y, bg);
+    drawText(text, x, y, fg);
+}
 function screen_to_world(screenX, screenY, playerX, playerY) {
     const cam_x = playerX - 116;
     const cam_y = playerY - 64;
@@ -553,29 +709,24 @@ function world_to_screen(worldX, worldY) {
     const screen_y = (worldY * 8) - (PLAYER.y - 64);
     return { tx: screen_x - 8, ty: screen_y - 8 };
 }
-function resizeCanvas() {
-    CVS.width = window.innerWidth;
-    CVS.height = window.innerHeight;
-}
-function randRange(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
-}
 function BOOT() {
     resizeCanvas();
     TIC();
 }
 function TIC() {
-    CTX.fillRect(0, 0, CVS.width, CVS.height);
+    drawBg("black");
     CURRENT_RECIPE.x = 0;
     CURRENT_RECIPE.y = 0;
     CURRENT_RECIPE.id = 0;
     if (state === "start" || state === 'help') {
         update_cursor_state();
+        UI.draw_menu();
         tick = tick + 1;
         return;
     }
     if (state === "first_launch") {
         update_cursor_state();
+        UI.draw_endgame_window();
         tick = tick + 1;
         return;
     }
