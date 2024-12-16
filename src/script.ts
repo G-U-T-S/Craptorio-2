@@ -47,6 +47,174 @@ if (ev instanceof KeyboardEvent) {
 }
 });
 
+interface uiString {
+  text: string;
+  x: number;
+  y: number;
+  bg: string;
+  fg: string;
+  shadow: {x: number, y: number};
+}
+
+class Ui {
+  draw_logo(): void {
+    // draw_image(0, 48, 240, 46, logo, 1);
+    //TODO CTX.drawImage(Logo, 48, 240);
+    CTX.fillRect(240, 46, 0, 48);
+  }
+
+  draw_menu(): void {
+    if (state === 'start') {
+      this.draw_logo();
+      
+      // this.draw_text_button(120 - (('  Start  '.length + 2) /2), 100, UI_BUTTON2, _, 8, 9, 15, 10, {text = '  Start  ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}})
+      if (this.draw_text_button(120 - ("  Start  ".length + 2) / 2, 100, 8, 8, "blue", "black", "darkBlue", {text: '  Start  ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
+        state = 'game';
+        clearScreen();
+      }
+      
+      // 120 - ((text_width('  Controls  ') + 2) /2), 110, UI_BUTTON2, _, 8, 9, 15, 10, {text = '  Controls  ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}}
+      if (this.draw_text_button(120 - (('  Controls  '.length + 2) / 2), 110, 8, 8, "blue", "black", "darkBlue", {text: '  Controls  ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
+        state = 'help';
+      }
+    }
+
+    else if (state === 'help') {
+      const info = [
+        ['W A S D', 'Move PLAYER'],
+        ['ESC', 'Exit game'],
+        ['CTRL + R', 'Reload game'],
+        ['I or TAB', 'Toggle inventory window'],
+        ['C', 'Toggle crafting window'],
+        ['T', 'Toggle research window'],
+        ['R', 'Rotate held item or hovered object'],
+        ['Q', 'Pipette tool - copy/swap objects'],
+        ['Left-click', 'Place/deposit item/open machine'],
+        ['Right-click hold', 'Mine resource or destroy object'],
+        ['Scroll +/-', 'Scroll active hotbar slot']
+      ];
+
+      // this.draw_panel(0, 0, 240, 136, 8, 9, {text = 'Controls', bg = 15, fg = 4})
+      //TODO this.draw_panel(0, 0, 240, 136, "white", "black", {text: 'Controls', bg: "blue", fg: "red"}, "black");
+      for (let i = 0; i < info.length; i++) {
+        prints(info[i][2], 3, 10 + ((i-1) * 7), "blue", "darkBlue", {x: 0, y: 0});
+        prints(info[i][1], 150, 10 + ((i-1) * 7), "blue", "darkBlue", {x: 0, y: 0});
+      }
+
+      //TODO if this.draw_button(240 - 12, 1, 1, UI_BUTTON, 2, 8, 3) {
+      //   clearScreen();
+      //   state = 'start';
+      //   return;
+      // }
+    }
+  }
+
+  draw_text_button(x: number, y: number, width: number, height: number, main_color: string, shadow_color: string, hover_color: string, label: uiString, locked: boolean): boolean {
+    if (label !== undefined) {
+      const w = label.text.length;
+      
+      if (w + 2 > width) {
+        width = w + 2;
+      }
+    }
+
+    const _mouse = {x: CURSOR.x, y: CURSOR.y};
+    const _box = {x:  x, y: y, w: width, h: height};
+    const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
+    const ck = 1;
+    
+    // let p = { BTN_PRESS, main_color, BTN_SHADOW, shadow_color, BTN_MAIN, main_color }
+    
+    // if (hov && !CURSOR.l) {
+    //   p = {BTN_SHADOW, shadow_color, BTN_MAIN, hover_color, BTN_PRESS, hover_color}
+    // }
+    // else if (hov && CURSOR.l) {
+    //   p = {BTN_SHADOW, hover_color, BTN_MAIN, hover_color, BTN_PRESS, hover_color}
+    //   ck = {1, BTN_PRESS}
+    // }
+    
+    const lines = [
+      {x1:  x, y1: y + height, x2:  x + width, y2: y + height},
+      {x1:  x, y1: y, x2:  x + width, y2: y}
+    ]
+
+    if (label !== undefined && width > 8) {
+      if (!locked && hov && !CURSOR.l) {
+        drawRect(x + 4, y, width - 8, height - 1, hover_color);
+        drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+      }
+      else if (!locked && hov && CURSOR.l) {
+        drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
+        label.y = label.y + 1
+      }
+      else {
+        drawRect(x + 4, y, width - 8, height - 1, main_color);
+        drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+      }
+    }
+    
+
+    // TODO spr(id, x, y, ck, 1, 0)
+    // spr(id, x + width - 8, y, ck, 1, 1)
+
+    if (label !== undefined) {
+      prints(label.text, x + label.x, y + label.y, label.bg, label.fg, label.shadow)
+    }
+    
+    if (hov && CURSOR.l && !CURSOR.ll) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  draw_panel(x: number, y: number, w: number, h: number, bg: string, fg: string, label: {text: string, bg: string, fg: string}, shadow_color: string): void {
+    // x, y = clamp(x, 0, (240 - w)), clamp(y, 0, (136 - h))
+    // bg, fg = bg or UI_BG, fg or UI_FG
+    // local width = text_width(type(label) == 'table' and label.text or label)
+    // if width > w + 7 then w = width + 7 end
+    // rect(x + 2, y + 2, w - 4, h - 4, bg) -- background fill
+    // if label then
+    //   pal(1, fg)
+    //   pal(8, fg)
+    //   sspr(UI_CORNER, x, y, 0)
+    //   sspr(UI_CORNER, x + w - 8, y, 0, 1, 1)
+    //   pal()
+    //   pal(1, fg)
+    //   pal(8, bg)
+    //   sspr(UI_CORNER, x + w - 8, y + h - 8, 0, 1, 3)
+    //   sspr(UI_CORNER, x, y + h - 8, 0, 1, 2)
+    //   pal()
+    //   rect(x, y + 6, w, 3, fg) -- header lower-fill
+    //   rect(x + 2, y + h - 3, w - 4, 1, fg) -- bottom footer fill
+    //   rect(x + 6, y + 2, w - 12, 4, fg)--header fill
+    //   --rect(x + 2, y + 9, w - 4, h - 12, bg) -- background fill
+    //   if type(label) == 'table' then
+    //     prints(label.text, x + w/2 - width/2, y + 2, label.bg, label.fg) -- header text
+    //   else
+    //     prints(label, x + w/2 - width/2, y + 2, 0, 4) -- header text
+    //   end
+    // else
+    //   pal(1, fg)
+    //   sspr(UI_CORNER, x + w - 8, y + h - 8, {0, 8}, 1, 3)
+    //   sspr(UI_CORNER, x, y + h - 8, {0, 8}, 1, 2)
+    //   sspr(UI_CORNER, x, y, {0, 8})
+    //   sspr(UI_CORNER, x + w - 8, y, {0, 8}, 1, 1)
+    //   pal()
+    // end
+    // rect(x + 6, y, w - 12, 2, fg) -- top border
+    // rect(x, y + 6, 2, h - 12, fg) -- left border
+    // rect(x + w - 2, y + 6, 2, h - 12, fg) -- right border
+    // rect(x + 6, y + h - 2, w - 12, 2, fg) -- bottom border
+    // if shadow then
+    //   --line(x + w - 1, y + 1, x + w, y + 3, shadow) -- shadow
+    //   line(x + 4, y + h, x + w - 3, y + h, shadow) -- shadow
+    //   line(x + w - 2, y + h - 1, x + w, y + h - 3, shadow)-- shadow
+    //   line(x + w, y + 4, x + w, y + h - 4, shadow)-- shadow
+    // end
+    // --sspr(CLOSE_ID, x + w - 9, y + 2, 0) -- close button
+  }
+};
 class Vec2 {
   public x: number;
   public y: number;
@@ -254,56 +422,6 @@ const OPENSiES = {
   'bio_refinery': true,
   'rocket_silo': true
 };
-const UI = {
-  draw_logo: () => {
-    // draw_image(0, 48, 240, 46, logo, 1);
-  },
-
-  draw_menu: () => {
-    if (state === 'start') {
-      // draw_logo();
-      
-      // if (ui.draw_text_button(120 - ((text_width('  Start  ') + 2) /2), 100, UI_BUTTON2, _, 8, 9, 15, 10, {text = '  Start  ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}})) {
-      //   state = 'game'
-      //   cls(0)
-      //   vbank(0)
-      // }
-      
-      // if (ui.draw_text_button(120 - ((text_width('  Controls  ') + 2) /2), 110, UI_BUTTON2, _, 8, 9, 15, 10, {text = '  Controls  ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}})) {
-      //   state = 'help'
-      // }
-    }
-
-    else if (state == 'help') {
-      // const info = {
-      //   {'W A S D', 'Move PLAYER'},
-      //   {'ESC', 'Exit game'},
-      //   {'CTRL + R', 'Reload game'},
-      //   {'I or TAB', 'Toggle inventory window'},
-      //   {'C', 'Toggle crafting window'},
-      //   {'T', 'Toggle research window'},
-      //   {'R', 'Rotate held item or hovered object'},
-      //   {'Q', 'Pipette tool - copy/swap objects'},
-      //   {'Left-click', 'Place/deposit item/open machine'},
-      //   {'Right-click hold', 'Mine resource or destroy object'},
-      //   {'Scroll +/-', 'Scroll active hotbar slot'}
-      // };
-
-      // ui.draw_panel(0, 0, 240, 136, 8, 9, {text = 'Controls', bg = 15, fg = 4})
-      // for i = 1, #info do
-      //   prints(info[i][2], 3, 10 + ((i-1) * 7), 15, 4)
-      //   prints(info[i][1], 150, 10 + ((i-1) * 7), 15, 11, _, true)
-      // end
-
-      // if ui.draw_button(240 - 12, 1, 1, UI_BUTTON, 2, 8, 3) {
-      //   cls()
-      //   state = 'start'
-        
-      //   return;
-      // }
-    }
-  },
-};
 const PLAYER = {
   x: 100*8, y: 50*8, spr: 362,
   lx: 0, ly: 0, shadow: 382,
@@ -363,6 +481,7 @@ const KEYBOARD: { [index: string]: boolean }= {
   "8": false,
   "9": false,
 };
+const UI = new Ui();
 
 
 let biome = 1;
@@ -397,6 +516,13 @@ let _t = 0;
 
 
 
+function clearScreen(): void {
+  CTX.clearRect(0, 0, CVS.width, CVS.height);
+}
+function drawBg(color: string): void {
+  CTX.fillStyle = color;
+  CTX.fillRect(0, 0, CVS.width, CVS.height);
+}
 // this is my implementation for the function time() of TIC-80;
 function time(): number {
   return ticks_elapsed;
@@ -914,6 +1040,34 @@ function dispatch_input(): void {
 //   end
 // end
 }
+function resizeCanvas(): void {
+  CVS.width = window.innerWidth;
+  CVS.height = window.innerHeight;
+}
+function randRange(min: number, max: number): number {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function hovered(mouse: {x: number, y: number}, box: {x: number, y: number, w: number, h: number}) {
+  return mouse.x >= box.x && mouse.x < box.x + box.w && mouse.y >= box.y && mouse.y < box.y + box.h;
+}
+function drawRect(x: number, y: number, w: number, h: number, color: string): void {
+  CTX.fillStyle = color;
+  CTX.fillRect(x, y, w, h);
+}
+function drawLine(x1: number, y1: number, x2: number, y2: number, color: string): void {
+  CTX.strokeStyle = color;
+  CTX.moveTo(x1, y1);
+  CTX.lineTo(x2, y2);
+}
+function drawText(text: string, x: number, y: number, color: string) {
+  CTX.fillStyle = color;
+  CTX.fillText(text, x, y);
+}
+function prints(text: string, x: number, y: number, bg: string, fg: string, shadow_offset: {x: number, y: number}): void {
+  drawText(text, x + shadow_offset.x, y + shadow_offset.y, bg);
+  drawText(text, x, y, fg);
+}
+
 //! não tenho certeza se essas funções funcionam de screen e world;
 function screen_to_world(screenX: number, screenY: number, playerX: number, playerY: number): {wordX: number, wordY: number} {
   const cam_x = playerX - 116;
@@ -933,13 +1087,6 @@ function world_to_screen(worldX: number, worldY: number): {tx: number, ty: numbe
   
   return {tx: screen_x - 8, ty: screen_y - 8};
 }
-function resizeCanvas(): void {
-  CVS.width = window.innerWidth;
-  CVS.height = window.innerHeight;
-}
-function randRange(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
 
 
 function BOOT(): void {
@@ -951,7 +1098,7 @@ function BOOT(): void {
 
 
 function TIC() {
-  CTX.fillRect(0, 0, CVS.width, CVS.height);
+  drawBg("black");
 
   CURRENT_RECIPE.x = 0;
   CURRENT_RECIPE.y = 0;
