@@ -70,7 +70,6 @@ class Ui {
 
     if (state === 'start') {
       this.draw_logo();
-      // console.log(hov);
       
       if (this.draw_text_button(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", {text: 'Start', bg: "black", fg: "white", shadow: {x: 0, y: 2}}, false)) {
         state = "game";
@@ -97,13 +96,19 @@ class Ui {
         ['Scroll +/-', 'Scroll active hotbar slot']
       ];
 
-      this.draw_panel(middleScreen.x - 250, middleScreen.y - 150, 500, 300, "white", "blue", {text: 'Controls', bg: "black", fg: "black"}, "black");
+      const panelCoords = {
+        x: middleScreen.x - 250,
+        y: middleScreen.y - 150,
+        w: 500, h: 300
+      };
+
+      this.draw_panel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "white", "blue", {text: 'Controls', bg: "black", fg: "black"}, "black");
       for (let i = 0; i < info.length; i++) {
-        prints(info[i][1], middleScreen.x - 250, (middleScreen.y - 150) + i * 20, 20, "black", "darkBlue", {x: 0, y: 0});
-        prints(info[i][0], 150, 10 + ((i-1) * 7), 20, "blue", "darkBlue", {x: 0, y: 0});
+        drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
+        drawText(info[i][0], panelCoords.x + panelCoords.w + 5, panelCoords.y + (i * 20) - 5, 20, "black", "top", "right");
       }
 
-      if (this.draw_button(240 - 12, 1, 1, "black", "black", "black")) {
+      if (this.draw_button(240 - 12, 150, 50, 50, "blue", "blue", "blue")) {
         drawBg("black");
         state = 'start';
         return;
@@ -129,20 +134,22 @@ class Ui {
     // }
   }
 
-  draw_button(x: number, y: number, flip: number, color: string, shadow_color: string, hover_color: string): boolean {
-    // local ck = {4, color, 2, shadow_color, 12, color}
+  draw_button(x: number, y: number, w: number, h: number, color: string, shadow_color: string, hover_color: string): boolean {
     const _mouse = {x: CURSOR.x, y: CURSOR.y};
-    const _box = {x: x, y: y, w: 8, h: 8};
-    // const ck = {4, color, 2, }
-    
-    const hov = hovered(_mouse, _box)
-    // if (hov && !CURSOR.l) {
-    //   p = {2, shadow_color, 12, hover_color, 4, hover_color}
-    // }
-    // else if (hov && CURSOR.l) {
-    //   p = {2, hover_color, 12, hover_color, 4, hover_color}
-    //   ck = {1, 4}
-    // }
+    const _box = {x: x, y: y, w: w, h: h};
+    const hov = hovered(_mouse, _box);
+
+    if (hov && !CURSOR.l) {
+      drawRect(x + 4, y, w - 8, h - 1, hover_color);
+      drawLine(x + 4, y + h - 1, x + w - 4, y + h - 1, shadow_color);
+    }
+    else if (hov && CURSOR.l) {
+      drawRect(x + 4, y + 1, w - 8, h - 1, hover_color);
+    }
+    else {
+      drawRect(x + 4, y, w - 8, h - 1, color);
+      drawLine(x + 4, y + h - 1, x + w - 4, y + h - 1, shadow_color);
+    }
 
     // spr(id x y colorkey=-1 scale=1 flip=0 rotate=0 w=1 h=1)
     // spr(id, x, y, ck, 1, flip)
