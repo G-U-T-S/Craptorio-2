@@ -49,8 +49,8 @@ if (ev instanceof KeyboardEvent) {
 
 interface uiString {
   text: string;
-  x: number;
-  y: number;
+  // x: number;
+  // y: number;
   bg: string;
   fg: string;
   shadow: {x: number, y: number};
@@ -62,20 +62,22 @@ class Ui {
   }
 
   draw_menu(): void {
+    drawBg("gray");
+
     const middleScreen = {
       x: CVS.width / 2, y: CVS.height / 2
     };
 
     if (state === 'start') {
       this.draw_logo();
+      // console.log(hov);
       
-      if (this.draw_text_button(middleScreen.x - 50, 100, 8, 8, "blue", "black", "darkBlue", {text: '  Start  ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
-        state = 'game';
+      if (this.draw_text_button(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", {text: 'Start', bg: "black", fg: "white", shadow: {x: 0, y: 2}}, false)) {
+        state = "game";
         drawBg("black");
       }
       
-      // 120 - ((text_width('  Controls  ') + 2) /2), 110, UI_BUTTON2, _, 8, 9, 15, 10, {text = '  Controls  ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}}
-      if (this.draw_text_button(120 - (('  Controls  '.length + 2) / 2), 110, 8, 8, "blue", "black", "darkBlue", {text: '  Controls  ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
+      if (this.draw_text_button(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", {text: '  Controls  ', bg: "black", fg: "white", shadow: {x: 0, y: 2}}, false)) {
         state = 'help';
       }
     }
@@ -95,13 +97,13 @@ class Ui {
         ['Scroll +/-', 'Scroll active hotbar slot']
       ];
 
-      this.draw_panel(0, 0, 240, 136, "white", "black", {text: 'Controls', bg: "blue", fg: "red"}, "black");
+      this.draw_panel(middleScreen.x - 250, middleScreen.y - 150, 500, 300, "white", "blue", {text: 'Controls', bg: "black", fg: "black"}, "black");
       for (let i = 0; i < info.length; i++) {
-        prints(info[i][2], 3, 10 + ((i-1) * 7), "blue", "darkBlue", {x: 0, y: 0});
-        prints(info[i][1], 150, 10 + ((i-1) * 7), "blue", "darkBlue", {x: 0, y: 0});
+        prints(info[i][1], middleScreen.x - 250, (middleScreen.y - 150) + i * 20, 20, "black", "darkBlue", {x: 0, y: 0});
+        prints(info[i][0], 150, 10 + ((i-1) * 7), 20, "blue", "darkBlue", {x: 0, y: 0});
       }
 
-      if (this.draw_button(240 - 12, 1, 1, "", "", "")) {
+      if (this.draw_button(240 - 12, 1, 1, "black", "black", "black")) {
         drawBg("black");
         state = 'start';
         return;
@@ -112,13 +114,13 @@ class Ui {
   draw_endgame_window(): void {
     drawBg("black");
     if (tick % 60 > 30) {
-      drawText('Congratulations!', 31, 44, "white");
-      drawText('Congratulations!', 30, 44, "white");
-      drawText('You won the game!', 11, 64, "white");
-      drawText('You won the game!', 10, 64, "white");
+      // TODO drawText('Congratulations!', 31, 44, 14, "white");
+      // drawText('Congratulations!', 30, 44, 15, "white");
+      // drawText('You won the game!', 11, 64, 15, "white");
+      // drawText('You won the game!', 10, 64, 15, "white");
     }
-    // this.draw_text_button(120 - (('  Controls  '.length + 2) / 2), 110, 8, 8, "blue", "black", "darkBlue", {text: '  Controls  ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)
-    if (this.draw_text_button(120 - ((' Continue '.length / 2) - 2), 84, 113, 8, "blue", "black", "darkBlue", {text: ' Continue ', x: 1, y: 1, bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
+    
+    if (this.draw_text_button(120 - ((' Continue '.length / 2) - 2), 84, 113, 8, "blue", "black", "darkBlue", {text: ' Continue ', bg: "white", fg: "green", shadow: {x: 1, y: 0}}, false)) {
       // trace('Returning to game');
       state = 'game';
     }
@@ -154,18 +156,21 @@ class Ui {
   }
 
   draw_text_button(x: number, y: number, width: number, height: number, main_color: string, shadow_color: string, hover_color: string, label: uiString, locked: boolean): boolean {
-    if (label !== undefined) {
-      const w = label.text.length;
+    // if (label !== undefined) {
+    //   const w = label.text.length;
       
-      if (w + 2 > width) {
-        width = w + 2;
-      }
-    }
+    //   if (w + 2 > width) {
+    //     width = w + 2;
+    //   }
+    // }
 
     const _mouse = {x: CURSOR.x, y: CURSOR.y};
     const _box = {x:  x, y: y, w: width, h: height};
+    const middle = {
+      x: x + (width / 2), y: y + (height / 2)
+    };
     const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
-    const ck = 1;
+    // const ck = 1;
     
     // let p = { BTN_PRESS, main_color, BTN_SHADOW, shadow_color, BTN_MAIN, main_color }
     
@@ -177,35 +182,34 @@ class Ui {
     //   ck = {1, BTN_PRESS}
     // }
     
-    const lines = [
-      {x1:  x, y1: y + height, x2:  x + width, y2: y + height},
-      {x1:  x, y1: y, x2:  x + width, y2: y}
-    ]
+    // const lines = [
+    //   {x1:  x, y1: y + height, x2:  x + width, y2: y + height},
+    //   {x1:  x, y1: y, x2:  x + width, y2: y}
+    // ]
 
-    if (label !== undefined && width > 8) {
-      if (!locked && hov && !CURSOR.l) {
-        drawRect(x + 4, y, width - 8, height - 1, hover_color);
-        drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
-      }
-      else if (!locked && hov && CURSOR.l) {
-        drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
-        label.y = label.y + 1
-      }
-      else {
-        drawRect(x + 4, y, width - 8, height - 1, main_color);
-        drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
-      }
+    if (!locked && hov && !CURSOR.l) {
+      drawRect(x + 4, y, width - 8, height - 1, hover_color);
+      drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
     }
+    else if (!locked && hov && CURSOR.l) {
+      drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
+      // label.y = label.y + 1
+    }
+    else {
+      drawRect(x + 4, y, width - 8, height - 1, main_color);
+      drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+    }
+    
     
 
     // TODO spr(id, x, y, ck, 1, 0)
     // spr(id, x + width - 8, y, ck, 1, 1)
-
-    if (label !== undefined) {
-      prints(label.text, x + label.x, y + label.y, label.bg, label.fg, label.shadow)
-    }
     
-    if (hov && CURSOR.l && !CURSOR.ll) {
+    drawText(label.text, middle.x + label.shadow.x, middle.y + label.shadow.y, 25, label.bg, "middle", "center");
+    drawText(label.text, middle.x, middle.y, 25, label.fg, "middle", "center");
+    
+    //! hov && CURSOR.l && !CURSOR.ll);
+    if (hov && CURSOR.l) {
       return true;
     }
     
@@ -213,50 +217,30 @@ class Ui {
   }
 
   draw_panel(x: number, y: number, w: number, h: number, bg: string, fg: string, label: {text: string, bg: string, fg: string}, shadow_color: string): void {
-    const width = label.text.length;
-    if (width > w + 7) {
-      w = width + 7;
-    }
+    // const width = label.text.length;
+    // if (width > w + 7) {
+    //   w = width + 7;
+    // }
 
-    drawRect(x + 2, y + 2, w - 4, h - 4, bg); //-- background fill
-    if (label !== undefined) {
-      // pal(1, fg)
-      // pal(8, fg)
-      // sspr(UI_CORNER, x, y, 0)
-      // sspr(UI_CORNER, x + w - 8, y, 0, 1, 1)
-      // pal()
-      // pal(1, fg)
-      // pal(8, bg)
-      // sspr(UI_CORNER, x + w - 8, y + h - 8, 0, 1, 3)
-      // sspr(UI_CORNER, x, y + h - 8, 0, 1, 2)
-      // pal()
-      drawRect(x, y + 6, w, 3, fg); //-- header lower-fill
-      drawRect(x + 2, y + h - 3, w - 4, 1, fg); //-- bottom footer fill
-      drawRect(x + 6, y + 2, w - 12, 4, fg); //--header fill
-      
-      if (label !== undefined) {
-        prints(label.text, x + w/2 - width/2, y + 2, label.bg, label.fg, {x: 0, y: 0});
-      } //-- header text
-    }
-    else {
-      // pal(1, fg)
-      // sspr(UI_CORNER, x + w - 8, y + h - 8, {0, 8}, 1, 3)
-      // sspr(UI_CORNER, x, y + h - 8, {0, 8}, 1, 2)
-      // sspr(UI_CORNER, x, y, {0, 8})
-      // sspr(UI_CORNER, x + w - 8, y, {0, 8}, 1, 1)
-      // pal()
-    }
+    drawRect(x, y, w, h, bg); //-- background fill
+    // drawRect(x, y + 6, w, 3, fg); //-- header lower-fill
+    // drawRect(x + 2, y + h - 3, w - 4, 1, fg); //-- bottom footer fill
+    // drawRect(x + (w / 2), y - 15, 50, 4, fg); //--header fill
+    
+    drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+    //TODO drawText(label.text, x + (w / 2), (y - 15) + 2, 20, label.fg, "middle", "center");
 
-    drawRect(x + 6, y, w - 12, 2, fg); //-- top border
-    drawRect(x, y + 6, 2, h - 12, fg); //-- left border
-    drawRect(x + w - 2, y + 6, 2, h - 12, fg); //-- right border
-    drawRect(x + 6, y + h - 2, w - 12, 2, fg); //-- bottom border
 
-    if (shadow_color === "") {
-      drawLine(x + 4, y + h, x + w - 3, y + h, shadow_color); //-- shadow
-      drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color); //-- shadow
-      drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
-    }
+    //TODO drawRect(x + 6, y, w - 12, 2, fg); //-- top border
+    // drawRect(x, y + 6, 2, h - 12, fg); //-- left border
+    // drawRect(x + w - 2, y + 6, 2, h - 12, fg); //-- right border
+    // drawRect(x + 6, y + h - 2, w - 12, 2, fg); //-- bottom border
+
+    // TODO if (shadow_color === "") {
+    //   drawLine(x + 4, y + h, x + w - 3, y + h, shadow_color); //-- shadow
+    //   drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color); //-- shadow
+    //   drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
+    // }
   }
 };
 class Vec2 {
@@ -363,63 +347,63 @@ class BaseEntity {
 }
 
 //TODO  simplex.seed()
-const ATLAS: HTMLImageElement = new Image();
-ATLAS.src = "./assets/sprites.png";
+// const ATLAS: HTMLImageElement = new Image();
+// ATLAS.src = "./assets/sprites.png";
 
-const SEED = 172046262608.13;
-const OFFSET = randRange(100000, 500000);
-const BELT_ID_STRAIGHT  = 256
-const BELT_ID_CURVED    = 260
-const BELT_ARROW_ID     = 287
-const BELT_COLORKEY     = 0
+// const SEED = 172046262608.13;
+// const OFFSET = randRange(100000, 500000);
+// const BELT_ID_STRAIGHT  = 256
+// const BELT_ID_CURVED    = 260
+// const BELT_ARROW_ID     = 287
+// const BELT_COLORKEY     = 0
 const BELT_TICKRATE     = 5
 const BELT_MAXTICK      = 3
 
-const UBELT_IN          = 278
-const UBELT_OUT         = 277
-const UBELT_COLORKEY    = 0
+// const UBELT_IN          = 278
+// const UBELT_OUT         = 277
+// const UBELT_COLORKEY    = 0
 const UBELT_TICKRATE    = 5
 const UBELT_MAXTICK     = 3
 
-const DRILL_BURNER_SPRITE_ID = 273;
-const DRILL_ELEC_SPRITE_ID   = 368;
-const DRILL_INV_ID           = 276;
-const DRILL_MINI_BELT_ID     = 304;
-const DRILL_BELT_ID          = 304;
-const DRILL_BIT_ID           = 275;
+// const DRILL_BURNER_SPRITE_ID = 273;
+// const DRILL_ELEC_SPRITE_ID   = 368;
+// const DRILL_INV_ID           = 276;
+// const DRILL_MINI_BELT_ID     = 304;
+// const DRILL_BELT_ID          = 304;
+// const DRILL_BIT_ID           = 275;
 const DRILL_TICK_RATE        = 8;
 const DRILL_BIT_DIR          = 1;
 
-const FURNACE_ID             = 488;
-const FURNACE_FUEL_ICON      = 291;
+// const FURNACE_ID             = 488;
+// const FURNACE_FUEL_ICON      = 291;
 const FURNACE_ANIM_TICKRATE  = 9;
 const FURNACE_ANIM_TICKS     = 2;
 const FURNACE_TICKRATE       = 5;
-const FURNACE_BUFFER_INPUT   = 50;
-const FURNACE_BUFFER_OUTPUT  = 100;
-const FURNACE_BUFFER_FUEL    = 50;
-const FURNACE_SMELT_TIME     = 3 * 60;
-const FURNACE_COLORKEY       = 6;
-const FURNACE_FIRE_KEYS      = [7, 11, 10];
+// const FURNACE_BUFFER_INPUT   = 50;
+// const FURNACE_BUFFER_OUTPUT  = 100;
+// const FURNACE_BUFFER_FUEL    = 50;
+// const FURNACE_SMELT_TIME     = 3 * 60;
+// const FURNACE_COLORKEY       = 6;
+// const FURNACE_FIRE_KEYS      = [7, 11, 10];
 
-const CRAFTER_ID        = 312;
+// const CRAFTER_ID        = 312;
 const CRAFTER_TICKRATE  = 5;
 const CRAFTER_ANIM_RATE = 5;
-const CRAFTER_TIME_ID   = 337;
+// const CRAFTER_TIME_ID   = 337;
 
-const CURSOR_POINTER = 286;
-const CURSOR_HIGHLIGHT = 309;
-const CURSOR_HIGHLIGHT_CORNER = 307;
-const CURSOR_HIGHLIGHT_CORNER_S = 336;
-const CURSOR_HAND_ID = 320;
-const CURSOR_GRAB_ID = 321;
-const WATER_SPRITE = 224;
-const CURSOR_MINING_SPEED = 50;
-const TECHNOLOGY = {};
-const ROCKETS = {};
-const ORES = {};
-const DUST = {};
-const SPRITES = {};
+// const CURSOR_POINTER = 286;
+// const CURSOR_HIGHLIGHT = 309;
+// const CURSOR_HIGHLIGHT_CORNER = 307;
+// const CURSOR_HIGHLIGHT_CORNER_S = 336;
+// const CURSOR_HAND_ID = 320;
+// const CURSOR_GRAB_ID = 321;
+// const WATER_SPRITE = 224;
+// const CURSOR_MINING_SPEED = 50;
+// const TECHNOLOGY = {};
+// const ROCKETS = {};
+// const ORES = {};
+// const DUST = {};
+// const SPRITES = {};
 const ENTS: { [index: string]: BaseEntity }= {};
 const CURRENT_RECIPE = {x: 0, y: 0, id: 0};
 const RESOURCES = {
@@ -487,7 +471,7 @@ const PLAYER = {
   },
 };
 const CURSOR = {
-  x: 8, y: 8, id: 352, lx: 8, ly: 8,
+  x: 0, y: 0, lx: 8, ly: 8,
   tx: 8, ty: 8, wx: 0, wy: 0,
   sx: 0, sy: 0, lsx: 0, lsy: 0,
   l: false, ll: false, m: false, lm: false,
@@ -531,20 +515,20 @@ const KEYBOARD: { [index: string]: boolean }= {
 const UI = new Ui();
 
 
-let biome = 1;
+// let biome = 1;
 let db_time = 0.0;
 let launched = false;
 let show_tile_widget = false;
-let debug = false;
-let alt_mode = false;
-let show_count = false;
-let num_colors = 3;
-let start_color = 8;
-let tileSize = 8;
-let tileCount = 1;
-let amplitude = num_colors;
-let frequency = 0.185;
-let speed = 0.0022;
+// let debug = false;
+// let alt_mode = false;
+// let show_count = false;
+// let num_colors = 3;
+// let start_color = 8;
+// let tileSize = 8;
+// let tileCount = 1;
+// let amplitude = num_colors;
+// let frequency = 0.185;
+// let speed = 0.0022;
 let ticks_elapsed = 0;
 let last_frame_time = ticks_elapsed;
 let show_mini_map = false;
@@ -558,7 +542,7 @@ let drill_anim_tick = 0;
 let furnace_anim_tick = 0;
 let crafter_anim_frame = 0;
 let crafter_anim_dir = 1;
-let state = "start";
+let state = "help";
 let _t = 0;
 
 
@@ -783,7 +767,7 @@ function update_cursor_state(): void {
   CURSOR.sy = sy;
   
   if (CURSOR.tx !== CURSOR.ltx || CURSOR.ty !== CURSOR.lty) {
-    CURSOR.hold_time = 0
+    CURSOR.hold_time = 0;
   }
 }
 function dispatch_keypress(): void {
@@ -1089,9 +1073,15 @@ function randRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 function hovered(mouse: {x: number, y: number}, box: {x: number, y: number, w: number, h: number}) {
-  return mouse.x >= box.x && mouse.x < box.x + box.w && mouse.y >= box.y && mouse.y < box.y + box.h;
+  return (
+    mouse.x >= box.x &&
+    mouse.x <= box.x + box.w &&
+    mouse.y >= box.y &&
+    mouse.y <= box.y + box.h
+  );
 }
 function drawRect(x: number, y: number, w: number, h: number, color: string): void {
+  CTX.strokeStyle = color;
   CTX.fillStyle = color;
   CTX.fillRect(x, y, w, h);
 }
@@ -1100,7 +1090,11 @@ function drawLine(x1: number, y1: number, x2: number, y2: number, color: string)
   CTX.moveTo(x1, y1);
   CTX.lineTo(x2, y2);
 }
-function drawText(text: string, x: number, y: number, color: string) {
+function drawText(text: string, x: number, y: number, size: number, color: string, baseLine: "top" | "bottom" | "middle", textAling: "left" | "center" | "right") {
+  CTX.textBaseline = baseLine;
+  CTX.textAlign = textAling;
+  CTX.font = `${size}px Arial`;
+  CTX.strokeStyle = color;
   CTX.fillStyle = color;
   CTX.fillText(text, x, y);
 }
@@ -1111,9 +1105,9 @@ function drawBg(color: string): void {
   CTX.fillStyle = color;
   CTX.fillRect(0, 0, CVS.width, CVS.height);
 }
-function prints(text: string, x: number, y: number, bg: string, fg: string, shadow_offset: {x: number, y: number}): void {
-  drawText(text, x + shadow_offset.x, y + shadow_offset.y, bg);
-  drawText(text, x, y, fg);
+function prints(text: string, x: number, y: number, fontSize: number, bg: string, fg: string, shadow_offset: {x: number, y: number}): void {
+  drawText(text, x + shadow_offset.x, y + shadow_offset.y, fontSize, bg, "middle", "left");
+  drawText(text, x, y, fontSize, fg, "middle", "left");
 }
 
 //! não tenho certeza se essas funções funcionam de screen e world;
@@ -1152,21 +1146,30 @@ function TIC() {
   CURRENT_RECIPE.y = 0;
   CURRENT_RECIPE.id = 0;
 
+  update_cursor_state();
+
   // --change mouse CURSOR
   //! poke(0x3FFB, 286); dont know what this do;
 
   // --draw main menu
   if (state === "start" || state === 'help') {
-    update_cursor_state();
     UI.draw_menu();
+
+    drawText(
+      `x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`,
+      0, 0, 25, "white", "top", "left"
+    );
+
     tick = tick + 1;
+    requestAnimationFrame(TIC);
     return;
   }
 
   if (state === "first_launch") {
-    update_cursor_state();
     UI.draw_endgame_window();
+    
     tick = tick + 1;
+    requestAnimationFrame(TIC);
     return;
   }
 

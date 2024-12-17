@@ -50,16 +50,17 @@ class Ui {
         drawBg("gray");
     }
     draw_menu() {
+        drawBg("gray");
         const middleScreen = {
             x: CVS.width / 2, y: CVS.height / 2
         };
         if (state === 'start') {
             this.draw_logo();
-            if (this.draw_text_button(middleScreen.x - 50, 100, 8, 8, "blue", "black", "darkBlue", { text: '  Start  ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
-                state = 'game';
+            if (this.draw_text_button(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", { text: 'Start', bg: "black", fg: "white", shadow: { x: 0, y: 2 } }, false)) {
+                state = "game";
                 drawBg("black");
             }
-            if (this.draw_text_button(120 - (('  Controls  '.length + 2) / 2), 110, 8, 8, "blue", "black", "darkBlue", { text: '  Controls  ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
+            if (this.draw_text_button(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", { text: '  Controls  ', bg: "black", fg: "white", shadow: { x: 0, y: 2 } }, false)) {
                 state = 'help';
             }
         }
@@ -77,12 +78,12 @@ class Ui {
                 ['Right-click hold', 'Mine resource or destroy object'],
                 ['Scroll +/-', 'Scroll active hotbar slot']
             ];
-            this.draw_panel(0, 0, 240, 136, "white", "black", { text: 'Controls', bg: "blue", fg: "red" }, "black");
+            this.draw_panel(middleScreen.x - 250, middleScreen.y - 150, 500, 300, "white", "blue", { text: 'Controls', bg: "black", fg: "black" }, "black");
             for (let i = 0; i < info.length; i++) {
-                prints(info[i][2], 3, 10 + ((i - 1) * 7), "blue", "darkBlue", { x: 0, y: 0 });
-                prints(info[i][1], 150, 10 + ((i - 1) * 7), "blue", "darkBlue", { x: 0, y: 0 });
+                prints(info[i][1], middleScreen.x - 250, (middleScreen.y - 150) + i * 20, 20, "black", "darkBlue", { x: 0, y: 0 });
+                prints(info[i][0], 150, 10 + ((i - 1) * 7), 20, "blue", "darkBlue", { x: 0, y: 0 });
             }
-            if (this.draw_button(240 - 12, 1, 1, "", "", "")) {
+            if (this.draw_button(240 - 12, 1, 1, "black", "black", "black")) {
                 drawBg("black");
                 state = 'start';
                 return;
@@ -92,12 +93,8 @@ class Ui {
     draw_endgame_window() {
         drawBg("black");
         if (tick % 60 > 30) {
-            drawText('Congratulations!', 31, 44, "white");
-            drawText('Congratulations!', 30, 44, "white");
-            drawText('You won the game!', 11, 64, "white");
-            drawText('You won the game!', 10, 64, "white");
         }
-        if (this.draw_text_button(120 - ((' Continue '.length / 2) - 2), 84, 113, 8, "blue", "black", "darkBlue", { text: ' Continue ', x: 1, y: 1, bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
+        if (this.draw_text_button(120 - ((' Continue '.length / 2) - 2), 84, 113, 8, "blue", "black", "darkBlue", { text: ' Continue ', bg: "white", fg: "green", shadow: { x: 1, y: 0 } }, false)) {
             state = 'game';
         }
     }
@@ -111,67 +108,33 @@ class Ui {
         return false;
     }
     draw_text_button(x, y, width, height, main_color, shadow_color, hover_color, label, locked) {
-        if (label !== undefined) {
-            const w = label.text.length;
-            if (w + 2 > width) {
-                width = w + 2;
-            }
-        }
         const _mouse = { x: CURSOR.x, y: CURSOR.y };
         const _box = { x: x, y: y, w: width, h: height };
+        const middle = {
+            x: x + (width / 2), y: y + (height / 2)
+        };
         const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
-        const ck = 1;
-        const lines = [
-            { x1: x, y1: y + height, x2: x + width, y2: y + height },
-            { x1: x, y1: y, x2: x + width, y2: y }
-        ];
-        if (label !== undefined && width > 8) {
-            if (!locked && hov && !CURSOR.l) {
-                drawRect(x + 4, y, width - 8, height - 1, hover_color);
-                drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
-            }
-            else if (!locked && hov && CURSOR.l) {
-                drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
-                label.y = label.y + 1;
-            }
-            else {
-                drawRect(x + 4, y, width - 8, height - 1, main_color);
-                drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
-            }
+        if (!locked && hov && !CURSOR.l) {
+            drawRect(x + 4, y, width - 8, height - 1, hover_color);
+            drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
         }
-        if (label !== undefined) {
-            prints(label.text, x + label.x, y + label.y, label.bg, label.fg, label.shadow);
+        else if (!locked && hov && CURSOR.l) {
+            drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
         }
-        if (hov && CURSOR.l && !CURSOR.ll) {
+        else {
+            drawRect(x + 4, y, width - 8, height - 1, main_color);
+            drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+        }
+        drawText(label.text, middle.x + label.shadow.x, middle.y + label.shadow.y, 25, label.bg, "middle", "center");
+        drawText(label.text, middle.x, middle.y, 25, label.fg, "middle", "center");
+        if (hov && CURSOR.l) {
             return true;
         }
         return false;
     }
     draw_panel(x, y, w, h, bg, fg, label, shadow_color) {
-        const width = label.text.length;
-        if (width > w + 7) {
-            w = width + 7;
-        }
-        drawRect(x + 2, y + 2, w - 4, h - 4, bg);
-        if (label !== undefined) {
-            drawRect(x, y + 6, w, 3, fg);
-            drawRect(x + 2, y + h - 3, w - 4, 1, fg);
-            drawRect(x + 6, y + 2, w - 12, 4, fg);
-            if (label !== undefined) {
-                prints(label.text, x + w / 2 - width / 2, y + 2, label.bg, label.fg, { x: 0, y: 0 });
-            }
-        }
-        else {
-        }
-        drawRect(x + 6, y, w - 12, 2, fg);
-        drawRect(x, y + 6, 2, h - 12, fg);
-        drawRect(x + w - 2, y + 6, 2, h - 12, fg);
-        drawRect(x + 6, y + h - 2, w - 12, 2, fg);
-        if (shadow_color === "") {
-            drawLine(x + 4, y + h, x + w - 3, y + h, shadow_color);
-            drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color);
-            drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color);
-        }
+        drawRect(x, y, w, h, bg);
+        drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
     }
 }
 ;
@@ -252,55 +215,17 @@ class BaseEntity {
         this.curveChecked = false;
     }
 }
-const SEED = 172046262608.13;
-const OFFSET = randRange(100000, 500000);
-const BELT_ID_STRAIGHT = 256;
-const BELT_ID_CURVED = 260;
-const BELT_ARROW_ID = 287;
-const BELT_COLORKEY = 0;
 const BELT_TICKRATE = 5;
 const BELT_MAXTICK = 3;
-const UBELT_IN = 278;
-const UBELT_OUT = 277;
-const UBELT_COLORKEY = 0;
 const UBELT_TICKRATE = 5;
 const UBELT_MAXTICK = 3;
-const DRILL_BURNER_SPRITE_ID = 273;
-const DRILL_ELEC_SPRITE_ID = 368;
-const DRILL_INV_ID = 276;
-const DRILL_MINI_BELT_ID = 304;
-const DRILL_BELT_ID = 304;
-const DRILL_BIT_ID = 275;
 const DRILL_TICK_RATE = 8;
 const DRILL_BIT_DIR = 1;
-const FURNACE_ID = 488;
-const FURNACE_FUEL_ICON = 291;
 const FURNACE_ANIM_TICKRATE = 9;
 const FURNACE_ANIM_TICKS = 2;
 const FURNACE_TICKRATE = 5;
-const FURNACE_BUFFER_INPUT = 50;
-const FURNACE_BUFFER_OUTPUT = 100;
-const FURNACE_BUFFER_FUEL = 50;
-const FURNACE_SMELT_TIME = 3 * 60;
-const FURNACE_COLORKEY = 6;
-const FURNACE_FIRE_KEYS = [7, 11, 10];
-const CRAFTER_ID = 312;
 const CRAFTER_TICKRATE = 5;
 const CRAFTER_ANIM_RATE = 5;
-const CRAFTER_TIME_ID = 337;
-const CURSOR_POINTER = 286;
-const CURSOR_HIGHLIGHT = 309;
-const CURSOR_HIGHLIGHT_CORNER = 307;
-const CURSOR_HIGHLIGHT_CORNER_S = 336;
-const CURSOR_HAND_ID = 320;
-const CURSOR_GRAB_ID = 321;
-const WATER_SPRITE = 224;
-const CURSOR_MINING_SPEED = 50;
-const TECHNOLOGY = {};
-const ROCKETS = {};
-const ORES = {};
-const DUST = {};
-const SPRITES = {};
 const ENTS = {};
 const CURRENT_RECIPE = { x: 0, y: 0, id: 0 };
 const RESOURCES = {
@@ -368,7 +293,7 @@ const PLAYER = {
     },
 };
 const CURSOR = {
-    x: 8, y: 8, id: 352, lx: 8, ly: 8,
+    x: 0, y: 0, lx: 8, ly: 8,
     tx: 8, ty: 8, wx: 0, wy: 0,
     sx: 0, sy: 0, lsx: 0, lsy: 0,
     l: false, ll: false, m: false, lm: false,
@@ -410,20 +335,9 @@ const KEYBOARD = {
     "9": false,
 };
 const UI = new Ui();
-let biome = 1;
 let db_time = 0.0;
 let launched = false;
 let show_tile_widget = false;
-let debug = false;
-let alt_mode = false;
-let show_count = false;
-let num_colors = 3;
-let start_color = 8;
-let tileSize = 8;
-let tileCount = 1;
-let amplitude = num_colors;
-let frequency = 0.185;
-let speed = 0.0022;
 let ticks_elapsed = 0;
 let last_frame_time = ticks_elapsed;
 let show_mini_map = false;
@@ -437,7 +351,7 @@ let drill_anim_tick = 0;
 let furnace_anim_tick = 0;
 let crafter_anim_frame = 0;
 let crafter_anim_dir = 1;
-let state = "start";
+let state = "help";
 let _t = 0;
 function time() {
     return ticks_elapsed;
@@ -667,9 +581,13 @@ function randRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 function hovered(mouse, box) {
-    return mouse.x >= box.x && mouse.x < box.x + box.w && mouse.y >= box.y && mouse.y < box.y + box.h;
+    return (mouse.x >= box.x &&
+        mouse.x <= box.x + box.w &&
+        mouse.y >= box.y &&
+        mouse.y <= box.y + box.h);
 }
 function drawRect(x, y, w, h, color) {
+    CTX.strokeStyle = color;
     CTX.fillStyle = color;
     CTX.fillRect(x, y, w, h);
 }
@@ -678,7 +596,11 @@ function drawLine(x1, y1, x2, y2, color) {
     CTX.moveTo(x1, y1);
     CTX.lineTo(x2, y2);
 }
-function drawText(text, x, y, color) {
+function drawText(text, x, y, size, color, baseLine, textAling) {
+    CTX.textBaseline = baseLine;
+    CTX.textAlign = textAling;
+    CTX.font = `${size}px Arial`;
+    CTX.strokeStyle = color;
     CTX.fillStyle = color;
     CTX.fillText(text, x, y);
 }
@@ -689,9 +611,9 @@ function drawBg(color) {
     CTX.fillStyle = color;
     CTX.fillRect(0, 0, CVS.width, CVS.height);
 }
-function prints(text, x, y, bg, fg, shadow_offset) {
-    drawText(text, x + shadow_offset.x, y + shadow_offset.y, bg);
-    drawText(text, x, y, fg);
+function prints(text, x, y, fontSize, bg, fg, shadow_offset) {
+    drawText(text, x + shadow_offset.x, y + shadow_offset.y, fontSize, bg, "middle", "left");
+    drawText(text, x, y, fontSize, fg, "middle", "left");
 }
 function screen_to_world(screenX, screenY, playerX, playerY) {
     const cam_x = playerX - 116;
@@ -718,16 +640,18 @@ function TIC() {
     CURRENT_RECIPE.x = 0;
     CURRENT_RECIPE.y = 0;
     CURRENT_RECIPE.id = 0;
+    update_cursor_state();
     if (state === "start" || state === 'help') {
-        update_cursor_state();
         UI.draw_menu();
+        drawText(`x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`, 0, 0, 25, "white", "top", "left");
         tick = tick + 1;
+        requestAnimationFrame(TIC);
         return;
     }
     if (state === "first_launch") {
-        update_cursor_state();
         UI.draw_endgame_window();
         tick = tick + 1;
+        requestAnimationFrame(TIC);
         return;
     }
     const start = time();
