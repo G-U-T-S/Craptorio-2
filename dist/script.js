@@ -88,7 +88,7 @@ class Ui {
                 drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
                 drawText(info[i][0], panelCoords.x + panelCoords.w + 5, panelCoords.y + (i * 20) - 5, 20, "black", "top", "right");
             }
-            if (this.draw_button(240 - 12, 150, 50, 50, "blue", "blue", "blue")) {
+            if (this.draw_text_button(panelCoords.x, panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", { text: "Back", bg: "black", fg: "white", shadow: { x: 0, y: 2 } }, false)) {
                 drawBg("black");
                 state = 'start';
                 return;
@@ -126,20 +126,18 @@ class Ui {
     draw_text_button(x, y, width, height, main_color, shadow_color, hover_color, label, locked) {
         const _mouse = { x: CURSOR.x, y: CURSOR.y };
         const _box = { x: x, y: y, w: width, h: height };
-        const middle = {
-            x: x + (width / 2), y: y + (height / 2)
-        };
+        const middle = { x: x + (width / 2), y: y + (height / 2) };
         const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
         if (!locked && hov && !CURSOR.l) {
-            drawRect(x + 4, y, width - 8, height - 1, hover_color);
-            drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+            drawRect(x, y, width, height, hover_color);
+            drawLine(x, y + height, x + width, y + height, shadow_color);
         }
         else if (!locked && hov && CURSOR.l) {
-            drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
+            drawRect(x, y, width, height, hover_color);
         }
         else {
-            drawRect(x + 4, y, width - 8, height - 1, main_color);
-            drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+            drawRect(x, y, width, height, main_color);
+            drawLine(x, y + height, x + width, y + height, shadow_color);
         }
         drawText(label.text, middle.x + label.shadow.x, middle.y + label.shadow.y, 25, label.bg, "middle", "center");
         drawText(label.text, middle.x, middle.y, 25, label.fg, "middle", "center");
@@ -153,7 +151,124 @@ class Ui {
         drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
     }
 }
-;
+class Tilemanager {
+    tiles;
+    auto_map;
+    biomes;
+    constructor() {
+        this.tiles = {};
+        this.auto_map = {
+            '1000': { sprite_id: 1, rot: 0 },
+            '0100': { sprite_id: 1, rot: 1 },
+            '0010': { sprite_id: 1, rot: 2 },
+            '0001': { sprite_id: 1, rot: 3 },
+            '1100': { sprite_id: 2, rot: 1 },
+            '0110': { sprite_id: 2, rot: 2 },
+            '0011': { sprite_id: 2, rot: 3 },
+            '1001': { sprite_id: 2, rot: 0 },
+            '1101': { sprite_id: 3, rot: 0 },
+            '1110': { sprite_id: 3, rot: 1 },
+            '0111': { sprite_id: 3, rot: 2 },
+            '1011': { sprite_id: 3, rot: 3 },
+            '0101': { sprite_id: 4, rot: 0 },
+            '1010': { sprite_id: 4, rot: 1 },
+            '1111': { sprite_id: 0, rot: 0 },
+        };
+        this.biomes = {
+            1: {
+                name: 'Desert',
+                tile_id_offset: 0,
+                min: 20,
+                max: 30,
+                t_min: 20.5,
+                t_max: 21.5,
+                tree_id: 194,
+                tree_density: 0.05,
+                color_key: 0,
+                map_col: 5,
+                clutter: 0.01
+            },
+            2: {
+                name: 'Prarie',
+                tile_id_offset: 16,
+                min: 30,
+                max: 45,
+                t_min: 33,
+                t_max: 40,
+                tree_id: 200,
+                tree_density: 0.075,
+                color_key: 1,
+                map_col: 12,
+                clutter: 0.09
+            },
+            3: {
+                name: 'Forest',
+                tile_id_offset: 32,
+                min: 45,
+                max: 101,
+                t_min: 65,
+                t_max: 85,
+                tree_id: 197,
+                tree_density: 0.15,
+                color_key: 1,
+                map_col: 14,
+                clutter: 0.05
+            },
+        };
+    }
+    draw_terrain(screenWidth, screenHeight) {
+        const cameraTopLeftX = PLAYER.x - 116;
+        const cameraTopLeftY = PLAYER.y - 64;
+        const subTileX = cameraTopLeftX % 8;
+        const subTileY = cameraTopLeftY % 8;
+        const startX = Math.floor(cameraTopLeftX / 8);
+        const startY = Math.floor(cameraTopLeftY / 8);
+        for (let screenY = 1; screenY < screenHeight; screenY++) {
+            for (let screenX = 1; screenX < screenWidth; screenX++) {
+                const worldX = startX + screenX;
+                const worldY = startY + screenY;
+                const tile = this.tiles[worldX][worldY];
+                if (!show_mini_map) {
+                    const sx = (screenX - 1) * 8 - subTileX;
+                    const sy = (screenY - 1) * 8 - subTileY;
+                    if (!tile.visited) {
+                        this.autoMap(worldX, worldY);
+                    }
+                }
+            }
+        }
+    }
+    autoMap(x, y) {
+        const tile = this.tiles[y][x];
+        this.tiles[y][x].visited = true;
+        const adj = {
+            0: { x: 0, y: -1 },
+            1: { x: 1, y: 0 },
+            2: { x: 0, y: 1 },
+            3: { x: -1, y: 0 }
+        };
+        let key = '';
+        for (let i = 0; i < 4; i++) {
+            const near = this.tiles[y + adj[i].y][x + adj[i].x];
+            if (!near.is_land || near.biome < tile.biome) {
+                key = key + '1';
+                this.tiles[y][x].border_col = this.biomes[near.biome].map_col;
+            }
+            else {
+                key = key + '0';
+            }
+        }
+        const new_tile = this.auto_map[key];
+        if (new_tile === undefined) {
+            return;
+        }
+        this.tiles[y][x].sprite_id = new_tile.sprite_id + 11 + this.biomes[tile.biome].tile_id_offset;
+        this.tiles[y][x].is_border = true;
+        this.tiles[y][x].ore = false;
+        this.tiles[y][x].flip = 0;
+        this.tiles[y][x].rot = new_tile.rot;
+    }
+}
 class Vec2 {
     x;
     y;
@@ -351,6 +466,7 @@ const KEYBOARD = {
     "9": false,
 };
 const UI = new Ui();
+const TILEMAN = new Tilemanager();
 let db_time = 0.0;
 let launched = false;
 let show_tile_widget = false;
@@ -367,7 +483,7 @@ let drill_anim_tick = 0;
 let furnace_anim_tick = 0;
 let crafter_anim_frame = 0;
 let crafter_anim_dir = 1;
-let state = "help";
+let state = "game";
 let _t = 0;
 function time() {
     return ticks_elapsed;
@@ -602,6 +718,9 @@ function hovered(mouse, box) {
         mouse.y >= box.y &&
         mouse.y <= box.y + box.h);
 }
+function draw_terrain() {
+    TILEMAN.draw_terrain(31, 18);
+}
 function drawRect(x, y, w, h, color) {
     CTX.strokeStyle = color;
     CTX.fillStyle = color;
@@ -659,7 +778,6 @@ function TIC() {
     update_cursor_state();
     if (state === "start" || state === 'help') {
         UI.draw_menu();
-        drawText(`x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`, 0, 0, 25, "white", "top", "left");
         tick = tick + 1;
         requestAnimationFrame(TIC);
         return;
@@ -671,8 +789,8 @@ function TIC() {
         return;
     }
     const start = time();
-    let m_time = 0;
     const gv_time = lapse(get_visible_ents);
+    const m_time = lapse(draw_terrain);
     const up_time = lapse(update_player);
     if (tick % BELT_TICKRATE === 0) {
         belt_tick = belt_tick + 1;
@@ -758,6 +876,7 @@ function TIC() {
     });
     last_frame_time = time();
     tick = tick + 1;
+    drawText(`x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`, 0, 0, 25, "white", "top", "left");
     requestAnimationFrame(TIC);
 }
 BOOT();

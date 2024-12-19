@@ -56,7 +56,22 @@ interface uiString {
   shadow: {x: number, y: number};
 }
 
+//& minha implementação da active_window
+class windo {
+  is_hovered(x: number, y: number): boolean {
+    return false;
+  }
+  click(x: number, y: number): boolean {
+    return false;
+  }
+}
 class Ui {
+  public active_window: windo | undefined;
+  
+  constructor() {
+    this.active_window = undefined;
+  }
+
   draw_logo(): void {
     drawBg("gray");
   }
@@ -108,7 +123,7 @@ class Ui {
         drawText(info[i][0], panelCoords.x + panelCoords.w + 5, panelCoords.y + (i * 20) - 5, 20, "black", "top", "right");
       }
 
-      if (this.draw_button(240 - 12, 150, 50, 50, "blue", "blue", "blue")) {
+      if (this.draw_text_button(panelCoords.x, panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", {text: "Back", bg: "black", fg: "white", shadow: {x: 0, y: 2}}, false)) {
         drawBg("black");
         state = 'start';
         return;
@@ -173,9 +188,7 @@ class Ui {
 
     const _mouse = {x: CURSOR.x, y: CURSOR.y};
     const _box = {x:  x, y: y, w: width, h: height};
-    const middle = {
-      x: x + (width / 2), y: y + (height / 2)
-    };
+    const middle = {x: x + (width / 2), y: y + (height / 2)};
     const hov = (!locked && hovered({ ..._mouse }, { ..._box }));
     // const ck = 1;
     
@@ -195,20 +208,19 @@ class Ui {
     // ]
 
     if (!locked && hov && !CURSOR.l) {
-      drawRect(x + 4, y, width - 8, height - 1, hover_color);
-      drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+      drawRect(x, y, width, height, hover_color);
+      drawLine(x, y + height, x + width, y + height, shadow_color);
     }
     else if (!locked && hov && CURSOR.l) {
-      drawRect(x + 4, y + 1, width - 8, height - 1, hover_color);
+      drawRect(x, y, width, height, hover_color);
       // label.y = label.y + 1
     }
     else {
-      drawRect(x + 4, y, width - 8, height - 1, main_color);
-      drawLine(x + 4, y + height - 1, x + width - 4, y + height - 1, shadow_color);
+      drawRect(x, y, width, height, main_color);
+      drawLine(x, y + height, x + width, y + height, shadow_color);
     }
     
     
-
     // TODO spr(id, x, y, ck, 1, 0)
     // spr(id, x + width - 8, y, ck, 1, 1)
     
@@ -249,7 +261,324 @@ class Ui {
     //   drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
     // }
   }
-};
+}
+class CraftMenu {
+  public x: number; public y: number;
+  public w: number; public h: number;
+  public grid_x: number; public grid_y: number;
+  public vis: boolean;
+  public docked: boolean
+
+  constructor() {
+    this.x = 0; this.y = 0;
+    this.w = 100; this.h = 100;
+    this.grid_x = 1; this.grid_y = 34;
+    this.vis = false;
+    this.docked = false;
+  }
+
+  public is_hovered(x: number, y: number): boolean {
+    if (this.vis) {
+      return x >= this.x && x < this.x + this.w && y >= this.y && y < this.y + this.h;
+    }
+
+    return false;
+  }
+
+  public get_hovered_slot(x: number, y: number): {result: boolean, sx: number, sy: number, index: number} | null {
+    const grid_x = this.x + this.grid_x;
+    const grid_y = this.y + this.grid_y;
+    const start_x = grid_x + 1;
+    const start_y = grid_y + 1;
+    
+    const rel_x = x - start_x + 1;
+    const rel_y = y - start_y + 1;
+    
+    const slot_x = Math.floor(rel_x / 9);
+    const slot_y = Math.floor(rel_y / 9);
+    
+    const slot_pos_x = start_x + slot_x * 9;
+    const slot_pos_y = start_y + slot_y * 9;
+    const slot_index = slot_y * 10 + slot_x + 1;
+    
+    if (slot_x >= 0 && slot_x <= CRAFT_COLS - 1 && slot_y >= 0 && slot_y <= CRAFT_ROWS - 1) {
+      return {result: true, sx: slot_pos_x, sy: slot_pos_y, index: slot_index};
+    }
+
+    return null;
+  }
+
+  public click(x: number, y: number, side: "left" | "right" | undefined): boolean {
+    if (side === "left" && !CURSOR.ll) {
+      const { result, sx, sy, index } = { ...this.get_hovered_slot(x, y) }
+    }
+  
+//   if side == 'left' and not CURSOR.ll then
+  //   local result, sx, sy, index = self:get_hovered_slot(x, y)
+  //   if result and self.current_output ~= 'PLAYER' then
+  //     local row = math.ceil(index / 10)
+  //     local col = ((index - 1) % 10) + 1
+  //     if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
+  //       --assembly machine crafting
+  //       if ENTS[self.current_output] then
+  //         local item = ITEMS[recipes[self.active_tab][row][col]]
+  //         if item.craftable == false and item.type ~= 'oil' then sound('deny') return end
+  //         if item.type == 'oil' and ENTS[self.current_output].type == 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
+  //           ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
+  //           toggle_crafting()
+  //           ui.active_window = ENTS[self.current_output]:open()
+  //           self.current_output = 'PLAYER'
+  //           return true
+  //         elseif item.type ~= 'oil' and ENTS[self.current_output].type ~= 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
+  //           ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
+  //           toggle_crafting()
+  //           ui.active_window = ENTS[self.current_output]:open()
+  //           self.current_output = 'PLAYER'
+  //           return true
+  //         end
+  //         sound('deny')
+  //         return false
+  //       end
+  //     end
+  //   elseif result and self.current_output == 'PLAYER' then
+  //     local row = math.ceil(index / 10)
+  //     local col = ((index - 1) % 10) + 1
+  //     if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
+  //       --PLAYER crafting
+  //       local item = ITEMS[recipes[self.active_tab][row][col]]
+  //       if item and item.craftable and UNLOCKED_ITEMS[item.id] then
+  //         local can_craft = true
+  //         for k, v in ipairs(item.recipe.ingredients) do
+  //           if not inv:has_stack(v) then can_craft = false end
+  //         end
+  //         if can_craft then
+  //           for k, v in ipairs(item.recipe.ingredients) do
+  //             inv:remove_stack(v)
+  //             ui.new_alert(CURSOR.x, CURSOR.y - 5, '-' .. v.count .. ' ' .. ITEMS[v.id].fancy_name, 1500, 0, 2)
+  //           end
+  //           ui.new_alert(CURSOR.x, CURSOR.y, '+' .. item.recipe.count .. ' ' .. item.fancy_name, 1500, 0, 4)
+  //           inv:add_item({id = item.id, count = item.recipe.count})
+  //         end
+  //       end
+  //     end
+  //   end
+  //   --close button
+  //   local cx, cy, w, h = self.x + self.close_x, self.y + self.close_y, 5, 5
+  //   if x >= cx and x < cx + w and y >= cy and y < cy + h then
+  //     self.vis = false
+  //     return true
+  //   end
+  //   --dock button
+  //   local cx, cy, w, h = self.x + self.dock_x, self.y + self.dock_y, 5, 5
+  //   if x >= cx and x < cx + w and y >= cy and y < cy + h then
+  //     self.docked = not self.docked
+  //     return true
+  //   end
+  //   --category tabs
+  //   for i = 1, #self.tab do
+  //     if x >= self.x + self.tab[i].x - 1 and x < self.x + self.tab[i].x + self.tab[i].w and y >= self.y + self.tab[i].y - 1 and y < self.y + self.tab[i].y - 1 + self.tab[i].h then
+  //       self.active_tab = i
+  //       return true
+  //     end
+  //   end
+  // end
+    
+    return false;
+  }
+}
+class Tilemanager {
+  private tiles: { [index: number]: { [index: number]: {
+    visited: boolean, is_land: boolean, biome: number,
+    is_border: boolean, sprite_id: number, ore: boolean,
+    flip: number, rot: number, border_col: string
+  }}};
+  private biomes: { [index: number]: {
+    name: string, tile_id_offset: number, min: number, max: number,
+    t_min: number, t_max: number, tree_id: number, tree_density: number,
+    color_key: number, map_col: string, clutter: number
+  }};
+  private auto_map: { [index: string]: {sprite_id: number, rot: number} };
+
+  constructor() {
+    this.tiles = {};
+    this.auto_map = {
+      '1000': {sprite_id: 1, rot: 0},
+      '0100': {sprite_id: 1, rot: 1},
+      '0010': {sprite_id: 1, rot: 2},
+      '0001': {sprite_id: 1, rot: 3},
+
+      '1100': {sprite_id: 2, rot: 1},
+      '0110': {sprite_id: 2, rot: 2},
+      '0011': {sprite_id: 2, rot: 3},
+      '1001': {sprite_id: 2, rot: 0},
+
+      '1101': {sprite_id: 3, rot: 0},
+      '1110': {sprite_id: 3, rot: 1},
+      '0111': {sprite_id: 3, rot: 2},
+      '1011': {sprite_id: 3, rot: 3},
+      '0101': {sprite_id: 4, rot: 0},
+      '1010': {sprite_id: 4, rot: 1},
+      '1111': {sprite_id: 0, rot: 0},
+    }
+    this.biomes = {
+      1: {
+        name: 'Desert',
+        tile_id_offset: 0,
+        min: 20,
+        max: 30,
+        t_min: 20.5,
+        t_max: 21.5,
+        tree_id: 194,
+        tree_density: 0.05,
+        color_key: 0,
+        map_col: "blue",
+        clutter: 0.01
+      },
+      2: {
+        name: 'Prarie',
+        tile_id_offset: 16,
+        min: 30,
+        max: 45,
+        t_min: 33,
+        t_max: 40,
+        tree_id: 200,
+        tree_density: 0.075,
+        color_key: 1,
+        map_col: "green",
+        clutter: 0.09
+      },
+      3: {
+        name: 'Forest',
+        tile_id_offset: 32,
+        min: 45,
+        max: 101,
+        t_min: 65,
+        t_max: 85,
+        tree_id: 197,
+        tree_density: 0.15,
+        color_key: 1,
+        map_col: "white",
+        clutter: 0.05
+      },
+    }
+  }
+
+  draw_terrain(screenWidth: number, screenHeight: number): void {
+    const cameraTopLeftX = PLAYER.x - 116;
+    const cameraTopLeftY = PLAYER.y - 64;
+    const subTileX = cameraTopLeftX % 8;
+    const subTileY = cameraTopLeftY % 8
+    const startX = Math.floor(cameraTopLeftX / 8);
+    const startY = Math.floor(cameraTopLeftY / 8);
+
+    for (let screenY = 1; screenY < screenHeight; screenY++) {
+      for (let screenX = 1; screenX < screenWidth; screenX++) {
+        const worldX = startX + screenX;
+        const worldY = startY + screenY;
+        //BUG
+        //! a questão aqui é, na impolementação original
+        //! quando se tenta acessar um tile inexistente, um novo é criado
+        const tile = this.tiles[worldX][worldY];
+
+        if (!show_mini_map) {
+          const sx = (screenX - 1) * 8 - subTileX;
+          const sy = (screenY - 1) * 8 - subTileY;
+
+          if (!tile.visited) { this.autoMap(worldX, worldY); }
+
+          if (tile.ore) {
+            drawRect(sx, sy, 8, 8, this.biomes[tile.biome].map_col)
+            //TODO sspr(ores[tile.ore].tile_id, sx, sy, ores[tile.ore].color_keys, 1, 0, tile.rot)
+          }
+          else if (!tile.is_border) {
+            const id = tile.sprite_id;
+            const rot = tile.rot;
+            let flip = tile.flip;
+
+            if (!tile.is_land) {
+              
+              if (worldX % 2 == 1 && worldY % 2 == 1) {
+                flip = 3;// -- Both horizontal and vertical flip
+              }
+              else if (worldX % 2 == 1) {
+                flip = 1;// -- Horizontal flip
+              }
+              else if (worldY % 2 == 1) {
+                flip = 2;// -- Vertical flip
+              }
+
+              //TODO sspr(224, sx, sy, 0, 1, flip, rot)
+            }
+            else {
+              drawRect(sx, sy, 8, 8, this.biomes[tile.biome].map_col);
+              //TODO sspr(biomes[tile.biome].tile_id_offset, sx, sy, biomes[tile.biome].map_col, 1, 0, tile.rot)
+              if (id !== this.biomes[tile.biome].tile_id_offset) {
+                //TODO sspr(id, sx, sy, biomes[tile.biome].map_col, 1, flip);
+              }
+            }
+          }
+          else {
+            if (tile.biome === 1) {
+              let flip = 0;
+              
+              if (worldX % 2 == 1 && worldY % 2 == 1) {
+                flip = 3;// -- Both horizontal and vertical flip
+              }
+              else if (worldX % 2 == 1) {
+                flip = 1;// -- Horizontal flip
+              }
+              else if (worldY % 2 == 1) {
+                flip = 2;// -- Vertical flip
+              }
+              
+              //TODO sspr(224, sx, sy, -1, 1, flip)
+              //TODO sspr(tile.sprite_id, sx, sy, 0, 1, 0, tile.rot)
+            }
+            else {
+              //TODO sspr(tile.sprite_id, sx, sy, -1, 1, 0, tile.rot)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  autoMap(x: number, y: number) {
+    const tile = this.tiles[y][x];
+    this.tiles[y][x].visited = true
+    const adj: { [index: number]: {x: number, y: number}} = {
+      0: {x: 0, y: -1},
+      1: {x: 1, y: 0},
+      2: {x: 0, y: 1},
+      3: {x: -1, y: 0}
+    };
+    let key = '';
+
+    for (let i = 0; i < 4; i++) {
+      const near = this.tiles[y + adj[i].y][x + adj[i].x]
+
+      // --Determine if neighbor is a '0' or '1', meaning 0 is land, 1 is water or a different biome
+      if (!near.is_land || near.biome < tile.biome) {
+        key = key + '1';
+        this.tiles[y][x].border_col = this.biomes[near.biome].map_col
+      }
+      else {
+        key = key + '0';
+      }
+    }
+
+    const new_tile = this.auto_map[key];
+
+  //   --If key exists, then valid config detected, so set tile to the returned value, otherwise return
+    if (new_tile === undefined) { return; }
+
+    this.tiles[y][x].sprite_id = new_tile.sprite_id + 11 + this.biomes[tile.biome].tile_id_offset;
+    this.tiles[y][x].is_border = true;
+    this.tiles[y][x].ore = false;
+    this.tiles[y][x].flip = 0;
+    this.tiles[y][x].rot = new_tile.rot;
+  }
+}
 class Vec2 {
   public x: number;
   public y: number;
@@ -398,6 +727,9 @@ const CRAFTER_TICKRATE  = 5;
 const CRAFTER_ANIM_RATE = 5;
 // const CRAFTER_TIME_ID   = 337;
 
+const CRAFT_ROWS = 6;
+const CRAFT_COLS = 8;
+
 // const CURSOR_POINTER = 286;
 // const CURSOR_HIGHLIGHT = 309;
 // const CURSOR_HIGHLIGHT_CORNER = 307;
@@ -486,7 +818,7 @@ const CURSOR = {
   held_left: false, held_right: false, ltx: 0, lty: 0,
   last_rotation: 0, hold_time: 0, type: 'pointer', item: 'transport_belt',
   drag: false, panel_drag: false, drag_dir: 0, drag_loc: {x: 0, y: 0},
-  hand_item: {id: 0, count: 0, drag_offset: {x: 0, y: 0}, item_stack: {id: 9, count: 100}}
+  hand_item: {id: 0, count: 0}, drag_offset: {x: 0, y: 0}, item_stack: {id: 9, count: 100}
 };
 const KEYBOARD: { [index: string]: boolean }= {
   "shift": false, // 16
@@ -520,6 +852,8 @@ const KEYBOARD: { [index: string]: boolean }= {
   "9": false,
 };
 const UI = new Ui();
+const TILEMAN = new Tilemanager();
+const CRAFT_MENU = new CraftMenu();
 
 
 // let biome = 1;
@@ -549,7 +883,7 @@ let drill_anim_tick = 0;
 let furnace_anim_tick = 0;
 let crafter_anim_frame = 0;
 let crafter_anim_dir = 1;
-let state = "help";
+let state: "start" | "help" | "game" | "first_launch" = "game";
 let _t = 0;
 
 
@@ -827,16 +1161,50 @@ function dispatch_input(): void {
   if (ENTS[k] !== undefined) {
     ENTS[k].isHovered = true;
   }
-
 //if CURSOR.sy ~= 0 then cycle_hotbar(CURSOR.sy*-1) end
-
   if (!CURSOR.l) {
     CURSOR.panel_drag = false;
     CURSOR.drag = false;
   }
 
   //& begin mouse-over priority dispatch
-  // if ()
+  if (UI.active_window !== undefined && UI.active_window.is_hovered(CURSOR.x, CURSOR.y)) {
+    if ((CURSOR.l && !CURSOR.ll) || (CURSOR.r && !CURSOR.lr)) {
+      if (UI.active_window.click(CURSOR.x, CURSOR.y)) {
+        //--trace('clicked active window')
+      }
+    }
+    return
+  }
+
+  if (CRAFT_MENU.vis && CRAFT_MENU.is_hovered(CURSOR.x, CURSOR.y)) {
+    if (CURSOR.l && !CURSOR.ll) {
+      if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, 'left')) { return; }
+    }
+    else if (CURSOR.r && CURSOR.lr) {
+      if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, 'right')) { return; }
+    }
+
+    if (CRAFT_MENU.vis && CURSOR.panel_drag) {
+      CRAFT_MENU.x = Math.max(1, Math.min(CURSOR.x + CURSOR.drag_offset.x, 239 - CRAFT_MENU.w));
+      CRAFT_MENU.y = Math.max(1, Math.min(CURSOR.y + CURSOR.drag_offset.y, 135 - CRAFT_MENU.h));
+      return;
+    }
+    
+    if (CRAFT_MENU.vis && !CURSOR.panel_drag && CURSOR.l && !CURSOR.ll && CRAFT_MENU.is_hovered(CURSOR.x, CURSOR.y)) {
+      if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, undefined)) {
+        return;
+      }
+      else if (!CRAFT_MENU.docked) {
+        CURSOR.panel_drag = true;
+        CURSOR.drag_offset.x = CRAFT_MENU.x - CURSOR.x;
+        CURSOR.drag_offset.y = CRAFT_MENU.y - CURSOR.y;
+        return;
+      }
+    }
+
+    return
+  }
 
 // function dispatch_input()
 //   --begin mouse-over priority dispatch
@@ -849,25 +1217,25 @@ function dispatch_input(): void {
 //     return
 //   end
   
-//   if craft_menu.vis and craft_menu:is_hovered(CURSOR.x, CURSOR.y) then
+//   if CRAFT_MENU.vis and CRAFT_MENU:is_hovered(CURSOR.x, CURSOR.y) then
 //     if CURSOR.l and not CURSOR.ll then
-//       if craft_menu:click(CURSOR.x, CURSOR.y, 'left') then return end
+//       if CRAFT_MENU:click(CURSOR.x, CURSOR.y, 'left') then return end
 //     elseif CURSOR.r and CURSOR.lr then
-//       if craft_menu:click(CURSOR.x, CURSOR.y, 'right') then return end
+//       if CRAFT_MENU:click(CURSOR.x, CURSOR.y, 'right') then return end
 //     end
-//     if craft_menu.vis and CURSOR.panel_drag then
-//       craft_menu.x = math.max(1, math.min(CURSOR.x + CURSOR.drag_offset.x, 239 - craft_menu.w))
-//       craft_menu.y = math.max(1, math.min(CURSOR.y + CURSOR.drag_offset.y, 135 - craft_menu.h))
+//     if CRAFT_MENU.vis and CURSOR.panel_drag then
+//       CRAFT_MENU.x = math.max(1, math.min(CURSOR.x + CURSOR.drag_offset.x, 239 - CRAFT_MENU.w))
+//       CRAFT_MENU.y = math.max(1, math.min(CURSOR.y + CURSOR.drag_offset.y, 135 - CRAFT_MENU.h))
 //       return
 //       --consumed = true
 //     end
-//     if craft_menu.vis and not CURSOR.panel_drag and CURSOR.l and not CURSOR.ll and craft_menu:is_hovered(CURSOR.x, CURSOR.y) then
-//       if craft_menu:click(CURSOR.x, CURSOR.y) then
+//     if CRAFT_MENU.vis and not CURSOR.panel_drag and CURSOR.l and not CURSOR.ll and CRAFT_MENU:is_hovered(CURSOR.x, CURSOR.y) then
+//       if CRAFT_MENU:click(CURSOR.x, CURSOR.y) then
 //         return
-//       elseif not craft_menu.docked then
+//       elseif not CRAFT_MENU.docked then
 //         CURSOR.panel_drag = true
-//         CURSOR.drag_offset.x = craft_menu.x - CURSOR.x
-//         CURSOR.drag_offset.y = craft_menu.y - CURSOR.y
+//         CURSOR.drag_offset.x = CRAFT_MENU.x - CURSOR.x
+//         CURSOR.drag_offset.y = CRAFT_MENU.y - CURSOR.y
 //         return
 //       end
 //     end
@@ -1025,7 +1393,7 @@ function dispatch_input(): void {
 
 //     --check for held item placement/deposit to other ents
 //   --  if ENTS[k] then ENTS[k].is_hovered = true end
-//   if CURSOR.l and not CURSOR.ll and not craft_menu:is_hovered(CURSOR.x, CURSOR.y) and inv:is_hovered(CURSOR.x, CURSOR.y) then
+//   if CURSOR.l and not CURSOR.ll and not CRAFT_MENU:is_hovered(CURSOR.x, CURSOR.y) and inv:is_hovered(CURSOR.x, CURSOR.y) then
 //     local slot = inv:get_hovered_slot(CURSOR.x, CURSOR.y)
 //     if slot then
 //       --trace(slot.index)
@@ -1086,6 +1454,9 @@ function hovered(mouse: {x: number, y: number}, box: {x: number, y: number, w: n
     mouse.y >= box.y &&
     mouse.y <= box.y + box.h
   );
+}
+function draw_terrain(): void {
+  TILEMAN.draw_terrain(31, 18);
 }
 function drawRect(x: number, y: number, w: number, h: number, color: string): void {
   CTX.strokeStyle = color;
@@ -1162,11 +1533,6 @@ function TIC() {
   if (state === "start" || state === 'help') {
     UI.draw_menu();
 
-    drawText(
-      `x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`,
-      0, 0, 25, "white", "top", "left"
-    );
-
     tick = tick + 1;
     requestAnimationFrame(TIC);
     return;
@@ -1184,9 +1550,9 @@ function TIC() {
   //TODO update_water_effect(time());
   //TODO cls(0); clear the screen here?
 
-  let m_time = 0;
+  // let m_time = 0;
   const gv_time = lapse(get_visible_ents);
-  //TODO let m_time = lapse(draw_terrain);
+  const m_time = lapse(draw_terrain);
 
   const up_time = lapse(update_player);
   //TODO const hi_time = lapse(dispatch_input);
@@ -1266,7 +1632,7 @@ function TIC() {
 
   if (!show_mini_map) {
     // inv:draw()
-    // craft_menu:draw()
+    // CRAFT_MENU:draw()
     // if (UI.active_window) {
     //   if (ENTS[UI.active_window.ent_key]) {
     //     UI.active_window.draw()
@@ -1337,13 +1703,17 @@ function TIC() {
 
   tick = tick + 1;
 
+  drawText(
+    `x: ${CURSOR.x}\ny: ${CURSOR.y}\nL: ${CURSOR.l}\nR: ${CURSOR.r}`,
+    0, 0, 25, "white", "top", "left"
+  );
+
   requestAnimationFrame(TIC);
 }
 
 
 BOOT();
 //
-//TODO TileMan = TileManager:new()
 //TODO sspr = spr
 //TODO inv = make_inventory()
 //TODO const starting_items = {
@@ -1360,7 +1730,7 @@ BOOT();
 // --   inv.slots[v.slot].id = v.id
 // --   inv.slots[v.slot].count = ITEMS[v.id].stack_size
 // -- end
-//TODO craft_menu = ui.NewCraftPanel(135, 1)
+//TODO CRAFT_MENU = ui.NewCraftPanel(135, 1)
 // --------------------
 //TODO sounds = {
 //   ['deny']        = {id =  5, note = 'C-3', duration = 22, channel = 0, volume = 10, speed = 0},
