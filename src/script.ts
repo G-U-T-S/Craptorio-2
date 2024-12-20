@@ -266,15 +266,15 @@ class CraftMenu {
   public x: number; public y: number;
   public w: number; public h: number;
   public grid_x: number; public grid_y: number;
-  public vis: boolean;
-  public docked: boolean
+  public vis: boolean; public docked: boolean
+  public current_output: string; public active_tab: number;
 
   constructor() {
     this.x = 0; this.y = 0;
     this.w = 100; this.h = 100;
     this.grid_x = 1; this.grid_y = 34;
-    this.vis = false;
-    this.docked = false;
+    this.vis = false; this.docked = false;
+    this.current_output = ""; this.active_tab = 1;
   }
 
   public is_hovered(x: number, y: number): boolean {
@@ -285,7 +285,7 @@ class CraftMenu {
     return false;
   }
 
-  public get_hovered_slot(x: number, y: number): {result: boolean, sx: number, sy: number, index: number} | null {
+  public get_hovered_slot(x: number, y: number): {result: boolean, sx: number, sy: number, index: number} | undefined {
     const grid_x = this.x + this.grid_x;
     const grid_y = this.y + this.grid_y;
     const start_x = grid_x + 1;
@@ -305,84 +305,48 @@ class CraftMenu {
       return {result: true, sx: slot_pos_x, sy: slot_pos_y, index: slot_index};
     }
 
-    return null;
+    return undefined;
   }
 
   public click(x: number, y: number, side: "left" | "right" | undefined): boolean {
     if (side === "left" && !CURSOR.ll) {
-      const { result, sx, sy, index } = { ...this.get_hovered_slot(x, y) }
+      const { result, sx, sy, index } = { ...this.get_hovered_slot(x, y) };
+
+      if(result !== undefined && sx !== undefined && sy !== undefined && index !== undefined && this.current_output !== "PLAYER") {
+        const row = Math.ceil(index / 10);
+        const col = ((index - 1) % 10) + 1;
+
+        if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
+          // --assembly machine crafting
+          // if (ENTS[this.current_output]) {
+          //   const item = ITEMS[recipes[self.active_tab][row][col]];
+
+          //   //TODO if (item.craftable === false && item.type !== 'oil') { sound('deny'); return false; }
+            
+          //   if (item.type == 'oil' && ENTS[this.current_output].type == 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
+          //     ENTS[self.current_output].set_recipe(ITEMS[recipes[this.active_tab][row][col]]);
+          //     toggle_crafting();
+          //     UI.active_window = ENTS[self.current_output].open();
+          //     this.current_output = 'PLAYER';
+              
+          //     return true;
+          //   }
+          //   else if (item.type !== 'oil' && ENTS[this.current_output].type !== 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
+          //     ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
+          //     toggle_crafting();
+          //     UI.active_window = ENTS[self.current_output].open();
+          //     this.current_output = 'PLAYER';
+              
+          //     return true;
+          //   }
+            
+          //   //TODO sound('deny')
+          //   return false;
+          // }
+        }
+      }
     }
-  
-//   if side == 'left' and not CURSOR.ll then
-  //   local result, sx, sy, index = self:get_hovered_slot(x, y)
-  //   if result and self.current_output ~= 'PLAYER' then
-  //     local row = math.ceil(index / 10)
-  //     local col = ((index - 1) % 10) + 1
-  //     if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
-  //       --assembly machine crafting
-  //       if ENTS[self.current_output] then
-  //         local item = ITEMS[recipes[self.active_tab][row][col]]
-  //         if item.craftable == false and item.type ~= 'oil' then sound('deny') return end
-  //         if item.type == 'oil' and ENTS[self.current_output].type == 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
-  //           ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
-  //           toggle_crafting()
-  //           ui.active_window = ENTS[self.current_output]:open()
-  //           self.current_output = 'PLAYER'
-  //           return true
-  //         elseif item.type ~= 'oil' and ENTS[self.current_output].type ~= 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
-  //           ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
-  //           toggle_crafting()
-  //           ui.active_window = ENTS[self.current_output]:open()
-  //           self.current_output = 'PLAYER'
-  //           return true
-  //         end
-  //         sound('deny')
-  //         return false
-  //       end
-  //     end
-  //   elseif result and self.current_output == 'PLAYER' then
-  //     local row = math.ceil(index / 10)
-  //     local col = ((index - 1) % 10) + 1
-  //     if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
-  //       --PLAYER crafting
-  //       local item = ITEMS[recipes[self.active_tab][row][col]]
-  //       if item and item.craftable and UNLOCKED_ITEMS[item.id] then
-  //         local can_craft = true
-  //         for k, v in ipairs(item.recipe.ingredients) do
-  //           if not inv:has_stack(v) then can_craft = false end
-  //         end
-  //         if can_craft then
-  //           for k, v in ipairs(item.recipe.ingredients) do
-  //             inv:remove_stack(v)
-  //             ui.new_alert(CURSOR.x, CURSOR.y - 5, '-' .. v.count .. ' ' .. ITEMS[v.id].fancy_name, 1500, 0, 2)
-  //           end
-  //           ui.new_alert(CURSOR.x, CURSOR.y, '+' .. item.recipe.count .. ' ' .. item.fancy_name, 1500, 0, 4)
-  //           inv:add_item({id = item.id, count = item.recipe.count})
-  //         end
-  //       end
-  //     end
-  //   end
-  //   --close button
-  //   local cx, cy, w, h = self.x + self.close_x, self.y + self.close_y, 5, 5
-  //   if x >= cx and x < cx + w and y >= cy and y < cy + h then
-  //     self.vis = false
-  //     return true
-  //   end
-  //   --dock button
-  //   local cx, cy, w, h = self.x + self.dock_x, self.y + self.dock_y, 5, 5
-  //   if x >= cx and x < cx + w and y >= cy and y < cy + h then
-  //     self.docked = not self.docked
-  //     return true
-  //   end
-  //   --category tabs
-  //   for i = 1, #self.tab do
-  //     if x >= self.x + self.tab[i].x - 1 and x < self.x + self.tab[i].x + self.tab[i].w and y >= self.y + self.tab[i].y - 1 and y < self.y + self.tab[i].y - 1 + self.tab[i].h then
-  //       self.active_tab = i
-  //       return true
-  //     end
-  //   end
-  // end
-    
+
     return false;
   }
 }
@@ -792,6 +756,35 @@ const OPENSiES = {
   'bio_refinery': true,
   'rocket_silo': true
 };
+const RECIPES: Array<Array<Array<number>>> = [
+  // --logistics/production
+  [
+    [ 33 ],
+    [ 9, 18, 10, 11 ],
+    [ ],
+    [ ],
+    [ ],
+    [ ]
+  ],
+  // --biology/chemistry
+  [
+    [ 2, 1, 37 ],
+    [ 15, 16, 17, 27, 29, 28 ],
+    [ 20, 21, 36 ],
+    [ 13, 14, 19, 31, 32 ],
+    [ 22, 30 ],
+    [ 40 ]
+  ],
+  // --intermediate/science
+  [
+    [ 3, 4, 5, 6, 7, 8 ],
+    [ 32, 35 ],
+    [ ],
+    [ ],
+    [ 23, 24, 25, 26 ],
+    [ ],
+  ]
+];
 const PLAYER = {
   x: 100*8, y: 50*8, spr: 362,
   lx: 0, ly: 0, shadow: 382,
