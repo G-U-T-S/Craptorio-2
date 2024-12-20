@@ -45,7 +45,20 @@ window.addEventListener("keyup", (ev) => {
         }
     }
 });
+;
+class windo {
+    is_hovered(x, y) {
+        return false;
+    }
+    click(x, y) {
+        return false;
+    }
+}
 class Ui {
+    active_window;
+    constructor() {
+        this.active_window = undefined;
+    }
     draw_logo() {
         drawBg("gray");
     }
@@ -151,10 +164,69 @@ class Ui {
         drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
     }
 }
+class CraftMenu {
+    x;
+    y;
+    w;
+    h;
+    grid_x;
+    grid_y;
+    vis;
+    docked;
+    current_output;
+    active_tab;
+    constructor() {
+        this.x = 0;
+        this.y = 0;
+        this.w = 100;
+        this.h = 100;
+        this.grid_x = 1;
+        this.grid_y = 34;
+        this.vis = false;
+        this.docked = false;
+        this.current_output = "";
+        this.active_tab = 1;
+    }
+    is_hovered(x, y) {
+        if (this.vis) {
+            return x >= this.x && x < this.x + this.w && y >= this.y && y < this.y + this.h;
+        }
+        return false;
+    }
+    get_hovered_slot(x, y) {
+        const grid_x = this.x + this.grid_x;
+        const grid_y = this.y + this.grid_y;
+        const start_x = grid_x + 1;
+        const start_y = grid_y + 1;
+        const rel_x = x - start_x + 1;
+        const rel_y = y - start_y + 1;
+        const slot_x = Math.floor(rel_x / 9);
+        const slot_y = Math.floor(rel_y / 9);
+        const slot_pos_x = start_x + slot_x * 9;
+        const slot_pos_y = start_y + slot_y * 9;
+        const slot_index = slot_y * 10 + slot_x + 1;
+        if (slot_x >= 0 && slot_x <= CRAFT_COLS - 1 && slot_y >= 0 && slot_y <= CRAFT_ROWS - 1) {
+            return { result: true, sx: slot_pos_x, sy: slot_pos_y, index: slot_index };
+        }
+        return undefined;
+    }
+    click(x, y, side) {
+        if (side === "left" && !CURSOR.ll) {
+            const { result, sx, sy, index } = { ...this.get_hovered_slot(x, y) };
+            if (result !== undefined && sx !== undefined && sy !== undefined && index !== undefined && this.current_output !== "PLAYER") {
+                const row = Math.ceil(index / 10);
+                const col = ((index - 1) % 10) + 1;
+                if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
+                }
+            }
+        }
+        return false;
+    }
+}
 class Tilemanager {
     tiles;
-    auto_map;
     biomes;
+    auto_map;
     constructor() {
         this.tiles = {};
         this.auto_map = {
@@ -185,7 +257,7 @@ class Tilemanager {
                 tree_id: 194,
                 tree_density: 0.05,
                 color_key: 0,
-                map_col: 5,
+                map_col: "blue",
                 clutter: 0.01
             },
             2: {
@@ -198,7 +270,7 @@ class Tilemanager {
                 tree_id: 200,
                 tree_density: 0.075,
                 color_key: 1,
-                map_col: 12,
+                map_col: "green",
                 clutter: 0.09
             },
             3: {
@@ -211,7 +283,7 @@ class Tilemanager {
                 tree_id: 197,
                 tree_density: 0.15,
                 color_key: 1,
-                map_col: 14,
+                map_col: "white",
                 clutter: 0.05
             },
         };
@@ -233,6 +305,46 @@ class Tilemanager {
                     const sy = (screenY - 1) * 8 - subTileY;
                     if (!tile.visited) {
                         this.autoMap(worldX, worldY);
+                    }
+                    if (tile.ore) {
+                        drawRect(sx, sy, 8, 8, this.biomes[tile.biome].map_col);
+                    }
+                    else if (!tile.is_border) {
+                        const id = tile.sprite_id;
+                        const rot = tile.rot;
+                        let flip = tile.flip;
+                        if (!tile.is_land) {
+                            if (worldX % 2 == 1 && worldY % 2 == 1) {
+                                flip = 3;
+                            }
+                            else if (worldX % 2 == 1) {
+                                flip = 1;
+                            }
+                            else if (worldY % 2 == 1) {
+                                flip = 2;
+                            }
+                        }
+                        else {
+                            drawRect(sx, sy, 8, 8, this.biomes[tile.biome].map_col);
+                            if (id !== this.biomes[tile.biome].tile_id_offset) {
+                            }
+                        }
+                    }
+                    else {
+                        if (tile.biome === 1) {
+                            let flip = 0;
+                            if (worldX % 2 == 1 && worldY % 2 == 1) {
+                                flip = 3;
+                            }
+                            else if (worldX % 2 == 1) {
+                                flip = 1;
+                            }
+                            else if (worldY % 2 == 1) {
+                                flip = 2;
+                            }
+                        }
+                        else {
+                        }
                     }
                 }
             }
@@ -357,6 +469,8 @@ const FURNACE_ANIM_TICKS = 2;
 const FURNACE_TICKRATE = 5;
 const CRAFTER_TICKRATE = 5;
 const CRAFTER_ANIM_RATE = 5;
+const CRAFT_ROWS = 6;
+const CRAFT_COLS = 8;
 const ENTS = {};
 const CURRENT_RECIPE = { x: 0, y: 0, id: 0 };
 const RESOURCES = {
@@ -406,6 +520,32 @@ const OPENSiES = {
     'bio_refinery': true,
     'rocket_silo': true
 };
+const RECIPES = [
+    [
+        [33],
+        [9, 18, 10, 11],
+        [],
+        [],
+        [],
+        []
+    ],
+    [
+        [2, 1, 37],
+        [15, 16, 17, 27, 29, 28],
+        [20, 21, 36],
+        [13, 14, 19, 31, 32],
+        [22, 30],
+        [40]
+    ],
+    [
+        [3, 4, 5, 6, 7, 8],
+        [32, 35],
+        [],
+        [],
+        [23, 24, 25, 26],
+        [],
+    ]
+];
 const PLAYER = {
     x: 100 * 8, y: 50 * 8, spr: 362,
     lx: 0, ly: 0, shadow: 382,
@@ -432,7 +572,7 @@ const CURSOR = {
     held_left: false, held_right: false, ltx: 0, lty: 0,
     last_rotation: 0, hold_time: 0, type: 'pointer', item: 'transport_belt',
     drag: false, panel_drag: false, drag_dir: 0, drag_loc: { x: 0, y: 0 },
-    hand_item: { id: 0, count: 0, drag_offset: { x: 0, y: 0 }, item_stack: { id: 9, count: 100 } }
+    hand_item: { id: 0, count: 0 }, drag_offset: { x: 0, y: 0 }, item_stack: { id: 9, count: 100 }
 };
 const KEYBOARD = {
     "shift": false,
@@ -467,6 +607,7 @@ const KEYBOARD = {
 };
 const UI = new Ui();
 const TILEMAN = new Tilemanager();
+const CRAFT_MENU = new CraftMenu();
 let db_time = 0.0;
 let launched = false;
 let show_tile_widget = false;
@@ -702,6 +843,42 @@ function dispatch_input() {
     if (!CURSOR.l) {
         CURSOR.panel_drag = false;
         CURSOR.drag = false;
+    }
+    if (UI.active_window !== undefined && UI.active_window.is_hovered(CURSOR.x, CURSOR.y)) {
+        if ((CURSOR.l && !CURSOR.ll) || (CURSOR.r && !CURSOR.lr)) {
+            if (UI.active_window.click(CURSOR.x, CURSOR.y)) {
+            }
+        }
+        return;
+    }
+    if (CRAFT_MENU.vis && CRAFT_MENU.is_hovered(CURSOR.x, CURSOR.y)) {
+        if (CURSOR.l && !CURSOR.ll) {
+            if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, 'left')) {
+                return;
+            }
+        }
+        else if (CURSOR.r && CURSOR.lr) {
+            if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, 'right')) {
+                return;
+            }
+        }
+        if (CRAFT_MENU.vis && CURSOR.panel_drag) {
+            CRAFT_MENU.x = Math.max(1, Math.min(CURSOR.x + CURSOR.drag_offset.x, 239 - CRAFT_MENU.w));
+            CRAFT_MENU.y = Math.max(1, Math.min(CURSOR.y + CURSOR.drag_offset.y, 135 - CRAFT_MENU.h));
+            return;
+        }
+        if (CRAFT_MENU.vis && !CURSOR.panel_drag && CURSOR.l && !CURSOR.ll && CRAFT_MENU.is_hovered(CURSOR.x, CURSOR.y)) {
+            if (CRAFT_MENU.click(CURSOR.x, CURSOR.y, undefined)) {
+                return;
+            }
+            else if (!CRAFT_MENU.docked) {
+                CURSOR.panel_drag = true;
+                CURSOR.drag_offset.x = CRAFT_MENU.x - CURSOR.x;
+                CURSOR.drag_offset.y = CRAFT_MENU.y - CURSOR.y;
+                return;
+            }
+        }
+        return;
     }
 }
 function resizeCanvas() {

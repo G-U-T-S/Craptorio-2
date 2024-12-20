@@ -47,7 +47,7 @@ if (ev instanceof KeyboardEvent) {
 }
 });
 
-interface uiString {
+interface IuiString {
   text: string;
   // x: number;
   // y: number;
@@ -55,6 +55,20 @@ interface uiString {
   fg: string;
   shadow: {x: number, y: number};
 }
+interface Iitem {
+  name: string; fancy_name: string;
+  id: number; sprite_id: number; belt_id: number;
+  color_key: 0; type: string; craftable: [string, string];
+  sub_type: string; stack_size: number;
+  recipe: {
+    id: number, crafting_time: number, count: number,
+    ingredients: [
+      {id: number, count: number}, //--copper_cable
+      {id: number, count: number}, //--green_circuit
+      {id: number, count: number}, //--plastic_bar
+    ],
+  };
+};
 
 //& minha implementação da active_window
 class windo {
@@ -177,7 +191,7 @@ class Ui {
     return false;
   }
 
-  draw_text_button(x: number, y: number, width: number, height: number, main_color: string, shadow_color: string, hover_color: string, label: uiString, locked: boolean): boolean {
+  draw_text_button(x: number, y: number, width: number, height: number, main_color: string, shadow_color: string, hover_color: string, label: IuiString, locked: boolean): boolean {
     // if (label !== undefined) {
     //   const w = label.text.length;
       
@@ -319,22 +333,22 @@ class CraftMenu {
         if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
           // --assembly machine crafting
           // if (ENTS[this.current_output]) {
-          //   const item = ITEMS[recipes[self.active_tab][row][col]];
+          //   const item = ITEMS[RECIPES[this.active_tab][row][col]];
 
           //   //TODO if (item.craftable === false && item.type !== 'oil') { sound('deny'); return false; }
             
           //   if (item.type == 'oil' && ENTS[this.current_output].type == 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
-          //     ENTS[self.current_output].set_recipe(ITEMS[recipes[this.active_tab][row][col]]);
-          //     toggle_crafting();
-          //     UI.active_window = ENTS[self.current_output].open();
+          //     ENTS[this.current_output].set_recipe(ITEMS[RECIPES[this.active_tab][row][col]]);
+          //     //TODO toggle_crafting();
+          //     UI.active_window = ENTS[this.current_output].open();
           //     this.current_output = 'PLAYER';
               
           //     return true;
           //   }
           //   else if (item.type !== 'oil' && ENTS[this.current_output].type !== 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
-          //     ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
-          //     toggle_crafting();
-          //     UI.active_window = ENTS[self.current_output].open();
+          //     ENTS[this.current_output].set_recipe(ITEMS[RECIPES[this.active_tab][row][col]])
+          //     //TODO toggle_crafting();
+          //     UI.active_window = ENTS[this.current_output].open();
           //     this.current_output = 'PLAYER';
               
           //     return true;
@@ -652,55 +666,26 @@ class BaseEntity {
 
 // const SEED = 172046262608.13;
 // const OFFSET = randRange(100000, 500000);
-// const BELT_ID_STRAIGHT  = 256
-// const BELT_ID_CURVED    = 260
-// const BELT_ARROW_ID     = 287
-// const BELT_COLORKEY     = 0
+
 const BELT_TICKRATE     = 5
 const BELT_MAXTICK      = 3
 
-// const UBELT_IN          = 278
-// const UBELT_OUT         = 277
-// const UBELT_COLORKEY    = 0
 const UBELT_TICKRATE    = 5
 const UBELT_MAXTICK     = 3
 
-// const DRILL_BURNER_SPRITE_ID = 273;
-// const DRILL_ELEC_SPRITE_ID   = 368;
-// const DRILL_INV_ID           = 276;
-// const DRILL_MINI_BELT_ID     = 304;
-// const DRILL_BELT_ID          = 304;
-// const DRILL_BIT_ID           = 275;
 const DRILL_TICK_RATE        = 8;
 const DRILL_BIT_DIR          = 1;
 
-// const FURNACE_ID             = 488;
-// const FURNACE_FUEL_ICON      = 291;
 const FURNACE_ANIM_TICKRATE  = 9;
 const FURNACE_ANIM_TICKS     = 2;
 const FURNACE_TICKRATE       = 5;
-// const FURNACE_BUFFER_INPUT   = 50;
-// const FURNACE_BUFFER_OUTPUT  = 100;
-// const FURNACE_BUFFER_FUEL    = 50;
-// const FURNACE_SMELT_TIME     = 3 * 60;
-// const FURNACE_COLORKEY       = 6;
-// const FURNACE_FIRE_KEYS      = [7, 11, 10];
 
-// const CRAFTER_ID        = 312;
 const CRAFTER_TICKRATE  = 5;
 const CRAFTER_ANIM_RATE = 5;
-// const CRAFTER_TIME_ID   = 337;
 
 const CRAFT_ROWS = 6;
 const CRAFT_COLS = 8;
 
-// const CURSOR_POINTER = 286;
-// const CURSOR_HIGHLIGHT = 309;
-// const CURSOR_HIGHLIGHT_CORNER = 307;
-// const CURSOR_HIGHLIGHT_CORNER_S = 336;
-// const CURSOR_HAND_ID = 320;
-// const CURSOR_GRAB_ID = 321;
-// const WATER_SPRITE = 224;
 // const CURSOR_MINING_SPEED = 50;
 // const TECHNOLOGY = {};
 // const ROCKETS = {};
@@ -756,11 +741,11 @@ const OPENSiES = {
   'bio_refinery': true,
   'rocket_silo': true
 };
-const RECIPES: Array<Array<Array<number>>> = [
+const RECIPES: Array<Array<Array<string>>> = [
   // --logistics/production
   [
-    [ 33 ],
-    [ 9, 18, 10, 11 ],
+    [ "chest" ],
+    [ "transport_belt", "underground_belt", "splitter", "inserter" ],
     [ ],
     [ ],
     [ ],
@@ -768,23 +753,26 @@ const RECIPES: Array<Array<Array<number>>> = [
   ],
   // --biology/chemistry
   [
-    [ 2, 1, 37 ],
-    [ 15, 16, 17, 27, 29, 28 ],
-    [ 20, 21, 36 ],
-    [ 13, 14, 19, 31, 32 ],
-    [ 22, 30 ],
-    [ 40 ]
+    [ "electronic_circuit", "advanced_circuit", "processing_unit" ],
+    [ 'iron_plate', 'copper_plate', 'stone_brick', 'steel_plate', 'solar_panel', 'wood' ],
+    [ 'gear', 'copper_cable', 'plastic_bar' ],
+    [ 'mining_drill', 'stone_furnace', 'assembly_machine', 'engine_unit', 'fiber' ],
+    [ 'research_lab', 'bio_refinery' ],
+    [ 'rocket_silo' ]
   ],
   // --intermediate/science
   [
-    [ 3, 4, 5, 6, 7, 8 ],
-    [ 32, 35 ],
+    [ 'iron_ore', 'copper_ore', 'stone', 'coal', 'uranium', 'oil_shale' ],
+    [ 'fiber', 'biofuel' ],
     [ ],
     [ ],
-    [ 23, 24, 25, 26 ],
+    [ 'automation_pack', 'logistics_pack', 'biology_pack', 'production_pack' ],
     [ ],
   ]
 ];
+const ITEMS = {
+
+};
 const PLAYER = {
   x: 100*8, y: 50*8, spr: 362,
   lx: 0, ly: 0, shadow: 382,
