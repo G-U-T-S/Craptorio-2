@@ -1,8 +1,9 @@
 interface item {
   name: string; fancy_name: string;
-  id: number; type: "consumable";
-  craftable: "PLAYER" | "MACHINE" | "BOTH" | "NULL";
-  sub_type: "icon_only"; stack_size: number;
+  id: number; type: "consumable" | "ore" | "fuel" | "liquid" | "placeable";
+  craftable: "PLAYER" | "MACHINE" | "BOTH" | "NULL"; smelting_time: undefined | number;
+  sub_type: "icon_only" | "null"; stack_size: number; mining_time: undefined | number
+  info: string;
   recipe: undefined | {
     id: number; crafting_time: number; quant: number;
     ingredients: Array< {name: string; quant: number} >;
@@ -12,20 +13,18 @@ interface item {
 /*
 "": {
     name: , fancy_name: ,
-    id: , type: , craftable: ,
-    sub_type: , stack_size: ,
-    recipe: {
-      id: , crafting_time: , quant: ,
-      ingredients: {},
-    }
+    id: , type: , craftable: , smelting_time: ,
+    sub_type: , stack_size: 100, mining_time: ,
+    info: ,
+    recipe: undefined
   },
 */
 
 const IITEMS: { [index: string]: item } = {
   "advanced_circuit": {
     name: "advanced_circuit", fancy_name: "advanced_circuit",
-    id: 1, type: 'consumable', craftable: "BOTH",
-    sub_type: 'icon_only', stack_size: 100,
+    id: 1, type: 'consumable', craftable: "BOTH", mining_time: undefined,
+    sub_type: 'icon_only', stack_size: 100, info: "", smelting_time: undefined,
     recipe: {
       id: 1, crafting_time: 60*6, quant: 1,
       ingredients: [
@@ -38,8 +37,8 @@ const IITEMS: { [index: string]: item } = {
 
   "electronic_circuit": {
     name: 'electronic_circuit', fancy_name: 'Electronic Circuit',
-    id: 2, type: 'consumable', craftable: "BOTH",
-    sub_type: 'icon_only', stack_size: 100,
+    id: 2, type: 'consumable', craftable: "BOTH", mining_time: undefined,
+    sub_type: 'icon_only', stack_size: 100, info: "", smelting_time: undefined,
     recipe: {
       id: 2, crafting_time: 60*0.5, quant: 1,
       ingredients: [
@@ -48,123 +47,71 @@ const IITEMS: { [index: string]: item } = {
       ],
     }
   },
+
+  "iron_ore": {
+    name: 'iron_ore', fancy_name: 'Iron Ore', smelting_time: 4 * 60,
+    id: 3, type: 'ore', craftable: "NULL",
+    mining_time: 4 * 60, sub_type: "null", stack_size: 100,
+    info: 'Collected by laser, or mining drill. Found at iron ore deposits in the wild',
+    recipe: undefined
+  },
+
+  "copper_ore": {
+    name: 'copper_ore', fancy_name: 'Copper Ore',
+    id: 4, type: 'ore', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by laser, or mining drill. Found at copper ore deposits in the wild',
+    recipe: undefined
+  },
+
+  "stone": {
+    name: 'stone', fancy_name: 'Stone Ore',
+    id: 5, type: 'ore', craftable: "NULL", smelting_time: 2 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 2 * 60,
+    info: 'Collected by laser, or mining drill. Found at stone ore deposits, and loose stones in the wild',
+    recipe: undefined
+  },
+
+  "coal": {
+    name: 'coal', fancy_name: 'Coal',
+    id: 6, type: 'fuel', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: 3 * 60,
+    info: 'Collected by laser, or mining drill. Found at coal ore deposits in the wild',
+    recipe: undefined
+  },
+
+  "uranium": {
+    name: 'uranium', fancy_name: 'Uranium Ore',
+    id: 7, type: 'liquid', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by mining drill only. Found at uranium ore deposits in the wild',
+    recipe: undefined
+  },
+
+  "oil_shale": {
+    name: 'oil_shale', fancy_name: 'Oil Shale',
+    id: 8, type: 'liquid', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by laser, or mining drill. Found at oil-shale deposits in the wild',
+    recipe: undefined
+  },
+
+  "transport_belt": {
+    name: 'transport_belt', fancy_name: 'Transport Belt',
+    id: 9, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 9, crafting_time: 60 * 0.5,
+      quant: 2, ingredients: [
+        {name: 'gear', quant: 1},
+        {name: 'iron_plate', quant: 1}
+      ]
+    }
+  },
 };
 
 // ITEMS = {
-//   [3] = {
-//     name = 'iron_ore',
-//     fancy_name = 'Iron Ore',
-//     info = 'Collected by laser, or mining drill. Found at iron ore deposits in the wild',
-//     id = 3,
-//     sprite_id = 162,
-//     smelted_id = 15,
-//     belt_id = 178,
-//     color_key = 4,
-//     --alt_ids = {256, }
-//     type = 'ore',
-//     craftable = false,
-//     stack_size = 100,
-//     smelting_time = 1 * 60,
-//     mining_time = 4 * 60,
-//     recipe = false,
-//   },
-//   [4] = {
-//     name = 'copper_ore',
-//     fancy_name = 'Copper Ore',
-//     info = 'Collected by laser, or mining drill. Found at copper ore deposits in the wild',
-//     id = 4,
-//     sprite_id = 161,
-//     belt_id = 177,
-//     color_key = 1,
-//     type = 'ore',
-//     craftable = false,
-//     stack_size = 100,
-//     smelted_id = 16,
-//     smelting_time = 5 * 60,
-//     mining_time = 4 * 60,
-//     recipe = false,
-//   },
-//   [5] = {
-//     name = 'stone',
-//     fancy_name = 'Stone Ore',
-//     info = 'Collected by laser, or mining drill. Found at stone ore deposits, and loose stones in the wild',
-//     id = 5,
-//     sprite_id = 160,
-//     belt_id = 176,
-//     color_key = 4,
-//     type = 'ore',
-//     craftable = false,
-//     stack_size = 100,
-//     smelted_id = 17,
-//     smelting_time = 2 * 60,
-//     mining_time = 2 * 60,
-//     recipe = false,
-//   },
-//   [6] = {
-//     name = 'coal',
-//     fancy_name = 'Coal',
-//     info = 'Collected by laser, or mining drill. Found at coal ore deposits in the wild',
-//     id = 6,
-//     sprite_id = 163,
-//     belt_id = 179,
-//     color_key = 4,
-//     type = 'fuel',
-//     craftable = false,
-//     stack_size = 100,
-//     fuel_time = 60*15,
-//     mining_time = 3 * 60,
-//     recipe = false,
-//   },
-//   [7] = {
-//     name = 'uranium',
-//     fancy_name = 'Uranium Ore',
-//     info = 'Collected by mining drill only. Found at uranium ore deposits in the wild',
-//     id = 7,
-//     sprite_id = 164,
-//     belt_id = 180,
-//     color_key = 4,
-//     type = 'liquid',
-//     craftable = false,
-//     stack_size = 100,
-//     smelting_time = 5 * 60,
-//     mining_time = 4 * 60,
-//     recipe = false,
-//   },
-//   [8] = {
-//     name = 'oil_shale',
-//     fancy_name = 'Oil Shale',
-//     info = 'Collected by laser, or mining drill. Found at oil-shale deposits in the wild',
-//     id = 8,
-//     sprite_id = 165,
-//     belt_id = 181,
-//     color_key = 4,
-//     type = 'liquid',
-//     craftable = false,
-//     stack_size = 100,
-//     smelting_time = 5 * 60,
-//     mining_time = 4 * 60,
-//     recipe = false,
-//   },
-//   [9] = {
-//     name = 'transport_belt',
-//     fancy_name = 'Transport Belt',
-//     id = 9,
-//     sprite_id = 256,
-//     belt_id = 434,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 100,
-//     recipe = {
-//       id = 9,
-//       crafting_time = 60*0.5,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 20, count = 1},
-//         [2] = {id = 15, count = 1},
-//       }
-//     },
-//   },
 //   [10] = {
 //     name = 'splitter',
 //     fancy_name = 'Splitter',
