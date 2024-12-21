@@ -1,6 +1,6 @@
 interface item {
   name: string; fancy_name: string;
-  id: number; type: "consumable" | "ore" | "fuel" | "liquid" | "placeable";
+  id: number; type: "consumable" | "ore" | "fuel" | "liquid" | "placeable" | "intermediate";
   craftable: "PLAYER" | "MACHINE" | "BOTH" | "NULL"; smelting_time: undefined | number;
   sub_type: "icon_only" | "null"; stack_size: number; mining_time: undefined | number
   info: string;
@@ -109,227 +109,155 @@ const IITEMS: { [index: string]: item } = {
       ]
     }
   },
+
+  "splitter": {
+    name: 'splitter', fancy_name: 'Splitter',
+    id: 10, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 10, crafting_time: 60 * 1, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 5},
+        {name: "iron_plate", quant: 5},
+        {name: "transport_belt", quant: 4}
+      ]
+    }
+  },
+
+  "inserter": {
+    name: 'inserter', fancy_name: 'Inserter',
+    id: 11, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 11, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "electronic_circuit", quant: 1},
+        {name: "gear", quant: 1},
+        {name: "iron_plate", quant: 1}
+      ]
+    }
+  },
+
+  "power_pole": {
+    name: 'power_pole', fancy_name: 'Power Pole',
+    id: 12, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: undefined
+  },
+
+  "mining_drill": {
+    name: 'mining_drill', fancy_name: 'Mining Drill',
+    id: 13, type: "placeable", craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 13, crafting_time: 60 * 2, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 3},
+        {name: "iron_plate", quant: 10},
+        {name: "gear", quant: 5}
+      ]
+    }
+  },
+
+  "stone_furnace": {
+    name: 'stone_furnace', fancy_name: 'Stone Furnace',
+    id: 14, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 14, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "stone", quant: 5}
+      ]
+    }
+  },
+
+  "iron_plate": {
+    name: 'iron_plate', fancy_name: 'Iron Plate',
+    id: 15, type: 'ore', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting iron ore in a furnace',
+    recipe: undefined
+  },
+
+  "copper_plate": {
+    name: 'copper_plate', fancy_name: 'Copper Plate',
+    id: 16, type: "intermediate", craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting copper ore in a furnace',
+    recipe: undefined
+  },
+
+  "stone_brick": {
+    name: 'stone_brick', fancy_name: 'Stone Brick',
+    id: 17, type: 'intermediate', craftable: "NULL", smelting_time: 10,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting stone ore in a furnace',
+    recipe: undefined
+  },
+
+  "underground_belt": {
+    name: 'underground_belt', fancy_name: 'Underground Belt',
+    id: 18, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 18, crafting_time: 60 * 1, quant: 2,
+      ingredients: [
+        {name: "iron_plate", quant: 10},
+        {name: "transport_belt", quant: 5}
+      ]
+    }
+  },
+
+  "assembly_machine": {
+    name: 'assembly_machine', fancy_name: 'Assembly Machine',
+    id: 19, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      //! why this id is 21???
+      id: 21, crafting_time: 60 * 0.5, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 3},
+        {name: "gear", quant: 5},
+        {name: "iron_plate", quant: 9}
+      ]
+    }
+  },
+
+  "gear": {
+    name: 'gear', fancy_name: 'Gear',
+    id: 20, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 20, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "iron_plate", quant: 2}
+      ]
+    }
+  },
+
+  "copper_cable": {
+    name: 'copper_cable', fancy_name: 'Copper Cable',
+    id: 21, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 21, crafting_time: 60 * 0.5, quant: 2,
+      ingredients: [
+        {name: "copper_plate", quant: 1}
+      ]
+    }
+  },
 };
 
 // ITEMS = {
-//   [10] = {
-//     name = 'splitter',
-//     fancy_name = 'Splitter',
-//     id = 10,
-//     sprite_id = 323,
-//     belt_id = 433,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 100,
-//     recipe = {
-//       id = 10,
-//       crafting_time = 60*1,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 2, count = 5},
-//         [2] = {id = 15, count = 5},
-//         [3] = {id = 9, count = 4},
-//       }
-//     },
-//   },
-//   [11] = {
-//     name = 'inserter',
-//     fancy_name = 'Inserter',
-//     id = 11,
-//     sprite_id = 267,
-//     belt_id = 417,
-//     color_key = 15,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 100,
-//     recipe = {
-//       id = 11,
-//       crafting_time = 60*0.5,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 2, count = 1},
-//         [2] = {id = 20, count = 1},
-//         [3] = {id = 15, count = 1},
-//       }
-//     },
-//   },
-//   [12] = {
-//     name = 'power_pole',
-//     fancy_name = 'Power Pole',
-//     id = 12,
-//     sprite_id = 478,
-//     belt_id = 433,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 100,
-//     recipe = {},
-//   },
-//   [13] = {
-//     name = 'mining_drill',
-//     fancy_name = 'Mining Drill',
-//     id = 13,
-//     sprite_id = 276,
-//     belt_id = 416,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 50,
-//     recipe = {
-//       id = 13,
-//       crafting_time = 60*2,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 2, count = 3},
-//         [2] = {id = 15, count = 10},
-//         [3] = {id = 20, count = 5}
-//       },
-//     }
-//   },
-//   [14] = {
-//     name = 'stone_furnace',
-//     fancy_name = 'Stone Furnace',
-//     id = 14,
-//     sprite_id = 503,
-//     belt_id = 502,
-//     color_key = 6,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 50,
-//     recipe = {
-//       id = 14,
-//       crafting_time = 60*0.5,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 5, count = 5}
-//       },
-//     }
-//   },
-//   [15] = {
-//     name = 'iron_plate',
-//     fancy_name = 'Iron Plate',
-//     info = 'Obtained via smelting iron ore in a furnace',
-//     id = 15,
-//     sprite_id = 448,
-//     belt_id = 299,
-//     color_key = 1,
-//     type = 'ore',
-//     craftable = false,
-//     stack_size = 50,
-//     smelted_id = 27,
-//     required_tech = 4,
-//     smelting_time = 5 * 60,
-//     recipe = false,
-//   },
-//   [16] = {
-//     name = 'copper_plate',
-//     fancy_name = 'Copper Plate',
-//     info = 'Obtained via smelting copper ore in a furnace',
-//     id = 16,
-//     sprite_id = 449,
-//     belt_id = 300,
-//     color_key = 1,
-//     type = 'intermediate',
-//     craftable = false,
-//     stack_size = 50,
-//     recipe = false,
-//   },
-//   [17] = {
-//     name = 'stone_brick',
-//     fancy_name = 'Stone Brick',
-//     info = 'Obtained via smelting stone ore in a furnace',
-//     id = 17,
-//     sprite_id = 450,
-//     belt_id = 282,
-//     color_key = 1,
-//     type = 'intermediate',
-//     craftable = false,
-//     stack_size = 50,
-//     smelting_time = 10,
-//     recipe = false,
-//   },
-//   [18] = {
-//     name = 'underground_belt',
-//     fancy_name = 'Underground Belt',
-//     id = 18,
-//     sprite_id = 301,
-//     belt_id = 279,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 50,
-//     recipe = {
-//       id = 18,
-//       crafting_time = 60*1,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 15, count = 10}, --plate
-//         [2] = {id = 9, count = 5}, --transport_belt
-//       }
-//     },
-//   },
-//   [19] = {
-//     name = 'assembly_machine',
-//     fancy_name = 'Assembly Machine',
-//     id = 19,
-//     sprite_id = 331,
-//     belt_id = 347,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     sub_type = 'craftable',
-//     stack_size = 50,
-//     recipe = {
-//       id = 21,
-//       crafting_time = 60*0.5,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 2, count = 3},
-//         [1] = {id = 20, count = 5},
-//         [1] = {id = 15, count = 9},
-//       },
-//     }
-//   },
-//   [20] = {
-//     name = 'gear',
-//     fancy_name = 'Gear',
-//     id = 20,
-//     sprite_id = 452,
-//     belt_id = 432,
-//     color_key = 0,
-//     type = 'intermediate',
-//     craftable = {'PLAYER', 'machine'},
-//     stack_size = 100,
-//     recipe = {
-//       id = 20,
-//       crafting_time = 60*0.5,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 15, count = 2}
-//       }
-//     }
-//   },
-//   [21] = {
-//     name = 'copper_cable',
-//     fancy_name = 'Copper Cable',
-//     sprite_id = 453,
-//     id = 21,
-//     belt_id = 281,
-//     color_key = 0,
-//     type = 'intermediate',
-//     craftable = {'PLAYER', 'machine'},
-//     sub_type = 'craftable',
-//     stack_size = 100,
-//     recipe = {
-//       id = 21,
-//       crafting_time = 60*0.5,
-//       count = 2,
-//       ingredients = {
-//         [1] = {id = 16, count = 1}
-//       },
-//     }
-//   },
 //   [22] = {
 //     name = 'research_lab',
 //     fancy_name = 'Research Lab',
