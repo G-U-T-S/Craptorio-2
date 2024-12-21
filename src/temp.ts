@@ -255,73 +255,52 @@ const IITEMS: { [index: string]: item } = {
       ]
     }
   },
+
+  "research_lab": {
+    name: 'research_lab', fancy_name: 'Research Lab',
+    id: 22, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 22, crafting_time: 60 * 2, quant: 1,
+      ingredients: [
+        {name: "electronic_circuit", quant: 10},
+        {name: "gear", quant: 10},
+        {name: "transport_belt", quant: 4}
+      ]
+    }
+  },
+
+  "automation_pack": {
+    name: 'automation_pack', fancy_name: 'Automation Pack',
+    id: 23, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 23, crafting_time: 60 * 5, quant: 1,
+      ingredients: [
+        {name: "copper_plate", quant: 1},
+        {name: "gear", quant: 1}
+      ]
+    }
+  },
+
+  "logistics_pack": {
+    name: 'logistics_pack', fancy_name: 'Logistics Pack',
+    id: 24, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: "",
+    recipe: {
+      id: 24, crafting_time: 60 * 6, quant: 1,
+      ingredients: [
+        {name: "inserter", quant: 1},
+        {name: "transport_belt", quant: 1}
+      ]
+    }
+  },
 };
 
 // ITEMS = {
-//   [22] = {
-//     name = 'research_lab',
-//     fancy_name = 'Research Lab',
-//     sprite_id = 399,
-//     id = 22,
-//     belt_id = 281,
-//     color_key = 0,
-//     type = 'placeable',
-//     craftable = {'PLAYER', 'machine'},
-//     sub_type = 'craftable',
-//     stack_size = 50,
-//     recipe = {
-//       id = 22,
-//       crafting_time = 60*2,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 2, count = 10},
-//         [2] = {id = 20, count = 10},
-//         [3] = {id = 9, count = 4}
-//       },
-//     }
-//   },
-//   [23] = {
-//     name = 'automation_pack',
-//     fancy_name = 'Automation Pack',
-//     id = 23,
-//     sprite_id = 460,
-//     belt_id = 444,
-//     color_key = 0,
-//     type = 'intermediate',
-//     craftable = {'PLAYER', 'machine'},
-//     sub_type = 'craftable',
-//     stack_size = 50,
-//     recipe = {
-//       id = 23,
-//       crafting_time = 60*5,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 16, count = 1},
-//         [2] = {id = 20, count = 1}
-//       },
-//     }
-//   },
-//   [24] = {
-//     name = 'logistics_pack',
-//     fancy_name = 'Logistics Pack',
-//     id = 24,
-//     sprite_id = 461,
-//     belt_id = 445,
-//     color_key = 0,
-//     type = 'intermediate',
-//     craftable = {'PLAYER', 'machine'},
-//     sub_type = 'craftable',
-//     stack_size = 50,
-//     recipe = {
-//       id = 24,
-//       crafting_time = 60*6,
-//       count = 1,
-//       ingredients = {
-//         [1] = {id = 11, count = 1},
-//         [2] = {id =  9, count = 1}
-//       },
-//     }
-//   },
 //   [25] = {
 //     name = 'biology_pack',
 //     fancy_name = 'Biology Pack',
