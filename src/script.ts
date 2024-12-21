@@ -55,20 +55,17 @@ interface IuiString {
   fg: string;
   shadow: {x: number, y: number};
 }
-interface Iitem {
+interface item {
   name: string; fancy_name: string;
-  id: number; sprite_id: number; belt_id: number;
-  color_key: 0; type: string; craftable: [string, string];
-  sub_type: string; stack_size: number;
-  recipe: {
-    id: number, crafting_time: number, count: number,
-    ingredients: [
-      {id: number, count: number}, //--copper_cable
-      {id: number, count: number}, //--green_circuit
-      {id: number, count: number}, //--plastic_bar
-    ],
+  id: number; type: "consumable" | "oil" |  "ore" | "fuel" | "liquid" | "placeable" | "intermediate" | "upgrade";
+  craftable: "PLAYER" | "MACHINE" | "BIO_REFINERY" | "BOTH" | "NULL"; smelting_time: undefined | number;
+  sub_type: "icon_only" | "craftable" | "null"; stack_size: number | undefined; mining_time: undefined | number
+  fuel_time: number | undefined; info: string;
+  recipe: undefined | {
+    id: number; crafting_time: number; quant: number;
+    ingredients: Array< {name: string; quant: number} >;
   };
-};
+}
 
 //& minha implementação da active_window
 class windo {
@@ -332,10 +329,10 @@ class CraftMenu {
 
         if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
           // --assembly machine crafting
-          // if (ENTS[this.current_output]) {
+          // if (ENTS[this.current_output] !== undefined) {
           //   const item = ITEMS[RECIPES[this.active_tab][row][col]];
 
-          //   //TODO if (item.craftable === false && item.type !== 'oil') { sound('deny'); return false; }
+          //   //TODO if (item.craftable === "NULL" && item.type !== 'oil') { sound('deny'); return false; }
             
           //   if (item.type == 'oil' && ENTS[this.current_output].type == 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
           //     ENTS[this.current_output].set_recipe(ITEMS[RECIPES[this.active_tab][row][col]]);
@@ -770,8 +767,555 @@ const RECIPES: Array<Array<Array<string>>> = [
     [ ],
   ]
 ];
-const ITEMS = {
+const ITEMS: { [index: string]: item } = {
+  "advanced_circuit": {
+    name: "advanced_circuit", fancy_name: "advanced_circuit",
+    id: 1, type: 'consumable', craftable: "BOTH", mining_time: undefined,
+    sub_type: 'icon_only', stack_size: 100, info: "", smelting_time: undefined,
+    fuel_time: undefined, recipe: {
+      id: 1, crafting_time: 60*6, quant: 1,
+      ingredients: [
+        {name: "copper_cable", quant: 4},
+        {name: "green_circuit", quant: 2},
+        {name: "plastic_bar", quant: 2},
+      ],
+    }
+  },
 
+  "electronic_circuit": {
+    name: 'electronic_circuit', fancy_name: 'Electronic Circuit',
+    id: 2, type: 'consumable', craftable: "BOTH", mining_time: undefined,
+    sub_type: 'icon_only', stack_size: 100, info: "", smelting_time: undefined,
+    fuel_time: undefined, recipe: {
+      id: 2, crafting_time: 60*0.5, quant: 1,
+      ingredients: [
+        {name: "copper_cable", quant: 3},
+        {name: "iron_plate", quant: 1}
+      ],
+    }
+  },
+
+  "iron_ore": {
+    name: 'iron_ore', fancy_name: 'Iron Ore', smelting_time: 4 * 60,
+    fuel_time: undefined, id: 3, type: 'ore', craftable: "NULL",
+    mining_time: 4 * 60, sub_type: "null", stack_size: 100,
+    info: 'Collected by laser, or mining drill. Found at iron ore deposits in the wild',
+    recipe: undefined
+  },
+
+  "copper_ore": {
+    name: 'copper_ore', fancy_name: 'Copper Ore',
+    id: 4, type: 'ore', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by laser, or mining drill. Found at copper ore deposits in the wild',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "stone": {
+    name: 'stone', fancy_name: 'Stone Ore',
+    id: 5, type: 'ore', craftable: "NULL", smelting_time: 2 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 2 * 60,
+    info: 'Collected by laser, or mining drill. Found at stone ore deposits, and loose stones in the wild',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "coal": {
+    name: 'coal', fancy_name: 'Coal',
+    id: 6, type: 'fuel', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: 3 * 60,
+    info: 'Collected by laser, or mining drill. Found at coal ore deposits in the wild',
+    fuel_time: 60*15, recipe: undefined
+  },
+
+  "uranium": {
+    name: 'uranium', fancy_name: 'Uranium Ore',
+    id: 7, type: 'liquid', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by mining drill only. Found at uranium ore deposits in the wild',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "oil_shale": {
+    name: 'oil_shale', fancy_name: 'Oil Shale',
+    id: 8, type: 'liquid', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: 4 * 60,
+    info: 'Collected by laser, or mining drill. Found at oil-shale deposits in the wild',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "transport_belt": {
+    name: 'transport_belt', fancy_name: 'Transport Belt',
+    id: 9, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 9, crafting_time: 60 * 0.5,
+      quant: 2, ingredients: [
+        {name: 'gear', quant: 1},
+        {name: 'iron_plate', quant: 1}
+      ]
+    }
+  },
+
+  "splitter": {
+    name: 'splitter', fancy_name: 'Splitter',
+    id: 10, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 10, crafting_time: 60 * 1, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 5},
+        {name: "iron_plate", quant: 5},
+        {name: "transport_belt", quant: 4}
+      ]
+    }
+  },
+
+  "inserter": {
+    name: 'inserter', fancy_name: 'Inserter',
+    id: 11, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 11, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "electronic_circuit", quant: 1},
+        {name: "gear", quant: 1},
+        {name: "iron_plate", quant: 1}
+      ]
+    }
+  },
+
+  "power_pole": {
+    name: 'power_pole', fancy_name: 'Power Pole',
+    id: 12, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: undefined
+  },
+
+  "mining_drill": {
+    name: 'mining_drill', fancy_name: 'Mining Drill',
+    id: 13, type: "placeable", craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 13, crafting_time: 60 * 2, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 3},
+        {name: "iron_plate", quant: 10},
+        {name: "gear", quant: 5}
+      ]
+    }
+  },
+
+  "stone_furnace": {
+    name: 'stone_furnace', fancy_name: 'Stone Furnace',
+    id: 14, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined,  info: "",
+    recipe: {
+      id: 14, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "stone", quant: 5}
+      ]
+    }
+  },
+
+  "iron_plate": {
+    name: 'iron_plate', fancy_name: 'Iron Plate',
+    id: 15, type: 'ore', craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting iron ore in a furnace',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "copper_plate": {
+    name: 'copper_plate', fancy_name: 'Copper Plate',
+    id: 16, type: "intermediate", craftable: "NULL", smelting_time: 5 * 60,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting copper ore in a furnace',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "stone_brick": {
+    name: 'stone_brick', fancy_name: 'Stone Brick',
+    id: 17, type: 'intermediate', craftable: "NULL", smelting_time: 10,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    info: 'Obtained via smelting stone ore in a furnace',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "underground_belt": {
+    name: 'underground_belt', fancy_name: 'Underground Belt',
+    id: 18, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 18, crafting_time: 60 * 1, quant: 2,
+      ingredients: [
+        {name: "iron_plate", quant: 10},
+        {name: "transport_belt", quant: 5}
+      ]
+    }
+  },
+
+  "assembly_machine": {
+    name: 'assembly_machine', fancy_name: 'Assembly Machine',
+    id: 19, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      //! why this id is 21???
+      id: 21, crafting_time: 60 * 0.5, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 3},
+        {name: "gear", quant: 5},
+        {name: "iron_plate", quant: 9}
+      ]
+    }
+  },
+
+  "gear": {
+    name: 'gear', fancy_name: 'Gear',
+    id: 20, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 20, crafting_time: 60 * 0.5, quant: 1,
+      ingredients: [
+        {name: "iron_plate", quant: 2}
+      ]
+    }
+  },
+
+  "copper_cable": {
+    name: 'copper_cable', fancy_name: 'Copper Cable',
+    id: 21, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 21, crafting_time: 60 * 0.5, quant: 2,
+      ingredients: [
+        {name: "copper_plate", quant: 1}
+      ]
+    }
+  },
+
+  "research_lab": {
+    name: 'research_lab', fancy_name: 'Research Lab',
+    id: 22, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 22, crafting_time: 60 * 2, quant: 1,
+      ingredients: [
+        {name: "electronic_circuit", quant: 10},
+        {name: "gear", quant: 10},
+        {name: "transport_belt", quant: 4}
+      ]
+    }
+  },
+
+  "automation_pack": {
+    name: 'automation_pack', fancy_name: 'Automation Pack',
+    id: 23, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 23, crafting_time: 60 * 5, quant: 1,
+      ingredients: [
+        {name: "copper_plate", quant: 1},
+        {name: "gear", quant: 1}
+      ]
+    }
+  },
+
+  "logistics_pack": {
+    name: 'logistics_pack', fancy_name: 'Logistics Pack',
+    id: 24, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 24, crafting_time: 60 * 6, quant: 1,
+      ingredients: [
+        {name: "inserter", quant: 1},
+        {name: "transport_belt", quant: 1}
+      ]
+    }
+  },
+
+  "biology_pack": {
+    name: 'biology_pack', fancy_name: 'Biology Pack',
+    id: 25, type: 'oil', craftable: "BIO_REFINERY", smelting_time: undefined,
+    sub_type: 'craftable', stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "Crafed in a Bio Refinery",
+    recipe: {
+      id :25, crafting_time: 60 * 10, quant: 1,
+      ingredients: [
+        {name: "fiber", quant :25},
+        {name: "coal", quant :5},
+        {name: "oil_shale", quant :10}
+      ]
+    }
+  },
+
+  "production_pack": {
+    name: 'production_pack', fancy_name: 'Production Pack',
+    id: 26, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: 'craftable', stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 26, crafting_time: 60 * 20, quant: 1,
+      ingredients: [
+        {name: "bio_refinery", quant: 1},
+        {name: "steel_plate", quant: 5},
+        {name: "processing_unit", quant: 1}
+      ]
+    }
+  },
+
+  "steel_plate": {
+    name: 'steel_plate', fancy_name: 'Steel Plate',
+    id: 27, type: 'intermediate', craftable: "BOTH", smelting_time: 180,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    info: 'Obtained via smelting 2x iron plates in a furnace',
+    fuel_time: undefined, recipe: undefined
+  },
+
+  "wood": {
+    name: 'wood', fancy_name: 'Wood Planks',
+    id: 28, type: 'fuel', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: 1 * 2 * 60, info: 'Obtained via chopping trees in the wild',
+    recipe: undefined
+  },
+
+  "solar_panel": {
+    name: 'solar_panel', fancy_name: 'Solar Panel',
+    id: 29, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 29, crafting_time: 4.5 * 60, quant: 1,
+      ingredients: [
+        {name: "copper_plate", quant: 5},
+        {name: "electronic_circuit", quant: 15},
+        {name: "steel_plate", quant: 5}
+      ]
+    }
+  },
+
+  "bio_refinery": {
+    name: 'bio_refinery', fancy_name: 'Bio-Refinery',
+    id: 30, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 10, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 30, crafting_time: 10 * 60, quant: 1,
+      ingredients: [
+        {name: "copper_plate", quant: 5},
+        {name: "electronic_circuit", quant: 15},
+        {name: "steel_plate", quant: 5}
+      ]
+    }
+  },
+
+  "engine_unit": {
+    name: 'engine_unit', fancy_name: 'Biofuel Engine',
+    id: 31, type: 'intermediate', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 5, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 31, crafting_time: 10 * 60, quant: 1,
+      ingredients: [
+        {name: "gear", quant: 3},
+        {name: "steel_plate", quant: 2},
+        {name: "electronic_circuit", quant: 1}
+      ]
+    }
+  },
+
+  "fiber": {
+    name: 'fiber', fancy_name: 'Organic Fibers',
+    id: 32, type: "oil", craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 200, mining_time: undefined,
+    fuel_time: undefined, info: 'Acquired via laser mining or made in Bio Refinery',
+    recipe: {
+      id: 32, crafting_time: 3 * 60, quant: 50,
+      ingredients: [
+        {name: "wood", quant: 10}
+      ]
+    }
+  },
+
+  "chest": {
+    name: 'chest', fancy_name: 'Storage Chest',
+    id: 33, type: 'placeable', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: "",
+    recipe: {
+      id: 33, crafting_time: 60 * 3, quant: 1,
+      ingredients: [
+        {name: "wood", quant: 10}
+      ]
+    }
+  },
+
+  "laser_mining_speed": {
+    name: 'laser_mining_speed', fancy_name: 'Laser Mining 1 Upgrade',
+    id: 34, type: 'upgrade', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: undefined, mining_time: undefined,
+    fuel_time: undefined, info: 'Increases mining speed by 150%',
+    recipe: undefined
+  },
+
+  "biofuel": {
+    name: 'biofuel', fancy_name: 'Solid Biofuel',
+    id: 35, type: 'oil', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 20, mining_time: undefined,
+    fuel_time: undefined, info: 'Crafed in a Bio Refinery',
+    recipe: {
+      id: 32, crafting_time: 60 * 3, quant: 5,
+      ingredients: [
+        {name: "coal", quant: 1},
+        {name: "oil_shale", quant: 5},
+        {name: "fiber", quant: 10}
+      ]
+    }
+  },
+
+  "plastic_bar": {
+    name: 'plastic_bar', fancy_name: 'Plastic Bar',
+    id: 36, type: 'oil', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'Crafed in a Bio Refinery',
+    recipe: {
+      id: 36, crafting_time: 15, quant: 2,
+      ingredients: [
+        {name: "coal", quant: 1},
+        {name: "oil_shale", quant: 5},
+        {name: "fiber", quant: 10}
+      ]
+    }
+  },
+
+  "processing_unit": {
+    name: 'processing_unit', fancy_name: 'Processing Unit',
+    id: 36, type: 'oil', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'Crafed in a Bio Refinery',
+    recipe: {
+      id: 37, crafting_time: 10, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 10},
+        {name: "advanced_circuit", quant: 10},
+        {name: "biofuel", quant: 10}
+      ]
+    }
+  },
+
+  "laser_mining_speed2": {
+    name: 'laser_mining_speed2', fancy_name: 'Laser Mining 2 Upgrade',
+    id: 38, type: "upgrade", craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: undefined, mining_time: undefined,
+    fuel_time: undefined, info: 'Increases mining speed by +150%',
+    recipe: undefined
+  },
+
+  "laser_mining_speed3": {
+    name: 'laser_mining_speed3', fancy_name: 'Laser Mining 3 Upgrade',
+    id: 39, type: "upgrade", craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: undefined, mining_time: undefined,
+    fuel_time: undefined, info: 'Increases mining speed by +150%',
+    recipe: undefined
+  },
+
+  "rocket_silo": {
+    name: 'rocket_silo', fancy_name: 'Rocket Silo',
+    id: 40, type: 'placeable', craftable: "MACHINE", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'placeholder rocket text',
+    recipe: {
+      id: 40, crafting_time: 60 * 10, quant: 1,
+      ingredients: [
+        {name: "stone_brick", quant: 250},
+        {name: "iron_plate", quant: 100},
+        {name: "copper_plate", quant: 100},
+        {name: "refined_oil_chunk", quant: 100}
+      ]
+    }
+  },
+
+  "rocket_part": {
+    name: 'rocket_part', fancy_name: 'Rocket Part',
+    id: 41, type: 'intermediate', craftable: "BOTH", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'An intermediate product used in repairing rockets',
+    recipe: {
+      id: 41, crafting_time: 60 * 5, quant: 2,
+      ingredients: [
+        {name: "electronic_circuit", quant: 10},
+        {name: "advanced_circuit", quant: 10},
+        {name: "iron_plate", quant: 25},
+        {name: "stone_brick", quant: 25},
+      ]
+    }
+  },
+
+  "rocket_fuel": {
+    name: 'rocket_fuel', fancy_name: 'Rocket Fuel',
+    id: 42, type: 'oil', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'Like my grandpa\'s whiskey',
+    recipe: {
+      id: 42, crafting_time: 60 * 5, quant: 5,
+      ingredients: [
+        {name: "iron_plate", quant: 5},
+        {name: "copper_plate", quant: 5},
+        {name: "refined_oil_chunk", quant: 10},
+        {name: "biofuel", quant: 10},
+      ]
+    }
+  },
+
+  "rocket_control_unit": {
+    name: 'rocket_control_unit', fancy_name: 'Rocket Control Unit',
+    id: 43, type: 'intermediate', craftable: "MACHINE", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: 'High-tech electronics used to re-build rockets',
+    recipe: {
+      id: 43, crafting_time: 60 * 5, quant: 1,
+      ingredients: [
+        {name: "plastic_bar", quant: 5},
+        {name: "advanced_circuit", quant: 10},
+        {name: "electronic_circuit", quant: 10},
+        {name: "iron_plate", quant: 5},
+      ]
+    }
+  },
+
+  "rocket_science_pack": {
+    name: 'rocket_science_pack', fancy_name: 'Rocket Science Pack',
+    id: 44, type: 'intermediate', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 100, mining_time: undefined,
+    fuel_time: undefined, info: '1k Obtained from a Rocket Silo after launching a rocket into space',
+    recipe: undefined
+  },
+
+  "refined_oil_chunk": {
+    name: 'refined_oil_chunk', fancy_name: 'Refined Oil Chunk',
+    id: 45, type: 'oil', craftable: "NULL", smelting_time: undefined,
+    sub_type: "null", stack_size: 50, mining_time: undefined,
+    fuel_time: undefined, info: 'Condensed heavy oil, used in high-grade fuels',
+    recipe: {
+      id: 45, crafting_time: 60 * 1.5, quant: 2,
+      ingredients: [
+        {name: "oil_shale", quant: 10}
+      ]
+    }
+  },
 };
 const PLAYER = {
   x: 100*8, y: 50*8, spr: 362,
