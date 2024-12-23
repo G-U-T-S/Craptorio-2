@@ -5,7 +5,7 @@ Welcome to Craptorio-2! This project is a fork of a game that is a demake of the
 
 ## About the Game
 
-This game is built using TypeScript and is designed to run in web browsers. It aims to capture the essence of Factorio, but being a demake.
+This game is built using TypeScript and is designed to run in web browsers. It aims to capture the essence of Factorio, but being a demake, to run in all devices.
 
 ## Features
 
