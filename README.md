@@ -20,7 +20,7 @@ To get started with the game, follow these simple steps:
 
 1. **Get the Repository zip:**
 
-   Just dowload the zip file of the repository.
+   dowload the zip file of the repository.
 
 3. **extract to your folder:**
 
