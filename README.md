@@ -18,18 +18,14 @@ This game is built using TypeScript and is designed to run in web browsers. It a
 
 To get started with the game, follow these simple steps:
 
-1. **Clone the Repository:**
+1. **Get the Repository zip:**
+   Just dowload the zip file of the repository.
 
-    ```bash
-    git clone https://github.com/<your-username>/<your-repo-name>.git
-    cd <your-repo-name>
-    ```
+3. **extract to your folder:**
 
-2. **extract to your folder:**
+    create a folder and extract the .zip file in there.
 
-    create a folder for the game and extract in there:
-
-3. **Run the Game:**
+4. **Run the Game:**
 
     just double click the index.html file:
 
