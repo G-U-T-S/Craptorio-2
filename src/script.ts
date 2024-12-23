@@ -1,3 +1,12 @@
+
+
+/*
+eu tava mexendo na função click do craftMenu, mas para
+proseguir preciso criar a classe inventario, e tudo isso
+esta sendo feito para a função dispatch_input funcionar
+*/
+
+
 const CVS = document.getElementById("mainCanvas") as HTMLCanvasElement;
 const CTX = CVS.getContext("2d") as CanvasRenderingContext2D;
 
@@ -55,16 +64,17 @@ interface IuiString {
   fg: string;
   shadow: {x: number, y: number};
 }
-interface item {
+interface IitemRecipe {
+  id: number; crafting_time: number; quant: number;
+  ingredients: Array< {name: string; quant: number} >;
+}
+interface Iitem {
   name: string; fancy_name: string;
   id: number; type: "consumable" | "oil" |  "ore" | "fuel" | "liquid" | "placeable" | "intermediate" | "upgrade";
   craftable: "PLAYER" | "MACHINE" | "BIO_REFINERY" | "BOTH" | "NULL"; smelting_time: undefined | number;
   sub_type: "icon_only" | "craftable" | "null"; stack_size: number | undefined; mining_time: undefined | number
   fuel_time: number | undefined; info: string;
-  recipe: undefined | {
-    id: number; crafting_time: number; quant: number;
-    ingredients: Array< {name: string; quant: number} >;
-  };
+  recipe: IitemRecipe | undefined;
 }
 
 //& minha implementação da active_window
@@ -329,36 +339,134 @@ class CraftMenu {
 
         if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
           // --assembly machine crafting
-          // if (ENTS[this.current_output] !== undefined) {
-          //   const item = ITEMS[RECIPES[this.active_tab][row][col]];
+          if (ENTS[this.current_output] !== undefined) {
+            const item = ITEMS[RECIPES[this.active_tab][row][col]];
+            const cur_output = ENTS[this.current_output];
 
-          //   //TODO if (item.craftable === "NULL" && item.type !== 'oil') { sound('deny'); return false; }
+            //TODO if (item.craftable === "NULL" && item.type !== 'oil') { sound('deny'); return false; }
             
-          //   if (item.type == 'oil' && ENTS[this.current_output].type == 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
-          //     ENTS[this.current_output].set_recipe(ITEMS[RECIPES[this.active_tab][row][col]]);
-          //     //TODO toggle_crafting();
-          //     UI.active_window = ENTS[this.current_output].open();
-          //     this.current_output = 'PLAYER';
+            if (item.type === 'oil' && cur_output instanceof CrafterEntity && cur_output.type === 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
+              cur_output.set_recipe({ ...ITEMS[RECIPES[this.active_tab][row][col]].recipe } as IitemRecipe);
+              toggle_crafting(false);
+              //TODO UI.active_window = ENTS[this.current_output].open();
+              this.current_output = 'PLAYER';
               
-          //     return true;
-          //   }
-          //   else if (item.type !== 'oil' && ENTS[this.current_output].type !== 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
-          //     ENTS[this.current_output].set_recipe(ITEMS[RECIPES[this.active_tab][row][col]])
-          //     //TODO toggle_crafting();
-          //     UI.active_window = ENTS[this.current_output].open();
-          //     this.current_output = 'PLAYER';
+              return true;
+            }
+            //REALLY NEEDED?? else if (item.type !== 'oil' && cur_output instanceof CrafterEntity && cur_output.type !== 'bio_refinery' && UNLOCKED_ITEMS[item.id]) {
+            //   cur_output.set_recipe(ITEMS[RECIPES[this.active_tab][row][col]])
+            //   toggle_crafting(false);
+            //   //TOD UI.active_window = ENTS[this.current_output].open();
+            //   this.current_output = 'PLAYER';
               
-          //     return true;
-          //   }
+            //   return true;
+            // }
             
-          //   //TODO sound('deny')
-          //   return false;
-          // }
+            //TODO sound('deny')
+            return false;
+          }
+        }
+      }
+      else if (result !== undefined && sx !== undefined && sy !== undefined && index !== undefined && this.current_output === 'PLAYER') {
+        const row = Math.ceil(index / 10);
+        const col = ((index - 1) % 10) + 1;
+
+        if (row <= RECIPES[this.active_tab].length && col <= RECIPES[this.active_tab][row].length) {
+          //--PLAYER crafting
+          const item = ITEMS[RECIPES[this.active_tab][row][col]];
+
+          if (item && item.craftable && item.recipe !== undefined && UNLOCKED_ITEMS[item.id]) {
+            let can_craft = true;
+
+            // Object.entries(item.recipe.ingredients).forEach((k) => {
+            //   if (!INV.has_stack(k[0])) {
+            //     can_craft = false;
+            //   }
+            // });
+
+            if (can_craft) {
+              // for k, v in ipairs(item.recipe.ingredients) do
+              //   INV:remove_stack(v)
+              //   ui.new_alert(CURSOR.x, CURSOR.y - 5, '-' .. v.count .. ' ' .. ITEMS[v.id].fancy_name, 1500, 0, 2)
+              // end
+              // ui.new_alert(CURSOR.x, CURSOR.y, '+' .. item.recipe.count .. ' ' .. item.fancy_name, 1500, 0, 4)
+              // INV:add_item({id = item.id, count = item.recipe.count})
+            }
+          }
         }
       }
     }
 
     return false;
+    /*
+    if side == 'left' and not CURSOR.ll then
+      if result and self.current_output ~= 'PLAYER' then
+        if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
+          --assembly machine crafting
+          if ENTS[self.current_output] then
+            local item = ITEMS[recipes[self.active_tab][row][col]]
+            if item.craftable == false and item.type ~= 'oil' then sound('deny') return end
+            if item.type == 'oil' and ENTS[self.current_output].type == 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
+              ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
+              toggle_crafting()
+              ui.active_window = ENTS[self.current_output]:open()
+              self.current_output = 'PLAYER'
+              return true
+            elseif item.type ~= 'oil' and ENTS[self.current_output].type ~= 'bio_refinery' and UNLOCKED_ITEMS[item.id] then
+              ENTS[self.current_output]:set_recipe(ITEMS[recipes[self.active_tab][row][col]])
+              toggle_crafting()
+              ui.active_window = ENTS[self.current_output]:open()
+              self.current_output = 'PLAYER'
+              return true
+            end
+            sound('deny')
+            return false
+          end
+        end
+      elseif result and self.current_output == 'PLAYER' then
+        local row = math.ceil(index / 10)
+        local col = ((index - 1) % 10) + 1
+        if row <= #recipes[self.active_tab] and col <= #recipes[self.active_tab][row] then
+          --PLAYER crafting
+          local item = ITEMS[recipes[self.active_tab][row][col]]
+          if item and item.craftable and UNLOCKED_ITEMS[item.id] then
+            local can_craft = true
+            for k, v in ipairs(item.recipe.ingredients) do
+              if not INV:has_stack(v) then can_craft = false end
+            end
+            if can_craft then
+              for k, v in ipairs(item.recipe.ingredients) do
+                INV:remove_stack(v)
+                ui.new_alert(CURSOR.x, CURSOR.y - 5, '-' .. v.count .. ' ' .. ITEMS[v.id].fancy_name, 1500, 0, 2)
+              end
+              ui.new_alert(CURSOR.x, CURSOR.y, '+' .. item.recipe.count .. ' ' .. item.fancy_name, 1500, 0, 4)
+              INV:add_item({id = item.id, count = item.recipe.count})
+            end
+          end
+        end
+      end
+      --close button
+      local cx, cy, w, h = self.x + self.close_x, self.y + self.close_y, 5, 5
+      if x >= cx and x < cx + w and y >= cy and y < cy + h then
+        self.vis = false
+        return true
+      end
+      --dock button
+      local cx, cy, w, h = self.x + self.dock_x, self.y + self.dock_y, 5, 5
+      if x >= cx and x < cx + w and y >= cy and y < cy + h then
+        self.docked = not self.docked
+        return true
+      end
+      --category tabs
+      for i = 1, #self.tab do
+        if x >= self.x + self.tab[i].x - 1 and x < self.x + self.tab[i].x + self.tab[i].w and y >= self.y + self.tab[i].y - 1 and y < self.y + self.tab[i].y - 1 + self.tab[i].h then
+          self.active_tab = i
+          return true
+        end
+      end
+    end
+    return false
+    */
   }
 }
 class Tilemanager {
@@ -554,104 +662,64 @@ class Tilemanager {
     this.tiles[y][x].rot = new_tile.rot;
   }
 }
-class Vec2 {
-  public x: number;
-  public y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-  }
-
-  add(other: Vec2): Vec2 {
-    return new Vec2(this.x + other.x, this.y + other.y);
-  }
-
-  sub(other: Vec2): Vec2 {
-    return new Vec2(this.x - other.x, this.y - other.y);
-  }
-
-  mult(other: Vec2): Vec2 {
-    return new Vec2(this.x * other.x, this.y * other.y);
-  }
-
-  div(other: Vec2): Vec2 {
-    return new Vec2(this.x / other.x, this.y / other.y);
-  }
-
-  unm(): Vec2 {
-    return new Vec2(-this.x, -this.y);
-  }
-
-  dot(other: Vec2): number {
-    return this.x * other.x + this.y * other.y;
-  }
-
-  length(): number {
-    return Math.sqrt(this.x * this.x + this.y * this.y);
-  }
-
-  distance(other: Vec2): number {
-    return ((this.x - other.x) ^ 2 + (this.y - other.y) ^ 2) ^ 0.5;
-  }
-
-  normalize(): Vec2 {
-    const lenght = this.length();
-
-    if (lenght === 0) {
-      return new Vec2(0, 0);
-    }
-
-    return new Vec2(this.x / length, this.y / length);
-  }
-
-  rotate(angle: number): Vec2 {
-    const cos = Math.cos(angle)
-    const sen = Math.sin(angle)
-    return new Vec2(this.x * cos - this.y * sen, this.x * sen + this.y * cos);
-  }
-
-  _div(): number {
-    return this.x / this.y;
-  }
-
-  //* maybe makes more sense if returns the larger or smaller vector;
-  min(other: Vec2): Vec2 {
-    return new Vec2(Math.min(this.x, other.x), Math.min(this.y, other.y));
-  }
-
-  max(other: Vec2): Vec2 {
-    return new Vec2(Math.max(this.x, other.x), Math.max(this.y, other.y))
-  }
-  //*--------------------------------
-
-  abs(): Vec2 {
-    return new Vec2(Math.abs(this.x), Math.abs(this.y));
-  }
-
-  // mix(other: Vec2, n: number): number {
-  //   return this * n + v * math.max(0, 1 - n)
-  // }
-
-  toString(): string {
-    return `${this.x}_#{this.y}`;
-  }
-}
 class BaseEntity {
   public type: string;
-  public otherKey: string;
   public updated: boolean;
   public drawn: boolean;
   public isHovered: boolean;
-  public beltDrawn: boolean;
-  public curveChecked: boolean
 
-  constructor(type: string, otherKey: string) {
+
+  constructor(type: string) {
     this.type = type;
-    this.otherKey = otherKey;
     this.updated = false;
     this.drawn = false;
     this.isHovered = false;
+  }
+}
+class CrafterEntity extends BaseEntity {
+  private recipe: IitemRecipe;
+  private input: Array< {name: string} >;
+  private output: {id: number, count: number};
+  private requests: Array<Array<boolean>>;
+  
+  
+  constructor() {
+    super("assembly_machine");
+
+    this.recipe = {
+      id: -1, crafting_time: -1, quant: -1,
+      ingredients: []
+    };
+    this.input = [];
+    this.output = {id: -1, count: -1};
+    this.requests = [];
+  }
+
+  set_recipe(newRecipe: IitemRecipe): void {
+    this.recipe = { ...newRecipe };
+    for (let i = 0; this.recipe.ingredients.length; i++) {
+      this.input[i].name = this.recipe.ingredients[i].name;
+    }
+
+    this.output.id = this.recipe.id;
+    this.output.count = 0;
+    this.requests = [];
+    
+    for (let i = 1; this.recipe.ingredients.length; i++) {
+      this.requests[i] = [true, false];
+      // --[1] = 'do I need this item'
+      // --[2] = 'is an inserter currently delivering this'
+    }
+  }
+}
+class BeltEntity extends BaseEntity {
+  public beltDrawn: boolean;
+  public curveChecked: boolean;
+
+  constructor() {
+    super("transport_belt");
+
     this.beltDrawn = false;
     this.curveChecked = false;
   }
@@ -689,7 +757,9 @@ const CRAFT_COLS = 8;
 // const ORES = {};
 // const DUST = {};
 // const SPRITES = {};
-const ENTS: { [index: string]: BaseEntity }= {};
+
+// const INV = make_inventory();
+const ENTS: { [index: string]: CrafterEntity | BeltEntity } = {};
 const CURRENT_RECIPE = {x: 0, y: 0, id: 0};
 const RESOURCES = {
   '2': {name: 'Petrified Fossil', id: 5, min:  5, max: 20}, //--rocks
@@ -767,7 +837,66 @@ const RECIPES: Array<Array<Array<string>>> = [
     [ ],
   ]
 ];
-const ITEMS: { [index: string]: item } = {
+const PLAYER = {
+  x: 100*8, y: 50*8, spr: 362,
+  lx: 0, ly: 0, shadow: 382,
+  anim_frame: 0, anim_speed: 8, anim_dir: 0,
+  anim_max: 4, last_dir: '0,0', move_speed: 0.15,
+  directions: <{ [index: string]: { id: number, flip: number, dust: {x: number, y: number}}}>{
+    '0,0':   {id: 362, flip: 0, rot: 0, dust: {x: 4, y: 11}},   //--straight
+    '0,-1':  {id: 365, flip: 0, rot: 0, dust: {x: 4, y: 11}},   //--up
+    '0,1':   {id: 365, flip: 2, rot: 0, dust: {x: 4, y: -2}},   //--down
+    '-1,0':  {id: 363, flip: 1, rot: 0, dust: {x: 11,y:  5}},   //--left
+    '1,0':   {id: 363, flip: 0, rot: 0, dust: {x: -2,y:  5}},   //--right
+    '1,-1':  {id: 364, flip: 0, rot: 0, dust: {x: -2,y: 10}},  //--up-right
+    '-1,-1': {id: 364, flip: 1, rot: 0, dust: {x: 10,y: 10}},  //--up-left
+    '-1,1':  {id: 364, flip: 3, rot: 0, dust: {x: 10,y: -2}},  //--down-left
+    '1,1':   {id: 364, flip: 2, rot: 0, dust: {x: -2,y: -2}}   //--down-right
+  },
+};
+const CURSOR = {
+  x: 0, y: 0, lx: 8, ly: 8,
+  tx: 8, ty: 8, wx: 0, wy: 0,
+  sx: 0, sy: 0, lsx: 0, lsy: 0,
+  l: false, ll: false, m: false, lm: false,
+  r: false, lr: false, prog: false, rot: 0,
+  held_left: false, held_right: false, ltx: 0, lty: 0,
+  last_rotation: 0, hold_time: 0, type: 'pointer', item: 'transport_belt',
+  drag: false, panel_drag: false, drag_dir: 0, drag_loc: {x: 0, y: 0},
+  hand_item: {id: 0, count: 0}, drag_offset: {x: 0, y: 0}, item_stack: {id: 9, count: 100}
+};
+const KEYBOARD: { [index: string]: boolean }= {
+  "shift": false, // 16
+  "alt": false,
+  "ctrl": false,
+  "tab": false,
+  "w": false, // 87
+  "a": false, // 65
+  "s": false, // 83
+  "d": false, // 68
+  "f": false,
+  "g": false,
+  "m": false,
+  "r": false,
+  "q": false,
+  "i": false,
+  "h": false,
+  "c": false,
+  "y": false,
+  "e": false,
+  "t": false,
+  "0": false,
+  "1": false,
+  "2": false,
+  "3": false,
+  "4": false,
+  "5": false,
+  "6": false,
+  "7": false,
+  "8": false,
+  "9": false,
+};
+const ITEMS: { [index: string]: Iitem } = {
   "advanced_circuit": {
     name: "advanced_circuit", fancy_name: "advanced_circuit",
     id: 1, type: 'consumable', craftable: "BOTH", mining_time: undefined,
@@ -1317,64 +1446,52 @@ const ITEMS: { [index: string]: item } = {
     }
   },
 };
-const PLAYER = {
-  x: 100*8, y: 50*8, spr: 362,
-  lx: 0, ly: 0, shadow: 382,
-  anim_frame: 0, anim_speed: 8, anim_dir: 0,
-  anim_max: 4, last_dir: '0,0', move_speed: 0.15,
-  directions: <{ [index: string]: { id: number, flip: number, dust: Vec2}}>{
-    '0,0':   {id: 362, flip: 0, rot: 0, dust: new Vec2(4, 11)},   //--straight
-    '0,-1':  {id: 365, flip: 0, rot: 0, dust: new Vec2(4, 11)},   //--up
-    '0,1':   {id: 365, flip: 2, rot: 0, dust: new Vec2(4, -2)},   //--down
-    '-1,0':  {id: 363, flip: 1, rot: 0, dust: new Vec2(11, 5)},   //--left
-    '1,0':   {id: 363, flip: 0, rot: 0, dust: new Vec2(-2, 5)},   //--right
-    '1,-1':  {id: 364, flip: 0, rot: 0, dust: new Vec2(-2, 10)},  //--up-right
-    '-1,-1': {id: 364, flip: 1, rot: 0, dust: new Vec2(10, 10)},  //--up-left
-    '-1,1':  {id: 364, flip: 3, rot: 0, dust: new Vec2(10, -2)},  //--down-left
-    '1,1':   {id: 364, flip: 2, rot: 0, dust: new Vec2(-2, -2)}   //--down-right
-  },
-};
-const CURSOR = {
-  x: 0, y: 0, lx: 8, ly: 8,
-  tx: 8, ty: 8, wx: 0, wy: 0,
-  sx: 0, sy: 0, lsx: 0, lsy: 0,
-  l: false, ll: false, m: false, lm: false,
-  r: false, lr: false, prog: false, rot: 0,
-  held_left: false, held_right: false, ltx: 0, lty: 0,
-  last_rotation: 0, hold_time: 0, type: 'pointer', item: 'transport_belt',
-  drag: false, panel_drag: false, drag_dir: 0, drag_loc: {x: 0, y: 0},
-  hand_item: {id: 0, count: 0}, drag_offset: {x: 0, y: 0}, item_stack: {id: 9, count: 100}
-};
-const KEYBOARD: { [index: string]: boolean }= {
-  "shift": false, // 16
-  "alt": false,
-  "ctrl": false,
-  "tab": false,
-  "w": false, // 87
-  "a": false, // 65
-  "s": false, // 83
-  "d": false, // 68
-  "f": false,
-  "g": false,
-  "m": false,
-  "r": false,
-  "q": false,
-  "i": false,
-  "h": false,
-  "c": false,
-  "y": false,
-  "e": false,
-  "t": false,
-  "0": false,
-  "1": false,
-  "2": false,
-  "3": false,
-  "4": false,
-  "5": false,
-  "6": false,
-  "7": false,
-  "8": false,
-  "9": false,
+const UNLOCKED_ITEMS: { [index: string]: boolean } = {
+  "advanced_circuit": false,
+  "electronic_circuit": true,
+  "iron_ore": true,
+  "copper_ore": true,
+  "stone": true,
+  "coal": true,
+  "uranium": true,
+  "oil_shale": true,
+  "transport_belt": true,
+  "splitter": false,
+  "inserter": false,
+  "power_pole": false,
+  "mining_drill": false,
+  "stone_furnace": true,
+  "iron_plate": true,
+  "copper_plate": true,
+  "stone_brick": true,
+  "underground_belt": false,
+  "assembly_machine": false,
+  "gear": true,
+  "copper_cable": true,
+  "research_lab": true,
+  "automation_pack": true,
+  "logistics_pack": false,
+  "biology_pack": false,
+  "production_pack": false,
+  "steel_plate": false,
+  "wood": true,
+  "solar_panel": false,
+  "bio_refinery": false,
+  "engine_unit": false,
+  "fiber": true,
+  "chest": true,
+  "laser_mining_speed": false,
+  "biofuel": false,
+  "plastic_bar": false,
+  "processing_unit": false,
+  "laser_mining_speed2": false,
+  "laser_mining_speed3": false,
+  "rocket_silo": false,
+  "rocket_part": false,
+  "rocket_fuel": false,
+  "rocket_control_unit": false,
+  "rocket_science_pack": false,
+  "refined_oil_chunk": false
 };
 const UI = new Ui();
 const TILEMAN = new Tilemanager();
@@ -1408,7 +1525,7 @@ let drill_anim_tick = 0;
 let furnace_anim_tick = 0;
 let crafter_anim_frame = 0;
 let crafter_anim_dir = 1;
-let state: "start" | "help" | "game" | "first_launch" = "game";
+let state: "start" | "help" | "game" | "first_launch" = "start";
 let _t = 0;
 
 
@@ -1496,11 +1613,11 @@ function get_ent(x: number, y: number): string {
 
   if (ENTS[k].type === 'splitter') { return k; }
 
-  if (ENTS[k].type === 'underground_belt_exit') { return ENTS[k].otherKey; }
+  //TODO if (ENTS[k].type === 'underground_belt_exit') { return ENTS[k].otherKey; }
   
   if (ENTS[k].type === 'underground_belt') { return k; }
   
-  if (ENTS[k].otherKey) {return ENTS[k].otherKey}
+  //TODO if (ENTS[k].otherKey) {return ENTS[k].otherKey}
   
   else{ return k; }
   
@@ -1767,9 +1884,9 @@ function dispatch_input(): void {
 //     return
 //   end
   
-//   if inv:is_hovered(CURSOR.x, CURSOR.y) then
+//   if INV:is_hovered(CURSOR.x, CURSOR.y) then
 //     if (CURSOR.l and not CURSOR.ll) or (CURSOR.r and not CURSOR.lr) then
-//       inv:clicked(CURSOR.x, CURSOR.y)
+//       INV:clicked(CURSOR.x, CURSOR.y)
 //     end
 //     return
 //   end
@@ -1785,10 +1902,10 @@ function dispatch_input(): void {
 //         if result then
 //           CURSOR.item_stack.count = CURSOR.item_stack.count - 1
 //           if CURSOR.item_stack.slot then
-//             inv.slots[CURSOR.item_stack.slot].count = inv.slots[CURSOR.item_stack.slot].count - 1
-//             if inv.slots[CURSOR.item_stack.slot].count < 1 then
-//               inv.slots[CURSOR.item_stack.slot].count = 0
-//               inv.slots[CURSOR.item_stack.slot].id = 0
+//             INV.slots[CURSOR.item_stack.slot].count = INV.slots[CURSOR.item_stack.slot].count - 1
+//             if INV.slots[CURSOR.item_stack.slot].count < 1 then
+//               INV.slots[CURSOR.item_stack.slot].count = 0
+//               INV.slots[CURSOR.item_stack.slot].id = 0
 //             end
 //           end
 //           ui.new_alert(CURSOR.x, CURSOR.y, '-1 ' .. ITEMS[CURSOR.item_stack.id].fancy_name, 1000, 0, 6)
@@ -1819,17 +1936,17 @@ function dispatch_input(): void {
 //         local slot = CURSOR.item_stack.slot
 //         local item_consumed = callbacks[CURSOR.item].place_item(CURSOR.x, CURSOR.y)
 //         if slot and item_consumed then
-//           inv.slots[slot].count = inv.slots[slot].count - 1
-//           CURSOR.item_stack.count = inv.slots[slot].count
+//           INV.slots[slot].count = INV.slots[slot].count - 1
+//           CURSOR.item_stack.count = INV.slots[slot].count
 //         elseif item_consumed ~= false then
 //           CURSOR.item_stack.count = CURSOR.item_stack.count - 1
 //           if CURSOR.item_stack.count < 1 then
 //             set_cursor_item()
 //           end
 //         end
-//         if slot and inv.slots[slot].count < 1 then
-//           inv.slots[slot].id = 0
-//           inv.slots[slot].count = 0
+//         if slot and INV.slots[slot].count < 1 then
+//           INV.slots[slot].id = 0
+//           INV.slots[slot].count = 0
 //           set_cursor_item()
 //         end
 //         return
@@ -1842,10 +1959,10 @@ function dispatch_input(): void {
 //               set_cursor_item()
 //             end
 //             if CURSOR.item_stack.slot then
-//               inv.slots[CURSOR.item_stack.slot].count = inv.slots[CURSOR.item_stack.slot].count - 1
-//               if inv.slots[CURSOR.item_stack.slot].count < 1 then
-//                 inv.slots[CURSOR.item_stack.slot].id = 0
-//                 inv.slots[CURSOR.item_stack.slot].count = 0
+//               INV.slots[CURSOR.item_stack.slot].count = INV.slots[CURSOR.item_stack.slot].count - 1
+//               if INV.slots[CURSOR.item_stack.slot].count < 1 then
+//                 INV.slots[CURSOR.item_stack.slot].id = 0
+//                 INV.slots[CURSOR.item_stack.slot].count = 0
 //                 set_cursor_item()
 //               end
 //             end
@@ -1918,11 +2035,11 @@ function dispatch_input(): void {
 
 //     --check for held item placement/deposit to other ents
 //   --  if ENTS[k] then ENTS[k].is_hovered = true end
-//   if CURSOR.l and not CURSOR.ll and not CRAFT_MENU:is_hovered(CURSOR.x, CURSOR.y) and inv:is_hovered(CURSOR.x, CURSOR.y) then
-//     local slot = inv:get_hovered_slot(CURSOR.x, CURSOR.y)
+//   if CURSOR.l and not CURSOR.ll and not CRAFT_MENU:is_hovered(CURSOR.x, CURSOR.y) and INV:is_hovered(CURSOR.x, CURSOR.y) then
+//     local slot = INV:get_hovered_slot(CURSOR.x, CURSOR.y)
 //     if slot then
 //       --trace(slot.index)
-//       inv.slots[slot.index]:callback()
+//       INV.slots[slot.index]:callback()
 //       return
 //     end
     
@@ -2011,6 +2128,14 @@ function drawBg(color: string): void {
 function prints(text: string, x: number, y: number, fontSize: number, bg: string, fg: string, shadow_offset: {x: number, y: number}): void {
   drawText(text, x + shadow_offset.x, y + shadow_offset.y, fontSize, bg, "middle", "left");
   drawText(text, x, y, fontSize, fg, "middle", "left");
+}
+function toggle_crafting(force: boolean) {
+  if (force) {
+    CRAFT_MENU.vis = true;
+  } 
+  else {
+    CRAFT_MENU.vis = !CRAFT_MENU.vis;
+  }
 }
 
 //! não tenho certeza se essas funções funcionam de screen e world;
@@ -2156,7 +2281,7 @@ function TIC() {
   }
 
   if (!show_mini_map) {
-    // inv:draw()
+    // INV:draw()
     // CRAFT_MENU:draw()
     // if (UI.active_window) {
     //   if (ENTS[UI.active_window.ent_key]) {
@@ -2204,7 +2329,7 @@ function TIC() {
     v.drawn = false;
     v.isHovered = false;
 
-    if (v.type === 'transport_belt') {
+    if (v.type === 'transport_belt' && v instanceof BeltEntity) {
       v.beltDrawn = false;
       v.curveChecked = false;
     }
@@ -2238,9 +2363,9 @@ function TIC() {
 
 
 BOOT();
+/*
 //
 //TODO sspr = spr
-//TODO inv = make_inventory()
 //TODO const starting_items = {
 //   {id = 33, slot =  1}, {id = 10, slot =  2}, {id = 23, slot =  3},
 //   {id = 24, slot =  4}, {id = 25, slot =  5}, {id = 26, slot =  6},
@@ -2252,8 +2377,8 @@ BOOT();
 //   {id = 22, slot = 62}, {id = 19, slot = 63}, {id = 30, slot = 64},
 // }
 // -- for k,v in ipairs(starting_items) do
-// --   inv.slots[v.slot].id = v.id
-// --   inv.slots[v.slot].count = ITEMS[v.id].stack_size
+// --   INV.slots[v.slot].id = v.id
+// --   INV.slots[v.slot].count = ITEMS[v.id].stack_size
 // -- end
 //TODO CRAFT_MENU = ui.NewCraftPanel(135, 1)
 // --------------------
@@ -2272,3 +2397,4 @@ BOOT();
 //   ['tech_add']    = {id = 13, note = 'G-5', duration = 50, channel = 1, volume = 10, speed = 6},
 // }
 //
+*/
