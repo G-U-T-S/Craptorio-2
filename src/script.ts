@@ -96,7 +96,6 @@ let tick = 0;
 let state: "start" | "help" | "game" | "first_launch" = "start";
 
 
-
 function randRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
@@ -140,10 +139,18 @@ function BOOT(): void {
 
 
 function TIC() {
-  drawBg("black");
+  /*
+  if "menu":
+    mainMenuLoop()
+  
+  elif "help":
+    helpMenuLoop()
+  
+  elif "game":
+    gameLoop()
+  */
 
   tick = tick + 1;
-
   requestAnimationFrame(TIC);
 }
 
