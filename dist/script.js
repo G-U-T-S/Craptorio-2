@@ -46,27 +46,30 @@ window.addEventListener("keyup", (ev) => {
         }
     }
 });
+const perm = new Uint8Array(512);
+const permMod12 = new Uint8Array(512);
+const tmp = new Uint8Array(256);
 class Player {
     x;
     y;
     lx;
     ly;
-    anim_frame;
-    anim_speed;
-    anim_dir;
-    anim_max;
-    last_dir;
-    move_speed;
+    animFrame;
+    animSpeed;
+    animDir;
+    animMax;
+    lastDir;
+    moveSpeed;
     directions;
     constructor() {
         this.x = 0, this.y = 0;
         this.lx = 0, this.ly = 0;
-        this.anim_frame = 0;
-        this.anim_speed = 8;
-        this.anim_dir = 0;
-        this.anim_max = 4;
-        this.last_dir = "0,0";
-        this.move_speed = 1.9;
+        this.animFrame = 0;
+        this.animSpeed = 8;
+        this.animDir = 0;
+        this.animMax = 4;
+        this.lastDir = "0,0";
+        this.moveSpeed = 1.9;
         this.directions = {
             '0,0': { id: 362, flip: 0, rot: 0, dust: { x: 4, y: 11 } },
             '0,-1': { id: 365, flip: 0, rot: 0, dust: { x: 4, y: 11 } },
@@ -80,81 +83,487 @@ class Player {
         };
     }
     update() {
-        if (tick % PLAYER.anim_speed === 0) {
-            if (PLAYER.anim_dir === 0) {
-                PLAYER.anim_frame = PLAYER.anim_frame + 1;
-                if (PLAYER.anim_frame > PLAYER.anim_max) {
-                    PLAYER.anim_dir = 1;
-                    PLAYER.anim_frame = PLAYER.anim_max;
+        if (tick % this.animSpeed === 0) {
+            if (this.animDir === 0) {
+                this.animFrame = this.animFrame + 1;
+                if (this.animFrame > this.animMax) {
+                    this.animDir = 1;
+                    this.animFrame = this.animMax;
                 }
             }
             else {
-                PLAYER.anim_frame = PLAYER.anim_frame - 1;
-                if (PLAYER.anim_frame < 0) {
-                    PLAYER.anim_dir = 0;
-                    PLAYER.anim_frame = 0;
+                this.animFrame = this.animFrame - 1;
+                if (this.animFrame < 0) {
+                    this.animDir = 0;
+                    this.animFrame = 0;
                 }
             }
         }
-        PLAYER.lx = PLAYER.x;
-        PLAYER.ly = PLAYER.y;
-        let x_dir = 0;
-        let y_dir = 0;
+        this.lx = this.x;
+        this.ly = this.y;
+        let xDir = 0;
+        let yDir = 0;
         if (KEYBOARD["w"]) {
-            y_dir = -1;
+            yDir = -1;
         }
         if (KEYBOARD["s"]) {
-            y_dir = 1;
+            yDir = 1;
         }
         if (KEYBOARD["a"]) {
-            x_dir = -1;
+            xDir = -1;
         }
         if (KEYBOARD["d"]) {
-            x_dir = 1;
+            xDir = 1;
         }
         if (!CURSOR.prog) {
-            if (x_dir !== 0 || y_dir !== 0) {
-                this.move(x_dir * PLAYER.move_speed, y_dir * PLAYER.move_speed);
+            if (xDir !== 0 || yDir !== 0) {
+                this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
             }
         }
-        PLAYER.last_dir = `${x_dir},${y_dir}`;
+        this.lastDir = `${xDir},${yDir}`;
     }
     move(x, y) {
-        PLAYER.x = PLAYER.x + x;
-        PLAYER.y = PLAYER.y + y;
+        this.x = this.x + x;
+        this.y = this.y + y;
     }
     draw() {
-        switch (this.last_dir) {
+        const center = {
+            x: Math.round(CVS.width / 2),
+            y: Math.round(CVS.height / 2)
+        };
+        const atlasCoord = {
+            x: 0, y: 32
+        };
+        switch (this.lastDir) {
             case "-1,0": {
+                atlasCoord.x = 16;
                 break;
             }
             case "-1,1": {
+                atlasCoord.x = 48;
                 break;
             }
             case "-1,-1": {
-                break;
-            }
-            case "0,0": {
-                drawSprite("sprites", this.x, this.y, 0, 32);
+                atlasCoord.x = 32;
                 break;
             }
             case "0,1": {
+                atlasCoord.x = 64;
                 break;
             }
             case "0,-1": {
+                atlasCoord.x = 56;
                 break;
             }
             case "1,0": {
-                drawSprite("sprites", this.x, this.y, 8, 32);
+                atlasCoord.x = 8;
                 break;
             }
             case "1,1": {
+                atlasCoord.x = 40;
                 break;
             }
             case "1,-1": {
+                atlasCoord.x = 24;
                 break;
             }
         }
+        drawSprite("sprites", center.x, center.y + this.animFrame, atlasCoord.x, atlasCoord.y);
+    }
+}
+class Tilemanager {
+    tiles;
+    constructor() {
+        this.tiles = {};
+    }
+    createTile(x, y) {
+        const scale = 0.0005;
+        const scale2 = 0.025;
+    }
+    drawTerrain() {
+        const cameraTopLeftX = PLAYER.x - CVS.width / 2;
+        const cameraTopLeftY = PLAYER.y - CVS.height / 2;
+        const subTileX = cameraTopLeftX % 8;
+        const subTileY = cameraTopLeftY % 8;
+        const startX = Math.floor(cameraTopLeftX / 8);
+        const startY = Math.floor(cameraTopLeftY / 8);
+        for (let screenY = 0; screenY < CVS.height; screenY++) {
+            for (let screenX = 0; screenX < CVS.width; screenX++) {
+                const worldX = startX + screenX;
+                const worldY = startY + screenY;
+                if (this.tiles[worldX][worldY] === undefined) {
+                    this.createTile(worldX, worldY);
+                }
+                const tile = this.tiles[worldX][worldY];
+                if (!showMiniMap) {
+                    const sx = (screenX - 1) * 8 - subTileX;
+                    const sy = (screenY - 1) * 8 - subTileY;
+                    if (tile.ore) {
+                    }
+                    else if (!tile.isBorder) {
+                        const rot = tile.rot;
+                        let flip = tile.flip;
+                        if (!tile.isLand) {
+                            if (worldX % 2 == 1 && worldY % 2 == 1) {
+                                flip = 3;
+                            }
+                            else if (worldX % 2 == 1) {
+                                flip = 1;
+                            }
+                            else if (worldY % 2 == 1) {
+                                flip = 2;
+                            }
+                        }
+                        else {
+                        }
+                    }
+                }
+                else {
+                    if (tile.biome === 1) {
+                        let flip = 0;
+                        if (worldX % 2 == 1 && worldY % 2 == 1) {
+                            flip = 3;
+                        }
+                        else if (worldX % 2 == 1) {
+                            flip = 1;
+                        }
+                        else if (worldY % 2 == 1) {
+                            flip = 2;
+                        }
+                    }
+                    else {
+                    }
+                }
+            }
+        }
+    }
+}
+class Grad {
+    x;
+    y;
+    z;
+    constructor(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    dot2(x, y) {
+        return this.x * x + this.y * y;
+    }
+}
+class Perlin {
+    gradP;
+    grad3;
+    p;
+    constructor(seed) {
+        this.gradP = new Array(512);
+        this.grad3 = [
+            new Grad(1, 1, 0),
+            new Grad(-1, 1, 0),
+            new Grad(1, -1, 0),
+            new Grad(-1, -1, 0),
+            new Grad(1, 0, 1),
+            new Grad(-1, 0, 1),
+            new Grad(1, 0, -1),
+            new Grad(-1, 0, -1),
+            new Grad(0, 1, 1),
+            new Grad(0, -1, 1),
+            new Grad(0, 1, -1),
+            new Grad(0, -1, -1),
+        ];
+        this.p = [
+            151,
+            160,
+            137,
+            91,
+            90,
+            15,
+            131,
+            13,
+            201,
+            95,
+            96,
+            53,
+            194,
+            233,
+            7,
+            225,
+            140,
+            36,
+            103,
+            30,
+            69,
+            142,
+            8,
+            99,
+            37,
+            240,
+            21,
+            10,
+            23,
+            190,
+            6,
+            148,
+            247,
+            120,
+            234,
+            75,
+            0,
+            26,
+            197,
+            62,
+            94,
+            252,
+            219,
+            203,
+            117,
+            35,
+            11,
+            32,
+            57,
+            177,
+            33,
+            88,
+            237,
+            149,
+            56,
+            87,
+            174,
+            20,
+            125,
+            136,
+            171,
+            168,
+            68,
+            175,
+            74,
+            165,
+            71,
+            134,
+            139,
+            48,
+            27,
+            166,
+            77,
+            146,
+            158,
+            231,
+            83,
+            111,
+            229,
+            122,
+            60,
+            211,
+            133,
+            230,
+            220,
+            105,
+            92,
+            41,
+            55,
+            46,
+            245,
+            40,
+            244,
+            102,
+            143,
+            54,
+            65,
+            25,
+            63,
+            161,
+            1,
+            216,
+            80,
+            73,
+            209,
+            76,
+            132,
+            187,
+            208,
+            89,
+            18,
+            169,
+            200,
+            196,
+            135,
+            130,
+            116,
+            188,
+            159,
+            86,
+            164,
+            100,
+            109,
+            198,
+            173,
+            186,
+            3,
+            64,
+            52,
+            217,
+            226,
+            250,
+            124,
+            123,
+            5,
+            202,
+            38,
+            147,
+            118,
+            126,
+            255,
+            82,
+            85,
+            212,
+            207,
+            206,
+            59,
+            227,
+            47,
+            16,
+            58,
+            17,
+            182,
+            189,
+            28,
+            42,
+            223,
+            183,
+            170,
+            213,
+            119,
+            248,
+            152,
+            2,
+            44,
+            154,
+            163,
+            70,
+            221,
+            153,
+            101,
+            155,
+            167,
+            43,
+            172,
+            9,
+            129,
+            22,
+            39,
+            253,
+            19,
+            98,
+            108,
+            110,
+            79,
+            113,
+            224,
+            232,
+            178,
+            185,
+            112,
+            104,
+            218,
+            246,
+            97,
+            228,
+            251,
+            34,
+            242,
+            193,
+            238,
+            210,
+            144,
+            12,
+            191,
+            179,
+            162,
+            241,
+            81,
+            51,
+            145,
+            235,
+            249,
+            14,
+            239,
+            107,
+            49,
+            192,
+            214,
+            31,
+            181,
+            199,
+            106,
+            157,
+            184,
+            84,
+            204,
+            176,
+            115,
+            121,
+            50,
+            45,
+            127,
+            4,
+            150,
+            254,
+            138,
+            236,
+            205,
+            93,
+            222,
+            114,
+            67,
+            29,
+            24,
+            72,
+            243,
+            141,
+            128,
+            195,
+            78,
+            66,
+            215,
+            61,
+            156,
+            180,
+        ];
+        if (seed > 0 && seed < 1) {
+            seed *= 65536;
+        }
+        seed = Math.floor(seed);
+        if (seed < 256) {
+            seed |= seed << 8;
+        }
+        for (let i = 0; i < 256; i++) {
+            let v;
+            if (i & 1) {
+                v = this.p[i] ^ (seed & 255);
+            }
+            else {
+                v = this.p[i] ^ ((seed >> 8) & 255);
+            }
+            perm[i] = perm[i + 256] = v;
+            this.gradP[i] = this.gradP[i + 256] = this.grad3[v % 12];
+        }
+    }
+    fade(t) {
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+    noise2D(x, y) {
+        let X = Math.floor(x);
+        let Y = Math.floor(y);
+        x = x - X;
+        y = y - Y;
+        X = X & 255;
+        Y = Y & 255;
+        const n00 = this.gradP[X + perm[Y]].dot2(x, y);
+        const n01 = this.gradP[X + perm[Y + 1]].dot2(x, y - 1);
+        const n10 = this.gradP[X + 1 + perm[Y]].dot2(x - 1, y);
+        const n11 = this.gradP[X + 1 + perm[Y + 1]].dot2(x - 1, y - 1);
+        const u = this.fade(x);
+        return lerp(lerp(n00, n10, u), lerp(n01, n11, u), this.fade(y));
     }
 }
 class Label {
@@ -206,18 +615,21 @@ const CURSOR = {
     sx: 0, sy: 0, lsx: 0, lsy: 0,
     l: false, ll: false, m: false, lm: false,
     r: false, lr: false, prog: false, rot: 0,
-    held_left: false, held_right: false, ltx: 0, lty: 0,
-    last_rotation: 0, hold_time: 0, type: 'pointer', item: 'transport_belt',
-    drag: false, panel_drag: false, drag_dir: 0, drag_loc: { x: 0, y: 0 },
-    hand_item: { id: 0, count: 0 }, drag_offset: { x: 0, y: 0 }, item_stack: { id: 9, count: 100 }
+    heldLeft: false, heldRight: false, ltx: 0, lty: 0,
+    lastRotation: 0, holdTime: 0, type: 'pointer', item: 'transport_belt',
+    drag: false, panelDrag: false, dragDir: 0, dragLoc: { x: 0, y: 0 },
+    handItem: { id: 0, count: 0 }, dragOffset: { x: 0, y: 0 }, itemStack: { id: 9, count: 100 }
 };
 const PLAYER = new Player();
+const TILEMAN = new Tilemanager();
+const PERLIN = new Perlin(1);
 const spriteAtlas = new Image();
 spriteAtlas.src = "./assets/sprites.png";
 const tilesAtlas = new Image();
 tilesAtlas.src = "./assets/tiles.png";
 let tick = 0;
 let state = "start";
+let showMiniMap = false;
 let integerScale = true;
 function isHovered(mouse, box) {
     return (mouse.x >= box.x &&
@@ -227,6 +639,9 @@ function isHovered(mouse, box) {
 }
 function randRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
+}
+function lerp(a, b, t) {
+    return a + t * (b - a);
 }
 function resizeCanvas() {
     const windowWidth = window.innerWidth;
@@ -264,7 +679,7 @@ function drawLine(x1, y1, x2, y2, strokeColor) {
     CTX.moveTo(x1, y1);
     CTX.lineTo(x2, y2);
 }
-function drawPanel(x, y, w, h, bg, fg, shadow_color, label) {
+function drawPanel(x, y, w, h, bg, fg, shadowColor, label) {
     drawRect(x, y, w, h, bg, bg);
     drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
 }
@@ -276,18 +691,18 @@ function drawText(text, x, y, fontSize, color, baseLine, textAling) {
     CTX.fillStyle = color;
     CTX.fillText(text, x, y);
 }
-function drawTextButton(x, y, width, height, main_color, shadow_color, hover_color, label, locked) {
+function drawTextButton(x, y, width, height, mainColor, shadowColor, hoverColor, label, locked) {
     const middle = { x: x + (width / 2), y: y + (height / 2) };
     const hov = (!locked &&
         isHovered({ x: CURSOR.x, y: CURSOR.y }, { x: x, y: y, w: width, h: height }));
     if (!locked && hov && !CURSOR.l) {
-        drawRect(x, y, width, height, hover_color, hover_color);
+        drawRect(x, y, width, height, hoverColor, hoverColor);
     }
     else if (!locked && hov && CURSOR.l) {
-        drawRect(x, y, width, height, hover_color, hover_color);
+        drawRect(x, y, width, height, hoverColor, hoverColor);
     }
     else {
-        drawRect(x, y, width, height, main_color, main_color);
+        drawRect(x, y, width, height, mainColor, mainColor);
     }
     drawText(label.text, middle.x + label.shadow.x, middle.y + label.shadow.y, 25, label.bg, "middle", "center");
     drawText(label.text, middle.x, middle.y, 25, label.fg, "middle", "center");
@@ -303,59 +718,30 @@ function drawBg(color) {
 function clearScreen() {
     CTX.clearRect(0, 0, CVS.width, CVS.height);
 }
-function world_to_screen(worldX, worldY) {
-    const screen_x = (worldX * 8) - (PLAYER.x - 116);
-    const screen_y = (worldY * 8) - (PLAYER.y - 64);
-    return { tx: screen_x - 8, ty: screen_y - 8 };
-}
-function get_world_cell(mouseX, mouseY) {
-    const cam_x = PLAYER.x - 116 + 1;
-    const cam_y = PLAYER.y - 64 + 1;
-    const sub_tile_x = cam_x % 8;
-    const sub_tile_y = cam_y % 8;
-    const sx = Math.floor((mouseX + sub_tile_x) / 8);
-    const sy = Math.floor((mouseY + sub_tile_y) / 8);
-    const wx = Math.floor(cam_x / 8) + sx + 1;
-    const wy = Math.floor(cam_y / 8) + sy + 1;
-    return { wx: wx, wy: wy };
-}
-function get_screen_cell(mouseX, mouseY) {
-    const cam_x = 116 - PLAYER.x;
-    const cam_y = 64 - PLAYER.y;
-    const mx = Math.floor(cam_x) % 8;
-    const my = Math.floor(cam_y) % 8;
-    return { sx: mouseX - ((mouseX - mx) % 8), sy: mouseY - ((mouseY - my) % 8) };
-}
 function updateCursorState() {
     const l = CURSOR.l;
     const r = CURSOR.r;
     const sx = CURSOR.sx;
     const sy = CURSOR.sy;
-    const { wx, wy } = get_world_cell(CURSOR.x, CURSOR.y);
-    const { tx, ty } = world_to_screen(wx, wy);
-    if (l && CURSOR.l && !CURSOR.held_left && !CURSOR.r) {
-        CURSOR.held_left = true;
+    if (l && CURSOR.l && !CURSOR.heldLeft && !CURSOR.r) {
+        CURSOR.heldLeft = true;
     }
-    if (r && CURSOR.r && !CURSOR.held_right && !CURSOR.l) {
-        CURSOR.held_right = true;
+    if (r && CURSOR.r && !CURSOR.heldRight && !CURSOR.l) {
+        CURSOR.heldRight = true;
     }
-    if (CURSOR.held_left || CURSOR.held_right) {
-        CURSOR.hold_time = CURSOR.hold_time + 1;
+    if (CURSOR.heldLeft || CURSOR.heldRight) {
+        CURSOR.holdTime = CURSOR.holdTime + 1;
     }
-    if (!l && CURSOR.held_left) {
-        CURSOR.held_left = false;
-        CURSOR.hold_time = 0;
+    if (!l && CURSOR.heldLeft) {
+        CURSOR.heldLeft = false;
+        CURSOR.holdTime = 0;
     }
-    if (!r && CURSOR.held_right) {
-        CURSOR.held_right = false;
-        CURSOR.hold_time = 0;
+    if (!r && CURSOR.heldRight) {
+        CURSOR.heldRight = false;
+        CURSOR.holdTime = 0;
     }
     CURSOR.ltx = CURSOR.tx;
     CURSOR.lty = CURSOR.ty;
-    CURSOR.wx = wx;
-    CURSOR.wy = wy;
-    CURSOR.tx = tx;
-    CURSOR.ty = ty;
     CURSOR.sx = sx;
     CURSOR.sy = sy;
     CURSOR.lx = CURSOR.x;
@@ -368,7 +754,7 @@ function updateCursorState() {
     CURSOR.sx = sx;
     CURSOR.sy = sy;
     if (CURSOR.tx !== CURSOR.ltx || CURSOR.ty !== CURSOR.lty) {
-        CURSOR.hold_time = 0;
+        CURSOR.holdTime = 0;
     }
 }
 function gameLoop() {
@@ -433,7 +819,15 @@ function TIC() {
         helpMenuLoop();
     }
     else if (state === "game") {
-        gameLoop();
+        clearScreen();
+        for (let x = 0; x < 100; x++) {
+            for (let y = 0; y < 100; y++) {
+                const noise = PERLIN.noise2D(x, y);
+                console.log(noise);
+                drawRect(x, y, 1, 1, `rgb(${255 * noise}, ${255 * noise}, ${255 * noise})`, `rgb(${255 * noise}, ${255 * noise}, ${255 * noise})`);
+            }
+        }
+        return;
     }
     tick = tick + 1;
     requestAnimationFrame(TIC);
