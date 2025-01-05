@@ -7,7 +7,7 @@ import { Render } from "./classes/render.js";
 import { Player } from "./classes/player.js";
 import { Cursor } from "./classes/cursor.js";
 import { Keyboard } from "./classes/keyboard.js";
-// import { Tilemanager } from "./classes/tileManager.js";
+import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 
 
@@ -17,10 +17,14 @@ window.addEventListener("contextmenu", (ev) => {
 
 
 const RENDER = new Render("mainCanvas");
-const CURSOR = new Cursor("mainCanvas");
-const KEYBOARD = new Keyboard();
-const PLAYER = new Player(RENDER);
 // const TILEMAN = new Tilemanager("mainCanvas", PLAYER);
+const CURSOR = new Cursor();
+const KEYBOARD = new Keyboard();
+const PLAYER = new Player(() => {
+  RENDER.drawSprite(
+    "sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + PLAYER.animFrame,
+    PLAYER.atlasCoord.x, PLAYER.atlasCoord.y
+);});
 
 let tick = 0;
 let state: string = "start";
@@ -65,10 +69,12 @@ function getScreenell(mouseX: number, mouseY: number): {sx: number, sy: number} 
 function gameLoop() {
   RENDER.drawBg("black");
 
-  PLAYER.update(tick, KEYBOARD, CURSOR);
+  PLAYER.update(
+    tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog
+  );
 
   // TILEMAN.drawTerrain();
-  PLAYER.draw(RENDER.canvas.width / 2, RENDER.canvas.height / 2);
+  PLAYER.draw();
 }
 function mainMenuLoop() {
   RENDER.drawBg("gray");

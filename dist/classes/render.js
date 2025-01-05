@@ -1,11 +1,13 @@
 export class Render {
     canvas;
     context;
+    centerCanvas;
     spriteAtlas;
     tilesAtlas;
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.context = this.canvas.getContext("2d");
+        this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.spriteAtlas = new Image();
         this.spriteAtlas.src = "./assets/sprites.png";
         this.tilesAtlas = new Image();
@@ -80,6 +82,7 @@ export class Render {
             this.canvas.width = width;
             this.canvas.height = height;
         }
+        this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");
     }

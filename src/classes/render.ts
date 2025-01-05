@@ -4,12 +4,14 @@ import { Label } from "./label.js";
 export class Render {
   public canvas: HTMLCanvasElement;
   public context: CanvasRenderingContext2D;
+  public centerCanvas: {x: number, y: number};
   private spriteAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
   
   constructor(canvasId: string) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.spriteAtlas = new Image();
     this.spriteAtlas.src = "./assets/sprites.png";
     this.tilesAtlas = new Image();
@@ -131,6 +133,7 @@ export class Render {
     //   this.canvas.height = Math.floor(this.canvas.height);
     // }
   
+    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;
     this.drawBg("black");
   }

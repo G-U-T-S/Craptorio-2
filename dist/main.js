@@ -7,15 +7,17 @@ window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
 const RENDER = new Render("mainCanvas");
-const CURSOR = new Cursor("mainCanvas");
+const CURSOR = new Cursor();
 const KEYBOARD = new Keyboard();
-const PLAYER = new Player(RENDER);
+const PLAYER = new Player(() => {
+    RENDER.drawSprite("sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + PLAYER.animFrame, PLAYER.atlasCoord.x, PLAYER.atlasCoord.y);
+});
 let tick = 0;
 let state = "start";
 function gameLoop() {
     RENDER.drawBg("black");
-    PLAYER.update(tick, KEYBOARD, CURSOR);
-    PLAYER.draw(RENDER.canvas.width / 2, RENDER.canvas.height / 2);
+    PLAYER.update(tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
+    PLAYER.draw();
 }
 function mainMenuLoop() {
     RENDER.drawBg("gray");

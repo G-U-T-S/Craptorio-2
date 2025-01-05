@@ -6,8 +6,8 @@ export class Cursor {
     m;
     r;
     prog;
-    canvas;
-    constructor(canvasId) {
+    canvasId;
+    constructor(canvasId = "mainCanvas") {
         this.x = 0;
         this.y = 0;
         this.l = false;
@@ -15,11 +15,14 @@ export class Cursor {
         this.m = false;
         this.r = false;
         this.prog = false;
-        this.canvas = document.getElementById(canvasId);
+        this.canvasId = canvasId;
         window.addEventListener("mousemove", (ev) => {
-            const rect = this.canvas.getBoundingClientRect();
-            this.x = ev.clientX - rect.left;
-            this.y = ev.clientY - rect.top;
+            const canvas = ev.target;
+            if (canvas instanceof HTMLCanvasElement && canvas.id === this.canvasId) {
+                const rect = canvas.getBoundingClientRect();
+                this.x = ev.clientX - rect.left;
+                this.y = ev.clientY - rect.top;
+            }
         });
         window.addEventListener("mousedown", (ev) => {
             if (ev.button === 0) {

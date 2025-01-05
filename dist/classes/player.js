@@ -10,8 +10,9 @@ export class Player {
     lastDir;
     moveSpeed;
     directions;
-    render;
-    constructor(render) {
+    atlasCoord;
+    drawCallback;
+    constructor(drawCallback) {
         this.x = 0, this.y = 0;
         this.lx = 0, this.ly = 0;
         this.animFrame = 0;
@@ -31,9 +32,10 @@ export class Player {
             '-1,1': { id: 364, flip: 3, rot: 0, dust: { x: 10, y: -2 } },
             '1,1': { id: 364, flip: 2, rot: 0, dust: { x: -2, y: -2 } }
         };
-        this.render = render;
+        this.drawCallback = drawCallback;
+        this.atlasCoord = { x: 0, y: 32 };
     }
-    update(tick, kboard, cursor) {
+    update(tick, keys, cursorProg) {
         if (tick % this.animSpeed === 0) {
             if (this.animDir === 0) {
                 this.animFrame = this.animFrame + 1;
@@ -54,67 +56,66 @@ export class Player {
         this.ly = this.y;
         let xDir = 0;
         let yDir = 0;
-        if (kboard.w) {
+        if (keys.w) {
             yDir = -1;
         }
-        if (kboard.s) {
+        if (keys.s) {
             yDir = 1;
         }
-        if (kboard.a) {
+        if (keys.a) {
             xDir = -1;
         }
-        if (kboard.d) {
+        if (keys.d) {
             xDir = 1;
         }
-        if (!cursor.prog) {
+        if (!cursorProg) {
             if (xDir !== 0 || yDir !== 0) {
-                this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
+                this.x += xDir * this.moveSpeed;
+                this.y += yDir * this.moveSpeed;
             }
         }
         this.lastDir = `${xDir},${yDir}`;
-    }
-    move(x, y) {
-        this.x = this.x + x;
-        this.y = this.y + y;
-    }
-    draw(x, y) {
-        const atlasCoord = {
-            x: 0, y: 32
-        };
         switch (this.lastDir) {
             case "-1,0": {
-                atlasCoord.x = 16;
+                this.atlasCoord.x = 16;
                 break;
             }
             case "-1,1": {
-                atlasCoord.x = 48;
+                this.atlasCoord.x = 48;
                 break;
             }
             case "-1,-1": {
-                atlasCoord.x = 32;
+                this.atlasCoord.x = 32;
                 break;
             }
             case "0,1": {
-                atlasCoord.x = 64;
+                this.atlasCoord.x = 64;
                 break;
             }
             case "0,-1": {
-                atlasCoord.x = 56;
+                this.atlasCoord.x = 56;
                 break;
             }
             case "1,0": {
-                atlasCoord.x = 8;
+                this.atlasCoord.x = 8;
                 break;
             }
             case "1,1": {
-                atlasCoord.x = 40;
+                this.atlasCoord.x = 40;
                 break;
             }
             case "1,-1": {
-                atlasCoord.x = 24;
+                this.atlasCoord.x = 24;
+                break;
+            }
+            default: {
+                this.atlasCoord.x = 0;
+                this.atlasCoord.y = 32;
                 break;
             }
         }
-        this.render.drawSprite("sprites", x, y + this.animFrame, atlasCoord.x, atlasCoord.y);
+    }
+    draw() {
+        this.drawCallback();
     }
 }
