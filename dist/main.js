@@ -3,6 +3,7 @@ import { Player } from "./classes/player.js";
 import { Cursor } from "./classes/cursor.js";
 import { Keyboard } from "./classes/keyboard.js";
 import { Label } from "./classes/label.js";
+import { FractalNoise2D } from "./classes/fractalNoise.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -12,12 +13,18 @@ const KEYBOARD = new Keyboard();
 const PLAYER = new Player(() => {
     RENDER.drawSprite("sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + PLAYER.animFrame, PLAYER.atlasCoord.x, PLAYER.atlasCoord.y);
 });
+const NOISE = new FractalNoise2D(1, 3, 0.01, 1, 0.05);
 let tick = 0;
-let state = "start";
+let state = "game";
 function gameLoop() {
     RENDER.drawBg("black");
-    PLAYER.update(tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
-    PLAYER.draw();
+    for (let x = 0; x < RENDER.canvas.width / 2; x++) {
+        for (let y = 0; y < RENDER.canvas.height / 2; y++) {
+            const noiseValue = NOISE.get(x, y);
+            console.log(noiseValue);
+            RENDER.drawRect(x, y, 1, 1, `rgb(${255 * noiseValue}, ${255 * noiseValue}, ${255 * noiseValue})`, `rgb(${255 * noiseValue}, ${255 * noiseValue}, ${255 * noiseValue})`);
+        }
+    }
 }
 function mainMenuLoop() {
     RENDER.drawBg("gray");
@@ -77,6 +84,7 @@ function TIC() {
     }
     else if (state === "game") {
         gameLoop();
+        return;
     }
     tick = tick + 1;
     requestAnimationFrame(TIC);
