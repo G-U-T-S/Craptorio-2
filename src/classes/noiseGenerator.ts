@@ -26,7 +26,7 @@ const p2D = [
   1, 0, 0, 0,
 ];
 
-export type Noise2DFn = (x: number, y: number) => number;
+type Noise2DFn = (x: number, y: number) => number;
 /*
 interface Options {
   amplitude: number;
@@ -214,10 +214,20 @@ export class FractalNoise2D {
     }
    
     value = value / (2 - 1 / Math.pow(2, this.octaves - 1));
-
-    //normalize
-    // value = (value - 0) / (1 - 0);
+    value *= -1;
 
     return value;
+  }
+}
+
+export class SimplexNoise2D {
+  private noise: Noise2DFn;
+
+  constructor(seed: number) {
+    this.noise = simplexNoise2D(seed);
+  }
+
+  get(x: number, y: number): number {
+    return this.noise(x, y);
   }
 }

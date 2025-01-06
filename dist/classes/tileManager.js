@@ -1,31 +1,129 @@
+import { SimplexNoise2D } from "./noiseGenerator.js";
+function lerp(a, b, t) {
+    return a + t * (b - a);
+}
+class Tile {
+    visited;
+    isLand;
+    biome;
+    isBorder;
+    atlasCoord;
+    ore;
+    flip;
+    rot;
+    borderCol;
+    noise;
+    constructor(noise, visited, isLand, biome, isBorder, atlasCoord, ore, flip, rot, borderCol) {
+        this.noise = noise;
+        this.visited = visited;
+        this.isLand = isLand;
+        this.biome = biome;
+        this.isBorder = isBorder;
+        this.atlasCoord = { ...atlasCoord };
+        this.ore = ore;
+        this.flip = flip;
+        this.rot = rot;
+        this.borderCol = borderCol;
+    }
+}
 export class Tilemanager {
     tiles;
     player;
-    canvas;
-    constructor(canvasId, player) {
+    render;
+    simplexNoise;
+    offset;
+    biomes;
+    ores;
+    constructor(noiseSeed, render, player) {
         this.tiles = {};
-        this.canvas = document.getElementById(canvasId);
+        this.render = render;
         this.player = player;
+        this.simplexNoise = new SimplexNoise2D(noiseSeed);
+        this.offset = 0;
+        this.biomes = [
+            {
+                name: "Desert", tileIdOffset: 0, min: 20, max: 30,
+                tMin: 20.5, tMax: 21.5, treeId: 194, treeDensity: 0.05,
+                colorKey: 0, mapCol: 5, clutter: 0.01
+            },
+            {
+                name: "Prarie", tileIdOffset: 16, min: 30, max: 45,
+                tMin: 33, tMax: 40, treeId: 200, treeDensity: 0.075,
+                colorKey: 1, mapCol: 12, clutter: 0.09
+            },
+            {
+                name: "Forest", tileIdOffset: 32, min: 45, max: 101,
+                tMin: 65, tMax: 85, treeId: 197, treeDensity: 0.15,
+                colorKey: 1, mapCol: 14, clutter: 0.05
+            }
+        ];
+        this.ores = [
+            {
+                name: "Iron", offset: 15000, id: 3, scale: 0.011, min: 15, max: 16,
+                bMin: 45, bMax: 100, tileId: 192, spriteId: 178,
+                colorKey: 4, biomeId: 2, mapCols: [8, 11, 12, 13, 14, 15]
+            },
+            {
+                name: "Copper", offset: 10000, id: 4, scale: 0.013, min: 15, max: 16,
+                bMin: 33, bMax: 65, tileId: 161, spriteId: 177,
+                colorKey: 1, biomeId: 2, mapCols: [2, 3, 4, 15]
+            },
+            {
+                name: "Coal", offset: 50000, id: 6, scale: 0.020, min: 14, max: 17,
+                bMin: 35, bMax: 75, tileId: 163, spriteId: 179,
+                colorKey: 4, biomeId: 3, mapCols: [0, 14, 15]
+            },
+            {
+                name: "Stone", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
+                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+            },
+            {
+                name: "Oil Shale", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
+                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+            },
+            {
+                name: "Uranium", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
+                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+            }
+        ];
     }
     createTile(x, y) {
         const scale = 0.0005;
         const scale2 = 0.025;
+        let baseNoise = (this.simplexNoise.get(x * scale + this.offset * scale, (y * scale) + (this.offset * scale)) / 2 + 0.5) * 100;
+        const addlNoise = (this.simplexNoise.get(x * scale2 + this.offset * scale2, (y * scale2) + (this.offset * scale2))) * 100;
+        baseNoise = lerp(baseNoise, addlNoise, 0.02);
+        const tile = new Tile(baseNoise, false, baseNoise >= 20, 1, false, { x: 0, y: 0 }, false, 0, 0, "green");
+        for (let i = 0; i > this.biomes.length; i++) {
+            if (baseNoise > this.biomes[i].min && baseNoise < this.biomes[i].max) {
+                tile.biome = i;
+                break;
+            }
+        }
+        tile.flip = Math.random() > 0.5 ? 1 : 0;
+        if (tile.isLand && baseNoise > 21 && this.oreSample(x, y, tile.biome, tile.noise) !== undefined) {
+            tile.ore = true;
+        }
+        return tile;
     }
     drawTerrain(showMiniMap) {
-        const cameraTopLeftX = this.player.x - this.canvas.width / 2;
-        const cameraTopLeftY = this.player.y - this.canvas.height / 2;
+        const cameraTopLeftX = this.player.x - this.render.canvas.width / 2;
+        const cameraTopLeftY = this.player.y - this.render.canvas.height / 2;
         const subTileX = cameraTopLeftX % 8;
         const subTileY = cameraTopLeftY % 8;
         const startX = Math.floor(cameraTopLeftX / 8);
         const startY = Math.floor(cameraTopLeftY / 8);
-        for (let screenY = 0; screenY < this.canvas.height; screenY++) {
-            for (let screenX = 0; screenX < this.canvas.width; screenX++) {
+        for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
+            for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
                 const worldX = startX + screenX;
                 const worldY = startY + screenY;
-                if (this.tiles[worldX][worldY] === undefined) {
-                    this.createTile(worldX, worldY);
+                if (this.tiles[`${worldX}-${worldY}`] === undefined) {
+                    this.tiles[`${worldX}-${worldY}`] = this.createTile(worldX, worldY);
                 }
-                const tile = this.tiles[worldX][worldY];
+                const tile = this.tiles[`${worldX}-${worldY}`];
                 if (!showMiniMap) {
                     const sx = (screenX - 1) * 8 - subTileX;
                     const sy = (screenY - 1) * 8 - subTileY;
@@ -67,5 +165,17 @@ export class Tilemanager {
                 }
             }
         }
+    }
+    oreSample(x, y, tilebiome, tilenoise) {
+        const tileBiome = tilebiome;
+        const tileNoise = tilenoise;
+        for (let i = 0; i < this.ores.length; i++) {
+            const scale = this.ores[i].scale;
+            const noise = (this.simplexNoise.get(x * scale + ((this.ores[i].offset * tileBiome) * scale) + this.offset * scale, (y * scale) + ((this.ores[i].offset * tileBiome) * scale) + (this.offset * scale)) / 2 + 0.5) * 16;
+            if (noise >= this.ores[i].min && noise <= this.ores[i].max && tileNoise >= this.ores[i].bMin && tileNoise <= this.ores[i].bMax) {
+                return i;
+            }
+        }
+        return undefined;
     }
 }

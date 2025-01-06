@@ -11,8 +11,8 @@ export class Player {
     moveSpeed;
     directions;
     atlasCoord;
-    drawCallback;
-    constructor(drawCallback) {
+    render;
+    constructor(render) {
         this.x = 0, this.y = 0;
         this.lx = 0, this.ly = 0;
         this.animFrame = 0;
@@ -32,7 +32,7 @@ export class Player {
             '-1,1': { id: 364, flip: 3, rot: 0, dust: { x: 10, y: -2 } },
             '1,1': { id: 364, flip: 2, rot: 0, dust: { x: -2, y: -2 } }
         };
-        this.drawCallback = drawCallback;
+        this.render = render;
         this.atlasCoord = { x: 0, y: 32 };
     }
     update(tick, keys, cursorProg) {
@@ -116,6 +116,6 @@ export class Player {
         }
     }
     draw() {
-        this.drawCallback();
+        this.render.drawSprite("sprites", this.render.centerCanvas.x - 16, this.render.centerCanvas.y + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }

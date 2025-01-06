@@ -2,29 +2,24 @@ import { Render } from "./classes/render.js";
 import { Player } from "./classes/player.js";
 import { Cursor } from "./classes/cursor.js";
 import { Keyboard } from "./classes/keyboard.js";
+import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
-import { FractalNoise2D } from "./classes/fractalNoise.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
 const RENDER = new Render("mainCanvas");
+const PLAYER = new Player(RENDER);
+const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
 const CURSOR = new Cursor();
 const KEYBOARD = new Keyboard();
-const PLAYER = new Player(() => {
-    RENDER.drawSprite("sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + PLAYER.animFrame, PLAYER.atlasCoord.x, PLAYER.atlasCoord.y);
-});
-const NOISE = new FractalNoise2D(1, 3, 0.01, 1, 0.05);
 let tick = 0;
 let state = "game";
+let showMiniMap = false;
 function gameLoop() {
     RENDER.drawBg("black");
-    for (let x = 0; x < RENDER.canvas.width / 2; x++) {
-        for (let y = 0; y < RENDER.canvas.height / 2; y++) {
-            const noiseValue = NOISE.get(x, y);
-            console.log(noiseValue);
-            RENDER.drawRect(x, y, 1, 1, `rgb(${255 * noiseValue}, ${255 * noiseValue}, ${255 * noiseValue})`, `rgb(${255 * noiseValue}, ${255 * noiseValue}, ${255 * noiseValue})`);
-        }
-    }
+    PLAYER.update(tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
+    TILEMAN.drawTerrain(showMiniMap);
+    PLAYER.draw();
 }
 function mainMenuLoop() {
     RENDER.drawBg("gray");

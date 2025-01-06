@@ -126,6 +126,16 @@ export class FractalNoise2D {
             value += this.noise(x * freq, y * freq) * (this.amplitude * Math.pow(this.persistence, octave));
         }
         value = value / (2 - 1 / Math.pow(2, this.octaves - 1));
+        value *= -1;
         return value;
+    }
+}
+export class SimplexNoise2D {
+    noise;
+    constructor(seed) {
+        this.noise = simplexNoise2D(seed);
+    }
+    get(x, y) {
+        return this.noise(x, y);
     }
 }
