@@ -20,7 +20,7 @@ export class Player {
         this.animDir = 0;
         this.animMax = 4;
         this.lastDir = "0,0";
-        this.moveSpeed = 1.9;
+        this.moveSpeed = 1;
         this.directions = {
             '0,0': { id: 362, flip: 0, rot: 0, dust: { x: 4, y: 11 } },
             '0,-1': { id: 365, flip: 0, rot: 0, dust: { x: 4, y: 11 } },
@@ -35,7 +35,7 @@ export class Player {
         this.render = render;
         this.atlasCoord = { x: 0, y: 32 };
     }
-    update(tick, keys, cursorProg) {
+    update(delta, tick, keys, cursorProg) {
         if (tick % this.animSpeed === 0) {
             if (this.animDir === 0) {
                 this.animFrame = this.animFrame + 1;
@@ -70,8 +70,8 @@ export class Player {
         }
         if (!cursorProg) {
             if (xDir !== 0 || yDir !== 0) {
-                this.x += xDir * this.moveSpeed;
-                this.y += yDir * this.moveSpeed;
+                this.x += (xDir * this.moveSpeed) * delta;
+                this.y += (yDir * this.moveSpeed) * delta;
             }
         }
         this.lastDir = `${xDir},${yDir}`;

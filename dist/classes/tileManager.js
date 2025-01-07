@@ -3,6 +3,7 @@ function lerp(a, b, t) {
     return a + t * (b - a);
 }
 class Tile {
+    position;
     visited;
     isLand;
     biome;
@@ -13,7 +14,8 @@ class Tile {
     rot;
     borderCol;
     noise;
-    constructor(noise, visited, isLand, biome, isBorder, atlasCoord, ore, flip, rot, borderCol) {
+    constructor(position, noise, visited, isLand, biome, isBorder, atlasCoord, ore, flip, rot, borderCol) {
+        this.position = { ...position };
         this.noise = noise;
         this.visited = visited;
         this.isLand = isLand;
@@ -31,7 +33,9 @@ export class Tilemanager {
     player;
     render;
     simplexNoise;
+    autoMapValues;
     offset;
+    totalTiles;
     biomes;
     ores;
     constructor(noiseSeed, render, player) {
@@ -89,6 +93,27 @@ export class Tilemanager {
                 colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
             }
         ];
+        this.autoMapValues = {
+            '1000': { spriteCoord: { x: 0, y: 0 } },
+            '0100': { spriteCoord: { x: 0, y: 0 } },
+            '0010': { spriteCoord: { x: 0, y: 0 } },
+            '0001': { spriteCoord: { x: 0, y: 0 } },
+            '1100': { spriteCoord: { x: 0, y: 0 } },
+            '0110': { spriteCoord: { x: 0, y: 0 } },
+            '0011': { spriteCoord: { x: 0, y: 0 } },
+            '1001': { spriteCoord: { x: 0, y: 0 } },
+            '1101': { spriteCoord: { x: 0, y: 0 } },
+            '1110': { spriteCoord: { x: 0, y: 0 } },
+            '0111': { spriteCoord: { x: 0, y: 0 } },
+            '1011': { spriteCoord: { x: 0, y: 0 } },
+            '0101': { spriteCoord: { x: 0, y: 0 } },
+            '1010': { spriteCoord: { x: 0, y: 0 } },
+            '1111': { spriteCoord: { x: 0, y: 0 } }
+        };
+        this.totalTiles = 0;
+        window.addEventListener("mouseup", () => {
+            console.log(this.totalTiles);
+        });
     }
     createTile(x, y) {
         const scale = 0.0005;
@@ -96,7 +121,7 @@ export class Tilemanager {
         let baseNoise = (this.simplexNoise.get(x * scale + this.offset * scale, (y * scale) + (this.offset * scale)) / 2 + 0.5) * 100;
         const addlNoise = (this.simplexNoise.get(x * scale2 + this.offset * scale2, (y * scale2) + (this.offset * scale2))) * 100;
         baseNoise = lerp(baseNoise, addlNoise, 0.02);
-        const tile = new Tile(baseNoise, false, baseNoise >= 20, 1, false, { x: 0, y: 0 }, 0, 0, 0, "green");
+        const tile = new Tile({ x: x, y: y }, baseNoise, false, baseNoise >= 20, 1, false, { x: 0, y: 0 }, 0, 0, 0, "green");
         for (let i = 0; i > this.biomes.length; i++) {
             if (baseNoise > this.biomes[i].min && baseNoise < this.biomes[i].max) {
                 tile.biome = i;
@@ -112,26 +137,35 @@ export class Tilemanager {
     drawTerrain(showMiniMap) {
         const cameraTopLeftX = this.player.x - this.render.canvas.width / 2;
         const cameraTopLeftY = this.player.y - this.render.canvas.height / 2;
-        const subTileX = cameraTopLeftX % 8;
-        const subTileY = cameraTopLeftY % 8;
-        const startX = Math.floor(cameraTopLeftX / 8);
-        const startY = Math.floor(cameraTopLeftY / 8);
-        for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
-            for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+        const startX = Math.floor(cameraTopLeftX);
+        const startY = Math.floor(cameraTopLeftY);
+        for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+            if (screenX % 40 !== 0) {
+                continue;
+            }
+            for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
+                if (screenY % 40 !== 0) {
+                    continue;
+                }
                 const worldX = startX + screenX;
                 const worldY = startY + screenY;
-                if (this.tiles[`${worldX}_${worldY}`] === undefined) {
+                if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 1500) {
                     this.tiles[`${worldX}_${worldY}`] = this.createTile(worldX, worldY);
+                    this.totalTiles += 1;
                 }
                 const tile = this.tiles[`${worldX}_${worldY}`];
-                const sx = (screenX - 1) * 8 - subTileX;
-                const sy = (screenY - 1) * 8 - subTileY;
+                if (tile === undefined) {
+                    return;
+                }
                 if (!showMiniMap) {
-                    if (tile.ore) {
-                        this.render.drawSprite("tiles", sx, sy, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y);
+                    if (!tile.visited) {
+                        this.autoMap(worldX, worldY);
+                    }
+                    if (tile.ore !== -1) {
+                        this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y);
                     }
                     else if (!tile.isBorder) {
-                        const rot = tile.rot;
+                        let rot = tile.rot;
                         let flip = tile.flip;
                         if (!tile.isLand) {
                             if (worldX % 2 == 1 && worldY % 2 == 1) {
@@ -145,10 +179,10 @@ export class Tilemanager {
                             }
                         }
                         else {
-                            this.render.drawSprite("tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                            this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
                             if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
-                                this.render.drawSprite("tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                                this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             }
                         }
                     }
@@ -165,9 +199,10 @@ export class Tilemanager {
                         else if (worldY % 2 == 1) {
                             flip = 2;
                         }
-                        this.render.drawSprite("tiles", sx, sy, tile.atlasCoord.x, tile.atlasCoord.y);
+                        this.render.drawSprite("tiles", tile.position.x, tile.position.y, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                     else {
+                        this.render.drawSprite("tiles", tile.position.x, tile.position.y, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                 }
             }
@@ -184,5 +219,38 @@ export class Tilemanager {
             }
         }
         return undefined;
+    }
+    autoMap(x, y) {
+        const tile = this.tiles[`${x}_${y}`];
+        tile.visited = true;
+        const adj = [
+            { x: 0, y: -1 },
+            { x: 1, y: 0 },
+            { x: 0, y: 1 },
+            { x: -1, y: 0 },
+        ];
+        let key = "";
+        for (let i = 0; i < 4; i++) {
+            const near = this.tiles[`${x + adj[i].x}_${y + adj[i].y}`];
+            if (near === undefined) {
+                break;
+            }
+            if (!near.isLand || near.biome < tile.biome) {
+                key = key + '1';
+                this.tiles[`${x}_${y}`].borderCol = this.biomes[near.biome].mapCol;
+            }
+            else {
+                key = key + '0';
+            }
+        }
+        const new_tile = this.autoMapValues[key];
+        if (new_tile === undefined) {
+            return;
+        }
+        this.tiles[`${x}_${y}`].atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
+        this.tiles[`${x}_${y}`].atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
+        this.tiles[`${x}_${y}`].isBorder = true;
+        this.tiles[`${x}_${y}`].ore = -1;
+        this.tiles[`${x}_${y}`].flip = 0;
     }
 }

@@ -13,7 +13,7 @@ export class Player {
     this.x = 0, this.y = 0;
     this.lx = 0, this.ly = 0
     this.animFrame = 0; this.animSpeed = 8; this.animDir = 0;
-    this.animMax = 4; this.lastDir = "0,0"; this.moveSpeed = 1.9
+    this.animMax = 4; this.lastDir = "0,0"; this.moveSpeed = 1
     this.directions = {
       '0,0':   {id: 362, flip: 0, rot: 0, dust: {x: 4, y: 11}},  //--straight
       '0,-1':  {id: 365, flip: 0, rot: 0, dust: {x: 4, y: 11}},  //--up
@@ -29,7 +29,7 @@ export class Player {
     this.atlasCoord = {x: 0, y: 32};
   }
 
-  public update(tick: number, keys: {w: boolean, a: boolean, s: boolean, d: boolean}, cursorProg: boolean): void {
+  public update(delta: number, tick: number, keys: {w: boolean, a: boolean, s: boolean, d: boolean}, cursorProg: boolean): void {
     // const dt = time() - lastFrameTime;
     if (tick % this.animSpeed === 0) {
       if (this.animDir === 0) {
@@ -87,8 +87,8 @@ export class Player {
         // sound('move');
         //! removi o delta time
         // this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
-        this.x += xDir * this.moveSpeed;
-        this.y += yDir * this.moveSpeed;
+        this.x += (xDir * this.moveSpeed) * delta;
+        this.y += (yDir * this.moveSpeed) * delta;
       }
     }
   

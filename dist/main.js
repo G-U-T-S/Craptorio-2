@@ -13,11 +13,13 @@ const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
 const CURSOR = new Cursor();
 const KEYBOARD = new Keyboard();
 let tick = 0;
+let delta = 0;
+let lastTime = 0;
 let state = "game";
 let showMiniMap = false;
 function gameLoop() {
     RENDER.drawBg("black");
-    PLAYER.update(tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
+    PLAYER.update(delta, tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
     TILEMAN.drawTerrain(showMiniMap);
     PLAYER.draw();
 }
@@ -67,10 +69,12 @@ function helpMenuLoop() {
 }
 function BOOT() {
     RENDER.resizeCanvas();
-    TIC();
+    TIC(1);
 }
-function TIC() {
+function TIC(currentTime) {
     CURSOR.update();
+    delta = (currentTime - lastTime) / 100;
+    lastTime = currentTime;
     if (state === "start") {
         mainMenuLoop();
     }
@@ -79,7 +83,6 @@ function TIC() {
     }
     else if (state === "game") {
         gameLoop();
-        return;
     }
     tick = tick + 1;
     requestAnimationFrame(TIC);

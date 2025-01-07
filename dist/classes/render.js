@@ -19,6 +19,9 @@ export class Render {
         if (src === "sprites") {
             this.context.drawImage(this.spriteAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
         }
+        else if (src === "tiles") {
+            this.context.drawImage(this.tilesAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
+        }
     }
     drawRect(x, y, w, h, fillColor, strokeColor) {
         this.context.strokeStyle = strokeColor;
@@ -70,8 +73,18 @@ export class Render {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     resizeCanvas() {
-        this.canvas.width = 100;
-        this.canvas.height = 100;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        const width = windowWidth;
+        const height = (windowWidth / 16) * 9;
+        if (height > windowHeight) {
+            this.canvas.height = windowHeight;
+            this.canvas.width = (windowHeight / 9) * 16;
+        }
+        else {
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");

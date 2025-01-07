@@ -20,11 +20,13 @@ function lerp(a: number, b: number, t: number): number {
   return a + t * (b - a);
 }
 class Tile {
+  readonly position: {x: number, y: number};
   public visited: boolean; public isLand: boolean; public biome: number;
   public isBorder: boolean; public atlasCoord: { x: number, y: number }; public ore: number;
   public flip: number; public rot: number; public borderCol: string; public noise: number;
 
-  constructor(noise: number, visited: boolean, isLand: boolean, biome: number, isBorder: boolean, atlasCoord: { x: number, y: number }, ore: number, flip: number, rot: number, borderCol: string) {
+  constructor(position: {x: number, y: number}, noise: number, visited: boolean, isLand: boolean, biome: number, isBorder: boolean, atlasCoord: { x: number, y: number }, ore: number, flip: number, rot: number, borderCol: string) {
+    this.position = { ...position };
     this.noise = noise; this.visited = visited; this.isLand = isLand; this.biome = biome; this.isBorder = isBorder;
     this.atlasCoord = { ...atlasCoord }; this.ore = ore; this.flip = flip; this.rot = rot; this.borderCol = borderCol;
   }
@@ -33,7 +35,9 @@ export class Tilemanager {
   private tiles: { [index: string]: Tile };//! `x_y`
   private player: Player; private render: Render;
   private simplexNoise: SimplexNoise2D;
+  private autoMapValues: { [index: string]: {spriteCoord: {x: number, y: number}}};
   private offset: number;
+  private totalTiles: number
   private biomes: Array<{
     name: string, tileCoordOffset: { x: number, y: number }, min: number, max: number,
     tMin: number, tMax: number, treeId: number, treeDensity: number,
@@ -100,6 +104,35 @@ export class Tilemanager {
         colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
       }
     ];
+    this.autoMapValues = {
+      // --N E S W
+      // --tiles surrounding land
+      // --0 is land, 1 is water or other biome
+    
+      '1000': {spriteCoord: {x: 0, y: 0}},
+      '0100': {spriteCoord: {x: 0, y: 0}},
+      '0010': {spriteCoord: {x: 0, y: 0}},
+      '0001': {spriteCoord: {x: 0, y: 0}},
+    
+      '1100': {spriteCoord: {x: 0, y: 0}},
+      '0110': {spriteCoord: {x: 0, y: 0}},
+      '0011': {spriteCoord: {x: 0, y: 0}},
+      '1001': {spriteCoord: {x: 0, y: 0}},
+    
+      '1101': {spriteCoord: {x: 0, y: 0}},
+      '1110': {spriteCoord: {x: 0, y: 0}},
+      '0111': {spriteCoord: {x: 0, y: 0}},
+      '1011': {spriteCoord: {x: 0, y: 0}},
+      '0101': {spriteCoord: {x: 0, y: 0}},
+      '1010': {spriteCoord: {x: 0, y: 0}},
+      '1111': {spriteCoord: {x: 0, y: 0}}
+    };
+
+
+    this.totalTiles = 0;
+    window.addEventListener("mouseup", () => {
+      console.log(this.totalTiles);
+    });
   }
 
   createTile(x: number, y: number): Tile {
@@ -110,7 +143,7 @@ export class Tilemanager {
     baseNoise = lerp(baseNoise, addlNoise, 0.02);
 
     const tile = new Tile(
-      baseNoise, false, baseNoise >= 20, 1,
+      {x: x, y: y}, baseNoise, false, baseNoise >= 20, 1,
       false, { x: 0, y: 0 }, 0, 0, 0, "green"
     );
 
@@ -175,39 +208,46 @@ export class Tilemanager {
   drawTerrain(showMiniMap: boolean): void {
     const cameraTopLeftX = this.player.x - this.render.canvas.width / 2;
     const cameraTopLeftY = this.player.y - this.render.canvas.height / 2;
-    const subTileX = cameraTopLeftX % 8;
-    const subTileY = cameraTopLeftY % 8;
-    const startX = Math.floor(cameraTopLeftX / 8);
-    const startY = Math.floor(cameraTopLeftY / 8);
+    // const subTileX = cameraTopLeftX % 40;
+    // const subTileY = cameraTopLeftY % 40;
+    const startX = Math.floor(cameraTopLeftX);
+    const startY = Math.floor(cameraTopLeftY);
 
-    for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
-      for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+    for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+      if (screenX % 40 !== 0) { continue; }
+      
+      for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
+        if (screenY % 40 !== 0) { continue; }
+        
         const worldX = startX + screenX;
         const worldY = startY + screenY;
 
         //! a questão aqui é, na implementação original
         //! quando se tenta acessar um tile inexistente, um novo é criado
-        if (this.tiles[`${worldX}_${worldY}`] === undefined) {
+        if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 1500) {
           this.tiles[`${worldX}_${worldY}`] = this.createTile(worldX, worldY);
+          this.totalTiles += 1;
         }
         const tile = this.tiles[`${worldX}_${worldY}`];
-        //!--------------------------------
+        //!-------------------------------
 
-        const sx = (screenX - 1) * 8 - subTileX;
-        const sy = (screenY - 1) * 8 - subTileY;
+        // const sx = (screenX - 1) * 40 - subTileX;
+        // const sy = (screenY - 1) * 40 - subTileY;
+
+        if(tile === undefined) { return; }
 
         if (!showMiniMap) {
-          //TODO if (!tile.visited) { this.autoMap(worldX, worldY); }
+          if (!tile.visited) { this.autoMap(worldX, worldY); }
 
-          if (tile.ore) {
-            //TODO this.render.drawRect(sx, sy, 8, 8, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
-            //sspr(ores[tile.ore].tile_id, sx, sy, ores[tile.ore].color_keys, 1, 0, tile.rot)
+          if (tile.ore !== -1) {
+            //TODO this.render.drawRect(tile.position.x, tile.position.y, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
+            //sspr(ores[tile.ore].tile_id, tile.position.x, tile.position.y, ores[tile.ore].color_keys, 1, 0, tile.rot)
             this.render.drawSprite(
-              "tiles", sx, sy, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y,
+              "tiles", tile.position.x, tile.position.y, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y,
             );
           }
           else if (!tile.isBorder) {
-            const rot = tile.rot;
+            let rot = tile.rot;
             let flip = tile.flip;
 
             if (!tile.isLand) {
@@ -222,18 +262,18 @@ export class Tilemanager {
                 flip = 2;// -- Vertical flip
               }
 
-              //TODO sspr(224, sx, sy, 0, 1, flip, rot)
+              //TODO sspr(224, tile.position.x, tile.position.y, 0, 1, flip, rot)
             }
             else {
-              //TODO this.render.drawRect(sx, sy, 8, 8, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
-              //sspr(biomes[tile.biome].tile_id_offset, sx, sy, biomes[tile.biome].map_col, 1, 0, tile.rot)
+              //TODO this.render.drawRect(tile.position.x, tile.position.y, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
+              //sspr(biomes[tile.biome].tile_id_offset, tile.position.x, tile.position.y, biomes[tile.biome].map_col, 1, 0, tile.rot)
               this.render.drawSprite(
-                "tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y
+                "tiles", tile.position.x, tile.position.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y
               )
 
               const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
               if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
-                this.render.drawSprite("tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
               }
             }
           }
@@ -252,11 +292,12 @@ export class Tilemanager {
               flip = 2;// -- Vertical flip
             }
 
-            //TODO sspr(224, sx, sy, -1, 1, flip)
-            this.render.drawSprite("tiles", sx, sy, tile.atlasCoord.x, tile.atlasCoord.y);
+            //TODO sspr(224, tile.position.x, tile.position.y, -1, 1, flip)
+            this.render.drawSprite("tiles", tile.position.x, tile.position.y, tile.atlasCoord.x, tile.atlasCoord.y);
           }
           else {
-            //TODO sspr(tile.sprite_id, sx, sy, -1, 1, 0, tile.rot)
+            //TODO sspr(tile.sprite_id, tile.position.x, tile.position.y, -1, 1, 0, tile.rot)
+            this.render.drawSprite("tiles", tile.position.x, tile.position.y, tile.atlasCoord.x, tile.atlasCoord.y);
           }
         }
       }
@@ -276,5 +317,47 @@ export class Tilemanager {
     }
 
     return undefined;
+  }
+
+  autoMap(x: number, y: number) {
+    //! por algum motivo no original era y_x
+    const tile = this.tiles[`${x}_${y}`];
+    tile.visited = true;
+    // --Here, 'adj' is the north, east, south, and west 'neighboring' tiles (in local space)
+    const adj = [
+      {x: 0, y: -1},
+      {x: 1, y: 0},
+      {x: 0, y: 1},
+      {x: -1, y: 0},
+    ]
+    
+    let key = "";
+    for (let i = 0; i < 4; i++) {
+      // --Grab the neighbor tile
+      const near = this.tiles[`${x + adj[i].x}_${y + adj[i].y}`];
+      if (near === undefined) { break; }
+
+      // --Determine if neighbor is a '0' or '1', meaning 0 is land, 1 is water or a different biome
+      if (!near.isLand || near.biome < tile.biome) {
+        key = key + '1';
+        this.tiles[`${x}_${y}`].borderCol = this.biomes[near.biome].mapCol;
+      }
+      else {
+        key = key + '0';
+      }
+    }
+
+    // --Try to index the key we just created
+    const new_tile = this.autoMapValues[key];
+
+    // --If key exists, then valid config detected, so set tile to the returned value, otherwise return
+    if (new_tile === undefined) { return; }
+
+    this.tiles[`${x}_${y}`].atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
+    this.tiles[`${x}_${y}`].atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
+    this.tiles[`${x}_${y}`].isBorder = true;
+    this.tiles[`${x}_${y}`].ore = -1;
+    this.tiles[`${x}_${y}`].flip = 0;
+    // this.tiles[`${x}_${y}`].rot = new_tile.rot
   }
 }
