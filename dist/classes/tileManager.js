@@ -42,50 +42,50 @@ export class Tilemanager {
         this.offset = 0;
         this.biomes = [
             {
-                name: "Desert", tileIdOffset: 0, min: 20, max: 30,
+                name: "Desert", tileCoordOffset: { x: 0, y: 8 }, min: 20, max: 30,
                 tMin: 20.5, tMax: 21.5, treeId: 194, treeDensity: 0.05,
-                colorKey: 0, mapCol: 5, clutter: 0.01
+                colorKey: 0, mapCol: "white", clutter: 0.01
             },
             {
-                name: "Prarie", tileIdOffset: 16, min: 30, max: 45,
+                name: "Prarie", tileCoordOffset: { x: 0, y: 16 }, min: 30, max: 45,
                 tMin: 33, tMax: 40, treeId: 200, treeDensity: 0.075,
-                colorKey: 1, mapCol: 12, clutter: 0.09
+                colorKey: 1, mapCol: "white", clutter: 0.09
             },
             {
-                name: "Forest", tileIdOffset: 32, min: 45, max: 101,
+                name: "Forest", tileCoordOffset: { x: 0, y: 0 }, min: 45, max: 101,
                 tMin: 65, tMax: 85, treeId: 197, treeDensity: 0.15,
-                colorKey: 1, mapCol: 14, clutter: 0.05
+                colorKey: 1, mapCol: "white", clutter: 0.05
             }
         ];
         this.ores = [
             {
                 name: "Iron", offset: 15000, id: 3, scale: 0.011, min: 15, max: 16,
-                bMin: 45, bMax: 100, tileId: 192, spriteId: 178,
+                bMin: 45, bMax: 100, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 24, y: 24 },
                 colorKey: 4, biomeId: 2, mapCols: [8, 11, 12, 13, 14, 15]
             },
             {
                 name: "Copper", offset: 10000, id: 4, scale: 0.013, min: 15, max: 16,
-                bMin: 33, bMax: 65, tileId: 161, spriteId: 177,
+                bMin: 33, bMax: 65, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 16, y: 24 },
                 colorKey: 1, biomeId: 2, mapCols: [2, 3, 4, 15]
             },
             {
                 name: "Coal", offset: 50000, id: 6, scale: 0.020, min: 14, max: 17,
-                bMin: 35, bMax: 75, tileId: 163, spriteId: 179,
+                bMin: 35, bMax: 75, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 32, y: 24 },
                 colorKey: 4, biomeId: 3, mapCols: [0, 14, 15]
             },
             {
                 name: "Stone", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
-                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 8, y: 24 },
                 colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
             },
             {
                 name: "Oil Shale", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
-                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 48, y: 24 },
                 colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
             },
             {
                 name: "Uranium", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
-                bMin: 20, bMax: 70, tileId: 163, spriteId: 179,
+                bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 40, y: 24 },
                 colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
             }
         ];
@@ -96,7 +96,7 @@ export class Tilemanager {
         let baseNoise = (this.simplexNoise.get(x * scale + this.offset * scale, (y * scale) + (this.offset * scale)) / 2 + 0.5) * 100;
         const addlNoise = (this.simplexNoise.get(x * scale2 + this.offset * scale2, (y * scale2) + (this.offset * scale2))) * 100;
         baseNoise = lerp(baseNoise, addlNoise, 0.02);
-        const tile = new Tile(baseNoise, false, baseNoise >= 20, 1, false, { x: 0, y: 0 }, false, 0, 0, "green");
+        const tile = new Tile(baseNoise, false, baseNoise >= 20, 1, false, { x: 0, y: 0 }, 0, 0, 0, "green");
         for (let i = 0; i > this.biomes.length; i++) {
             if (baseNoise > this.biomes[i].min && baseNoise < this.biomes[i].max) {
                 tile.biome = i;
@@ -105,7 +105,7 @@ export class Tilemanager {
         }
         tile.flip = Math.random() > 0.5 ? 1 : 0;
         if (tile.isLand && baseNoise > 21 && this.oreSample(x, y, tile.biome, tile.noise) !== undefined) {
-            tile.ore = true;
+            tile.ore = this.oreSample(x, y, tile.biome, tile.noise);
         }
         return tile;
     }
@@ -120,14 +120,15 @@ export class Tilemanager {
             for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
                 const worldX = startX + screenX;
                 const worldY = startY + screenY;
-                if (this.tiles[`${worldX}-${worldY}`] === undefined) {
-                    this.tiles[`${worldX}-${worldY}`] = this.createTile(worldX, worldY);
+                if (this.tiles[`${worldX}_${worldY}`] === undefined) {
+                    this.tiles[`${worldX}_${worldY}`] = this.createTile(worldX, worldY);
                 }
-                const tile = this.tiles[`${worldX}-${worldY}`];
+                const tile = this.tiles[`${worldX}_${worldY}`];
+                const sx = (screenX - 1) * 8 - subTileX;
+                const sy = (screenY - 1) * 8 - subTileY;
                 if (!showMiniMap) {
-                    const sx = (screenX - 1) * 8 - subTileX;
-                    const sy = (screenY - 1) * 8 - subTileY;
                     if (tile.ore) {
+                        this.render.drawSprite("tiles", sx, sy, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y);
                     }
                     else if (!tile.isBorder) {
                         const rot = tile.rot;
@@ -144,6 +145,11 @@ export class Tilemanager {
                             }
                         }
                         else {
+                            this.render.drawSprite("tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                            const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
+                            if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
+                                this.render.drawSprite("tiles", sx, sy, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                            }
                         }
                     }
                 }
@@ -159,6 +165,7 @@ export class Tilemanager {
                         else if (worldY % 2 == 1) {
                             flip = 2;
                         }
+                        this.render.drawSprite("tiles", sx, sy, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                     else {
                     }

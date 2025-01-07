@@ -113,25 +113,28 @@ export class Render {
   }
 
   resizeCanvas(): void {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    // const windowWidth = window.innerWidth;
+    // const windowHeight = window.innerHeight;
   
-    const width = windowWidth;
-    const height = (windowWidth / 16) * 9;
+    // const width = windowWidth;
+    // const height = (windowWidth / 16) * 9;
   
-    if (height > windowHeight) {
-      this.canvas.height = windowHeight;
-      this.canvas.width = (windowHeight / 9) * 16;
-    }
-    else {
-      this.canvas.width = width;
-      this.canvas.height = height;
-    }
+    // if (height > windowHeight) {
+    //   this.canvas.height = windowHeight;
+    //   this.canvas.width = (windowHeight / 9) * 16;
+    // }
+    // else {
+    //   this.canvas.width = width;
+    //   this.canvas.height = height;
+    // }
   
     // if (integerScale) {
     //   this.canvas.width = Math.floor(this.canvas.width);
     //   this.canvas.height = Math.floor(this.canvas.height);
     // }
+
+    this.canvas.width = 100;
+    this.canvas.height = 100;
   
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;

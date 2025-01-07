@@ -70,18 +70,8 @@ export class Render {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     resizeCanvas() {
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const width = windowWidth;
-        const height = (windowWidth / 16) * 9;
-        if (height > windowHeight) {
-            this.canvas.height = windowHeight;
-            this.canvas.width = (windowHeight / 9) * 16;
-        }
-        else {
-            this.canvas.width = width;
-            this.canvas.height = height;
-        }
+        this.canvas.width = 100;
+        this.canvas.height = 100;
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");

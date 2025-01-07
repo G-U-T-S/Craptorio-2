@@ -20,7 +20,7 @@ const KEYBOARD = new Keyboard();
 //TODO ajustar o noise, não esta na maneira ideal ainda
 // const NOISE = new FractalNoise2D(1, 3, 0.009, 1, 0.001);
 
-let tick = 0;
+let tick: number = 0;
 let state: string = "game";
 let showMiniMap: boolean = false;
 // let integerScale: boolean = true;

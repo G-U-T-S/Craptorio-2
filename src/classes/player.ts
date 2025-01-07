@@ -142,8 +142,8 @@ export class Player {
 
   public draw() {
     this.render.drawSprite(
-        "sprites", this.render.centerCanvas.x - 16, this.render.centerCanvas.y + this.animFrame,
-        this.atlasCoord.x, this.atlasCoord.y
+      "sprites", this.render.centerCanvas.x - 16, this.render.centerCanvas.y + this.animFrame,
+      this.atlasCoord.x, this.atlasCoord.y
     );
   }
 }
