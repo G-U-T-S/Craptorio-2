@@ -202,29 +202,35 @@ export class Tilemanager {
     //   end
     // end
 
-    return tile
+    return { ...tile };
   }
 
   drawTerrain(showMiniMap: boolean): void {
-    const cameraTopLeftX = this.player.x - this.render.canvas.width / 2;
-    const cameraTopLeftY = this.player.y - this.render.canvas.height / 2;
+    const cameraTopLeftX = Math.floor(this.player.x - this.render.canvas.width / 2);
+    const cameraTopLeftY = Math.floor(this.player.y - this.render.canvas.height / 2);
     // const subTileX = cameraTopLeftX % 40;
     // const subTileY = cameraTopLeftY % 40;
-    const startX = Math.floor(cameraTopLeftX);
-    const startY = Math.floor(cameraTopLeftY);
+    // const startX = Math.floor(cameraTopLeftX / 40);
+    // const startY = Math.floor(cameraTopLeftY / 40);
+    
+    this.render.drawRect(
+      cameraTopLeftX, cameraTopLeftY,
+      this.render.canvas.width, this.render.canvas.height,
+      "green", "green"
+    );
 
-    for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+    for (let screenX = cameraTopLeftX; screenX < cameraTopLeftX + this.render.canvas.width; screenX++) {
       if (screenX % 40 !== 0) { continue; }
       
-      for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
+      for (let screenY = cameraTopLeftY; screenY < cameraTopLeftY + this.render.canvas.height; screenY++) {
         if (screenY % 40 !== 0) { continue; }
         
-        const worldX = startX + screenX;
-        const worldY = startY + screenY;
+        const worldX = screenX;
+        const worldY = screenY;
 
         //! a questão aqui é, na implementação original
         //! quando se tenta acessar um tile inexistente, um novo é criado
-        if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 1500) {
+        if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 5000) {
           this.tiles[`${worldX}_${worldY}`] = this.createTile(worldX, worldY);
           this.totalTiles += 1;
         }
@@ -243,11 +249,11 @@ export class Tilemanager {
             //TODO this.render.drawRect(tile.position.x, tile.position.y, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
             //sspr(ores[tile.ore].tile_id, tile.position.x, tile.position.y, ores[tile.ore].color_keys, 1, 0, tile.rot)
             this.render.drawSprite(
-              "tiles", tile.position.x, tile.position.y, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y,
+              "tiles", tile.position.x, tile.position.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y,
             );
           }
           else if (!tile.isBorder) {
-            let rot = tile.rot;
+            // let rot = tile.rot;
             let flip = tile.flip;
 
             if (!tile.isLand) {
@@ -340,7 +346,7 @@ export class Tilemanager {
       // --Determine if neighbor is a '0' or '1', meaning 0 is land, 1 is water or a different biome
       if (!near.isLand || near.biome < tile.biome) {
         key = key + '1';
-        this.tiles[`${x}_${y}`].borderCol = this.biomes[near.biome].mapCol;
+        tile.borderCol = this.biomes[near.biome].mapCol;
       }
       else {
         key = key + '0';
@@ -353,11 +359,11 @@ export class Tilemanager {
     // --If key exists, then valid config detected, so set tile to the returned value, otherwise return
     if (new_tile === undefined) { return; }
 
-    this.tiles[`${x}_${y}`].atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
-    this.tiles[`${x}_${y}`].atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
-    this.tiles[`${x}_${y}`].isBorder = true;
-    this.tiles[`${x}_${y}`].ore = -1;
-    this.tiles[`${x}_${y}`].flip = 0;
+    tile.atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
+    tile.atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
+    tile.isBorder = true;
+    tile.ore = -1;
+    tile.flip = 0;
     // this.tiles[`${x}_${y}`].rot = new_tile.rot
   }
 }

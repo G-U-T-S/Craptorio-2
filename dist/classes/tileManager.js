@@ -132,24 +132,23 @@ export class Tilemanager {
         if (tile.isLand && baseNoise > 21 && this.oreSample(x, y, tile.biome, tile.noise) !== undefined) {
             tile.ore = this.oreSample(x, y, tile.biome, tile.noise);
         }
-        return tile;
+        return { ...tile };
     }
     drawTerrain(showMiniMap) {
-        const cameraTopLeftX = this.player.x - this.render.canvas.width / 2;
-        const cameraTopLeftY = this.player.y - this.render.canvas.height / 2;
-        const startX = Math.floor(cameraTopLeftX);
-        const startY = Math.floor(cameraTopLeftY);
-        for (let screenX = 0; screenX < this.render.canvas.width; screenX++) {
+        const cameraTopLeftX = Math.floor(this.player.x - this.render.canvas.width / 2);
+        const cameraTopLeftY = Math.floor(this.player.y - this.render.canvas.height / 2);
+        this.render.drawRect(cameraTopLeftX, cameraTopLeftY, this.render.canvas.width, this.render.canvas.height, "green", "green");
+        for (let screenX = cameraTopLeftX; screenX < cameraTopLeftX + this.render.canvas.width; screenX++) {
             if (screenX % 40 !== 0) {
                 continue;
             }
-            for (let screenY = 0; screenY < this.render.canvas.height; screenY++) {
+            for (let screenY = cameraTopLeftY; screenY < cameraTopLeftY + this.render.canvas.height; screenY++) {
                 if (screenY % 40 !== 0) {
                     continue;
                 }
-                const worldX = startX + screenX;
-                const worldY = startY + screenY;
-                if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 1500) {
+                const worldX = screenX;
+                const worldY = screenY;
+                if (this.tiles[`${worldX}_${worldY}`] === undefined && this.totalTiles < 5000) {
                     this.tiles[`${worldX}_${worldY}`] = this.createTile(worldX, worldY);
                     this.totalTiles += 1;
                 }
@@ -162,10 +161,9 @@ export class Tilemanager {
                         this.autoMap(worldX, worldY);
                     }
                     if (tile.ore !== -1) {
-                        this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.ores[tile.ore].tileAtlasCoord.x, this.ores[tile.ore].tileAtlasCoord.y);
+                        this.render.drawSprite("tiles", tile.position.x, tile.position.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
                     }
                     else if (!tile.isBorder) {
-                        let rot = tile.rot;
                         let flip = tile.flip;
                         if (!tile.isLand) {
                             if (worldX % 2 == 1 && worldY % 2 == 1) {
@@ -237,7 +235,7 @@ export class Tilemanager {
             }
             if (!near.isLand || near.biome < tile.biome) {
                 key = key + '1';
-                this.tiles[`${x}_${y}`].borderCol = this.biomes[near.biome].mapCol;
+                tile.borderCol = this.biomes[near.biome].mapCol;
             }
             else {
                 key = key + '0';
@@ -247,10 +245,10 @@ export class Tilemanager {
         if (new_tile === undefined) {
             return;
         }
-        this.tiles[`${x}_${y}`].atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
-        this.tiles[`${x}_${y}`].atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
-        this.tiles[`${x}_${y}`].isBorder = true;
-        this.tiles[`${x}_${y}`].ore = -1;
-        this.tiles[`${x}_${y}`].flip = 0;
+        tile.atlasCoord.x = new_tile.spriteCoord.x + this.biomes[tile.biome].tileCoordOffset.x;
+        tile.atlasCoord.y = new_tile.spriteCoord.y + this.biomes[tile.biome].tileCoordOffset.y;
+        tile.isBorder = true;
+        tile.ore = -1;
+        tile.flip = 0;
     }
 }

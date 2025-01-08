@@ -30,7 +30,6 @@ export class Player {
   }
 
   public update(delta: number, tick: number, keys: {w: boolean, a: boolean, s: boolean, d: boolean}, cursorProg: boolean): void {
-    // const dt = time() - lastFrameTime;
     if (tick % this.animSpeed === 0) {
       if (this.animDir === 0) {
         this.animFrame = this.animFrame + 1
@@ -87,8 +86,10 @@ export class Player {
         // sound('move');
         //! removi o delta time
         // this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
-        this.x += (xDir * this.moveSpeed) * delta;
-        this.y += (yDir * this.moveSpeed) * delta;
+        // this.x += (xDir * this.moveSpeed) * delta;
+        // this.y += (yDir * this.moveSpeed) * delta;
+        this.x += 40 * xDir;
+        this.y += 40 * yDir;
       }
     }
   

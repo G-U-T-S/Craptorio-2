@@ -70,8 +70,8 @@ export class Player {
         }
         if (!cursorProg) {
             if (xDir !== 0 || yDir !== 0) {
-                this.x += (xDir * this.moveSpeed) * delta;
-                this.y += (yDir * this.moveSpeed) * delta;
+                this.x += 40 * xDir;
+                this.y += 40 * yDir;
             }
         }
         this.lastDir = `${xDir},${yDir}`;
