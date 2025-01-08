@@ -1,14 +1,14 @@
 TileManager = {}
 TileManager.__index =  TileManager
 
- = {
+auto_map = {
   --N E S W
   --tiles surrounding land
   --0 is land, 1 is water or other biome
 
   ['1000'] = {sprite_id = 1, rot = 0},
   ['0100'] = {sprite_id = 1, rot = 1},
-  ['0010auto_map'] = {sprite_id = 1, rot = 2},
+  ['0010'] = {sprite_id = 1, rot = 2},
   ['0001'] = {sprite_id = 1, rot = 3},
 
   ['1100'] = {sprite_id = 2, rot = 1},

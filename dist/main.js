@@ -7,7 +7,7 @@ import { Label } from "./classes/label.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-const RENDER = new Render("mainCanvas");
+const RENDER = new Render("mainCanvas", true);
 const PLAYER = new Player(RENDER);
 const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
 const CURSOR = new Cursor();
@@ -21,6 +21,8 @@ function gameLoop() {
     RENDER.drawBg("black");
     PLAYER.update(delta, tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
     TILEMAN.drawTerrain(showMiniMap);
+    RENDER.drawRect(0, 0, 250, 35, "black", "black");
+    RENDER.drawText(`Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30, "white", "top", "left");
     PLAYER.draw();
 }
 function mainMenuLoop() {

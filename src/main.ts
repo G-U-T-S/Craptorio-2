@@ -14,7 +14,7 @@ window.addEventListener("contextmenu", (ev) => {
 });
 
 
-const RENDER = new Render("mainCanvas");
+const RENDER = new Render("mainCanvas", true);
 const PLAYER = new Player(RENDER);
 const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
 const CURSOR = new Cursor();
@@ -73,6 +73,12 @@ function gameLoop() {
   );
 
   TILEMAN.drawTerrain(showMiniMap);
+
+  RENDER.drawRect(0, 0, 250, 35, "black", "black");
+  RENDER.drawText(
+    `Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30,
+    "white", "top", "left"
+  );
   PLAYER.draw();
 }
 function mainMenuLoop() {

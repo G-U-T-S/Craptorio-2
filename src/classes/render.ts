@@ -5,10 +5,11 @@ export class Render {
   public canvas: HTMLCanvasElement;
   public context: CanvasRenderingContext2D;
   public centerCanvas: {x: number, y: number};
+  public integerScale: boolean;
   private spriteAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
   
-  constructor(canvasId: string) {
+  constructor(canvasId: string, integerScale: boolean) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
@@ -16,6 +17,7 @@ export class Render {
     this.spriteAtlas.src = "./assets/sprites.png";
     this.tilesAtlas = new Image();
     this.tilesAtlas.src = "./assets/tiles.png";
+    this.integerScale = integerScale;
 
     window.addEventListener("resize", this.resizeCanvas.bind(this));
   }
@@ -119,28 +121,28 @@ export class Render {
   }
 
   resizeCanvas(): void {
-    const windowWidth = window.innerWidth;
-    const windowHeight = window.innerHeight;
+    // const windowWidth = window.innerWidth;
+    // const windowHeight = window.innerHeight;
   
-    const width = windowWidth;
-    const height = (windowWidth / 16) * 9;
+    // const width = windowWidth;
+    // const height = (windowWidth / 16) * 9;
   
-    if (height > windowHeight) {
-      this.canvas.height = windowHeight;
-      this.canvas.width = (windowHeight / 9) * 16;
-    }
-    else {
-      this.canvas.width = width;
-      this.canvas.height = height;
-    }
-  
-    // if (integerScale) {
-    //   this.canvas.width = Math.floor(this.canvas.width);
-    //   this.canvas.height = Math.floor(this.canvas.height);
+    // if (height > windowHeight) {
+    //   this.canvas.height = windowHeight;
+    //   this.canvas.width = (windowHeight / 9) * 16;
+    // }
+    // else {
+    //   this.canvas.width = width;
+    //   this.canvas.height = height;
     // }
 
-    // this.canvas.width = 100;
-    // this.canvas.height = 100;
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  
+    if (this.integerScale) {
+      this.canvas.width = Math.floor(this.canvas.width);
+      this.canvas.height = Math.floor(this.canvas.height);
+    }
   
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;

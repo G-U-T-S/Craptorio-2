@@ -2,9 +2,10 @@ export class Render {
     canvas;
     context;
     centerCanvas;
+    integerScale;
     spriteAtlas;
     tilesAtlas;
-    constructor(canvasId) {
+    constructor(canvasId, integerScale) {
         this.canvas = document.getElementById(canvasId);
         this.context = this.canvas.getContext("2d");
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
@@ -12,6 +13,7 @@ export class Render {
         this.spriteAtlas.src = "./assets/sprites.png";
         this.tilesAtlas = new Image();
         this.tilesAtlas.src = "./assets/tiles.png";
+        this.integerScale = integerScale;
         window.addEventListener("resize", this.resizeCanvas.bind(this));
     }
     drawSprite(src, x, y, coordX, coordY, sizeX = 8, sizeY = 8) {
@@ -73,17 +75,11 @@ export class Render {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
     resizeCanvas() {
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        const width = windowWidth;
-        const height = (windowWidth / 16) * 9;
-        if (height > windowHeight) {
-            this.canvas.height = windowHeight;
-            this.canvas.width = (windowHeight / 9) * 16;
-        }
-        else {
-            this.canvas.width = width;
-            this.canvas.height = height;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+        if (this.integerScale) {
+            this.canvas.width = Math.floor(this.canvas.width);
+            this.canvas.height = Math.floor(this.canvas.height);
         }
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
