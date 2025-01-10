@@ -20,13 +20,13 @@ function lerp(a: number, b: number, t: number): number {
   return a + t * (b - a);
 }
 class Tile {
-  readonly globalPos: {x: number, y: number};
+  readonly globalPos: {x: number, y: number}; public color: string;
   public visited: boolean; public isLand: boolean; public biome: number;
   public isBorder: boolean; public atlasCoord: { x: number, y: number }; public ore: number;
   public flip: number; public rot: number; public borderCol: string; public noise: number;
 
   constructor(globalBos: {x: number, y: number}, noise: number, visited: boolean, isLand: boolean, biome: number, isBorder: boolean, atlasCoord: { x: number, y: number }, ore: number, flip: number, rot: number, borderCol: string) {
-    this.globalPos = { ...globalBos };
+    this.globalPos = { ...globalBos }; this.color = "black";
     this.noise = noise; this.visited = visited; this.isLand = isLand; this.biome = biome; this.isBorder = isBorder;
     this.atlasCoord = { ...atlasCoord }; this.ore = ore; this.flip = flip; this.rot = rot; this.borderCol = borderCol;
   }
@@ -47,7 +47,7 @@ export class Tilemanager {
   private ores: Array<{
     name: string, offset: number, id: number, scale: number, min: number, max: number,
     bMin: number, bMax: number, tileAtlasCoord: { x: number, y: number }, spriteAtlasCoord: { x: number, y: number },
-    colorKey: number, biomeId: number, mapCols: Array<number>;
+    colorKey: number, biomeId: number, mapCols: Array<string>;
   }>;
 
   constructor(noiseSeed: number, render: Render, player: Player) {
@@ -78,32 +78,32 @@ export class Tilemanager {
       {
         name: "Iron", offset: 15000, id: 3, scale: 0.011, min: 15, max: 16,
         bMin: 45, bMax: 100, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 24, y: 24 },
-        colorKey: 4, biomeId: 2, mapCols: [8, 11, 12, 13, 14, 15]
+        colorKey: 4, biomeId: 2, mapCols: ["#257179", "#41a6f6", "#73eff7", "#f4f4f4", "#94b0c2", "#566c86"]
       },
       {
         name: "Copper", offset: 10000, id: 4, scale: 0.013, min: 15, max: 16,
         bMin: 33, bMax: 65, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 16, y: 24 },
-        colorKey: 1, biomeId: 2, mapCols: [2, 3, 4, 15]
+        colorKey: 1, biomeId: 2, mapCols: ["#5d275d", "#b13e53", "#ef7d57", "#566c86"]
       },
       {
         name: "Coal", offset: 50000, id: 6, scale: 0.020, min: 14, max: 17,
         bMin: 35, bMax: 75, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 32, y: 24 },
-        colorKey: 4, biomeId: 3, mapCols: [0, 14, 15]
+        colorKey: 4, biomeId: 3, mapCols: ["#1a1c2c", "#94b0c2", "#566c86"]
       },
       {
         name: "Stone", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
         bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 8, y: 24 },
-        colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+        colorKey: 4, biomeId: 1, mapCols: ["#73eff7", "#f4f4f4", "#94b0c2", "#566c86"]
       },
       {
         name: "Oil Shale", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
         bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 48, y: 24 },
-        colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+        colorKey: 4, biomeId: 1, mapCols: ["#73eff7", "#f4f4f4", "#94b0c2", "#566c86"]
       },
       {
         name: "Uranium", offset: 22500, id: 5, scale: 0.018, min: 15, max: 16,
         bMin: 20, bMax: 70, tileAtlasCoord: { x: 0, y: 0 }, spriteAtlasCoord: { x: 40, y: 24 },
-        colorKey: 4, biomeId: 1, mapCols: [12, 13, 14, 15]
+        colorKey: 4, biomeId: 1, mapCols: ["#73eff7", "#f4f4f4", "#94b0c2", "#566c86"]
       }
     ];
     this.autoMapValues = {
@@ -141,7 +141,7 @@ export class Tilemanager {
     );
 
     const tile = new Tile(
-      {x: x, y: y}, baseNoise, false, baseNoise >= 20, -1,
+      {x: x, y: y}, baseNoise, false, baseNoise >= 20, 0,
       false, { x: 0, y: 0 }, 0, 0, 0, "green"
     );
 
@@ -164,16 +164,17 @@ export class Tilemanager {
     //   tile.spriteId = WATER_SPRITE;
     //   tile.rot = floor(math.random(0,3));
     // }
-    // else {
-    //   tile.spriteId = biomes[tile.biome].tile_id_offset;
-    //   tile.color = biomes[tile.biome].map_col;
-    // }
+    //! maybe cause a bug
+    if (tile.isLand) {
+      // tile.spriteId = biomes[tile.biome].tile_id_offset;
+      tile.color = this.biomes[tile.biome].mapCol;
+    }
 
     // --If ore-generation was successful, then set sprite_id and color
-    // if tile.ore then
-    //   tile.color = ores[tile.ore].map_cols[floor(math.random(#ores[tile.ore].map_cols))]
-    //   tile.rot = math.random(4) % 4
-    // end
+    if (tile.ore) {
+      tile.color = this.ores[tile.ore].mapCols[Math.floor(Math.random() * this.ores[tile.ore].mapCols.length)]
+      // tile.rot = math.random(4) % 4;
+    }
 
     // if tile.is_land and not tile.ore then
     //   --Generate clutter based on biome clutter scale, ex grass, rocks, trees, etc
@@ -228,7 +229,7 @@ export class Tilemanager {
           if (!tile.visited) { this.autoMap(worldX, worldY); }
 
           if (tile.ore !== -1) {
-            // this.render.drawRect(tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
+            this.render.drawRect(tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
             //sspr(ores[tile.ore].tile_id, tile.position.x, tile.position.y, ores[tile.ore].color_keys, 1, 0, tile.rot)
             // this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, tile.atlasCoord.x, tile.atlasCoord.y)
             this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
@@ -316,10 +317,12 @@ export class Tilemanager {
   }
 
   oreSample(x: number, y: number, tilebiome: number, tilenoise: number): number | undefined {
+    //! TODO todos os minerios são o mesmo, o valor inicial
+    
     const tileBiome = tilebiome;
     const tileNoise = tilenoise;
     for (let i = 0; i < this.ores.length; i++) {
-      const scale = this.ores[i].scale //-- ((4 - biome)/100)
+      const scale = 5//this.ores[i].scale //-- ((4 - biome)/100)
       const noise = (this.simplexNoise.get(x * scale + ((this.ores[i].offset * tileBiome) * scale) + this.offset * scale, (y * scale) + ((this.ores[i].offset * tileBiome) * scale) + (this.offset * scale)) / 2 + 0.5) * 16
 
       if (noise >= this.ores[i].min && noise <= this.ores[i].max && tileNoise >= this.ores[i].bMin && tileNoise <= this.ores[i].bMax) {

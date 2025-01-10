@@ -17,6 +17,46 @@ let delta = 0;
 let lastTime = 0;
 let state = "game";
 let showMiniMap = false;
+class baseEntity {
+    type;
+    constructor(type) {
+        this.type = type;
+    }
+}
+class TransportBelt extends baseEntity {
+    actualTick;
+    globalPos;
+    drawn;
+    outputKey;
+    coordStraight;
+    coordCurved;
+    coordArrow;
+    tickrate;
+    maxTick;
+    constructor() {
+        super("transport_belt");
+        this.actualTick = 0;
+        this.globalPos = { x: 0, y: 0 };
+        this.drawn = false;
+        this.outputKey = "";
+        this.coordStraight = { x: 0, y: 0 };
+        this.coordCurved = { x: 0, y: 0 };
+        this.coordArrow = { x: 0, y: 0 };
+        this.tickrate = 5;
+        this.maxTick = 3;
+    }
+    draw(ents) {
+        if (!this.drawn) {
+            this.drawn = true;
+            if (ents[this.outputKey] !== undefined && ents[this.outputKey] instanceof TransportBelt) {
+                const outputBelt = ents[this.outputKey];
+                if (!outputBelt.drawn) {
+                    outputBelt.draw(ents);
+                }
+            }
+        }
+    }
+}
 function gameLoop() {
     RENDER.drawBg("black");
     PLAYER.update(delta, tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);

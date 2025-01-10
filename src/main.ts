@@ -51,7 +51,7 @@ function getWorldCell(mouseX: number, mouseY: number): {wx: number, wy: number} 
   const wx = Math.floor(cam_x / 8) + sx + 1;
   const wy = Math.floor(cam_y / 8) + sy + 1;
 
-  //TODO return TileMan.tiles[wy][wx], wx, wy; TILEMAN?
+  //TODO return TileMan.tiles[wy][wx], wx, wy;
   return {wx: wx, wy: wy};
 }
 function getScreenell(mouseX: number, mouseY: number): {sx: number, sy: number} {
@@ -64,13 +64,65 @@ function getScreenell(mouseX: number, mouseY: number): {sx: number, sy: number} 
 }
 */
 
+class baseEntity {
+  public type: string;
+
+  constructor(type: string) {
+    this.type = type;
+  }
+}
+
+class TransportBelt extends baseEntity {
+  public actualTick: number;
+  public globalPos: {x: number, y: number};
+  public drawn: boolean;
+  public outputKey: string;
+
+  readonly coordStraight: {x: number, y: number};
+  readonly coordCurved: {x: number, y: number};
+  readonly coordArrow: {x: number, y: number};
+  readonly tickrate: number;
+  readonly maxTick: number;
+
+  constructor() {
+    super("transport_belt");
+
+    this.actualTick = 0;
+    this.globalPos = {x: 0, y: 0};
+    this.drawn = false;
+    this.outputKey = "";
+
+    this.coordStraight = {x: 0, y: 0};
+    this.coordCurved = {x: 0, y: 0};
+    this.coordArrow = {x: 0, y: 0};
+    this.tickrate = 5;
+    this.maxTick = 3;
+  }
+
+  draw(ents: { [index: string]: baseEntity}): void {
+    if (!this.drawn) {
+      //! esse algoritimo pode ser perigoso, por envolver recurção.
+      this.drawn = true;
+      if (ents[this.outputKey] !== undefined && ents[this.outputKey] instanceof TransportBelt) {
+        const outputBelt = ents[this.outputKey] as TransportBelt;
+        
+        if (!outputBelt.drawn) {
+          outputBelt.draw(ents);
+        }
+      }
+      // if (self.id == BELT_ID_CURVED) {rot = self.sprite_rot; flip = self.flip}
+      // local sx, sy = world_to_screen(self.pos.x, self.pos.y)
+      // self.screen_pos = {x = sx, y = sy}
+      // sspr(self.id + belt_tick, sx, sy, BELT_COLORKEY, 1, flip, rot, 1, 1)
+    }
+  }
+}
+
 
 function gameLoop() {
   RENDER.drawBg("black");
 
-  PLAYER.update(
-    delta, tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog
-  );
+  PLAYER.update(delta, tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog);
 
   TILEMAN.drawTerrain(showMiniMap);
 
