@@ -9,7 +9,7 @@
 //   drag: false, panelDrag: false, dragDir: 0, dragLoc: {x: 0, y: 0},
 //   handItem: {id: 0, count: 0}, dragOffset: {x: 0, y: 0}, itemStack: {id: 9, count: 100}
 // };
-export class Cursor {
+class Cursor {
   public x: number; public y: number;
   public l: boolean; public ll: boolean;
   public m: boolean; public r: boolean
@@ -99,3 +99,6 @@ export class Cursor {
     // }
   }
 }
+
+const cursor = new Cursor();
+export default cursor;

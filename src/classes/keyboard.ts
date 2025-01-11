@@ -1,4 +1,4 @@
-export class Keyboard {
+class Keyboard {
   public w: boolean; public a: boolean
   public s: boolean; public d: boolean;
 
@@ -79,3 +79,6 @@ export class Keyboard {
 //   "8": false,
 //   "9": false,
 // };
+
+const keyboard = new Keyboard();
+export default keyboard;

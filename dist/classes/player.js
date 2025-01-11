@@ -1,4 +1,5 @@
-export class Player {
+import RENDER from "./render.js";
+class Player {
     x;
     y;
     lx;
@@ -11,8 +12,7 @@ export class Player {
     moveSpeed;
     directions;
     atlasCoord;
-    render;
-    constructor(render) {
+    constructor() {
         this.x = 0, this.y = 0;
         this.lx = 0, this.ly = 0;
         this.animFrame = 0;
@@ -32,7 +32,6 @@ export class Player {
             '-1,1': { id: 364, flip: 3, rot: 0, dust: { x: 10, y: -2 } },
             '1,1': { id: 364, flip: 2, rot: 0, dust: { x: -2, y: -2 } }
         };
-        this.render = render;
         this.atlasCoord = { x: 0, y: 32 };
     }
     update(delta, tick, keys, cursorProg) {
@@ -116,6 +115,8 @@ export class Player {
         }
     }
     draw() {
-        this.render.drawSprite("sprites", this.render.centerCanvas.x - 16, this.render.centerCanvas.y + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
+        RENDER.drawSprite("sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
+const player = new Player();
+export default player;

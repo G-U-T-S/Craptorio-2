@@ -1,3 +1,5 @@
+import RENDER from "./render.js";
+import PLAYER from "./player.js";
 import { SimplexNoise2D } from "./noiseGenerator.js";
 function lerp(a, b, t) {
     return a + t * (b - a);
@@ -33,17 +35,13 @@ class Tile {
 export class Tilemanager {
     totalTiles;
     tiles;
-    player;
-    render;
     simplexNoise;
     autoMapValues;
     offset;
     biomes;
     ores;
-    constructor(noiseSeed, render, player) {
+    constructor(noiseSeed) {
         this.tiles = {};
-        this.render = render;
-        this.player = player;
         this.simplexNoise = new SimplexNoise2D(noiseSeed);
         this.offset = 0;
         this.totalTiles = 0;
@@ -137,13 +135,13 @@ export class Tilemanager {
         return { ...tile };
     }
     drawTerrain(showMiniMap) {
-        const cameraTopLeftX = Math.floor(this.player.x - this.render.canvas.width / 2);
-        const cameraTopLeftY = Math.floor(this.player.y - this.render.canvas.height / 2);
-        for (let worldX = cameraTopLeftX - 40; worldX < cameraTopLeftX + this.render.canvas.width; worldX++) {
+        const cameraTopLeftX = Math.floor(PLAYER.x - RENDER.canvas.width / 2);
+        const cameraTopLeftY = Math.floor(PLAYER.y - RENDER.canvas.height / 2);
+        for (let worldX = cameraTopLeftX - 40; worldX < cameraTopLeftX + RENDER.canvas.width; worldX++) {
             if (worldX % 40 !== 0) {
                 continue;
             }
-            for (let worldY = cameraTopLeftY - 40; worldY < cameraTopLeftY + this.render.canvas.height; worldY++) {
+            for (let worldY = cameraTopLeftY - 40; worldY < cameraTopLeftY + RENDER.canvas.height; worldY++) {
                 if (worldY % 40 !== 0) {
                     continue;
                 }
@@ -160,18 +158,17 @@ export class Tilemanager {
                         this.autoMap(worldX, worldY);
                     }
                     if (tile.ore !== -1) {
-                        this.render.drawRect(tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
-                        this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
+                        RENDER.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
                     }
                     if (!tile.isBorder) {
                         let flip = tile.flip;
                         if (!tile.isLand) {
                         }
                         else {
-                            this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                            RENDER.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
                             if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
-                                this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                                RENDER.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             }
                         }
                     }
@@ -188,23 +185,23 @@ export class Tilemanager {
                         else if (worldY % 2 == 1) {
                             flip = 2;
                         }
-                        this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, tile.atlasCoord.x, tile.atlasCoord.y);
+                        RENDER.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                     else {
-                        this.render.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, tile.atlasCoord.x, tile.atlasCoord.y);
+                        RENDER.drawSprite("tiles", tile.globalPos.x - cameraTopLeftX, tile.globalPos.y - cameraTopLeftY, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                 }
             }
         }
     }
     drawClutter() {
-        const cameraTopLeftX = Math.floor(this.player.x - this.render.canvas.width / 2);
-        const cameraTopLeftY = Math.floor(this.player.y - this.render.canvas.height / 2);
-        for (let worldX = cameraTopLeftX - 40; worldX < cameraTopLeftX + this.render.canvas.width; worldX++) {
+        const cameraTopLeftX = Math.floor(PLAYER.x - RENDER.canvas.width / 2);
+        const cameraTopLeftY = Math.floor(PLAYER.y - RENDER.canvas.height / 2);
+        for (let worldX = cameraTopLeftX - 40; worldX < cameraTopLeftX + RENDER.canvas.width; worldX++) {
             if (worldX % 40 !== 0) {
                 continue;
             }
-            for (let worldY = cameraTopLeftY - 40; worldY < cameraTopLeftY + this.render.canvas.height; worldY++) {
+            for (let worldY = cameraTopLeftY - 40; worldY < cameraTopLeftY + RENDER.canvas.height; worldY++) {
                 if (worldY % 40 !== 0) {
                     continue;
                 }

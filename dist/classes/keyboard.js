@@ -1,4 +1,4 @@
-export class Keyboard {
+class Keyboard {
     w;
     a;
     s;
@@ -50,3 +50,5 @@ export class Keyboard {
         });
     }
 }
+const keyboard = new Keyboard();
+export default keyboard;

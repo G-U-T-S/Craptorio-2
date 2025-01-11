@@ -1,4 +1,5 @@
-export class Render {
+import CURSOR from "./cursor.js";
+class Render {
     canvas;
     context;
     centerCanvas;
@@ -47,14 +48,14 @@ export class Render {
         this.context.fillStyle = color;
         this.context.fillText(text, x, y);
     }
-    drawTextButton(cursor, x, y, width, height, mainColor, shadowColor, hoverColor, label, locked) {
+    drawTextButton(x, y, width, height, mainColor, shadowColor, hoverColor, label, locked) {
         const middle = { x: x + (width / 2), y: y + (height / 2) };
         const hov = (!locked &&
-            this.isHovered({ x: cursor.x, y: cursor.y }, { x: x, y: y, w: width, h: height }));
-        if (!locked && hov && !cursor.l) {
+            this.isHovered({ x: CURSOR.x, y: CURSOR.y }, { x: x, y: y, w: width, h: height }));
+        if (!locked && hov && !CURSOR.l) {
             this.drawRect(x, y, width, height, hoverColor, hoverColor);
         }
-        else if (!locked && hov && cursor.l) {
+        else if (!locked && hov && CURSOR.l) {
             this.drawRect(x, y, width, height, hoverColor, hoverColor);
         }
         else {
@@ -62,7 +63,7 @@ export class Render {
         }
         this.drawText(label.text, middle.x + label.shadow.x, middle.y + label.shadow.y, 25, label.bg, "middle", "center");
         this.drawText(label.text, middle.x, middle.y, 25, label.fg, "middle", "center");
-        if (hov && cursor.l) {
+        if (hov && CURSOR.l) {
             return true;
         }
         return false;
@@ -92,3 +93,5 @@ export class Render {
             mouse.y <= box.y + box.h);
     }
 }
+const render = new Render("mainCanvas", false);
+export default render;

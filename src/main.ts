@@ -1,10 +1,11 @@
 //TODOS OS SPRITES SÃO ESCALONADOS POR CINCO
 
 
-import { Render } from "./classes/render.js";
-import { Player } from "./classes/player.js";
-import { Cursor } from "./classes/cursor.js";
-import { Keyboard } from "./classes/keyboard.js";
+import RENDER from "./classes/render.js";
+import PLAYER from "./classes/player.js";
+import UTILS from "./classes/utils.js";
+import CURSOR from "./classes/cursor.js";
+import KEYBOARD from "./classes/keyboard.js";
 import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 
@@ -14,11 +15,7 @@ window.addEventListener("contextmenu", (ev) => {
 });
 
 
-const RENDER = new Render("mainCanvas", true);
-const PLAYER = new Player(RENDER);
-const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
-const CURSOR = new Cursor();
-const KEYBOARD = new Keyboard();
+const TILEMAN = new Tilemanager(1);
 
 //TODO ajustar o noise, não esta na maneira ideal ainda
 // const NOISE = new FractalNoise2D(1, 3, 0.009, 1, 0.001);
@@ -54,14 +51,6 @@ function getWorldCell(mouseX: number, mouseY: number): {wx: number, wy: number} 
   //TODO return TileMan.tiles[wy][wx], wx, wy;
   return {wx: wx, wy: wy};
 }
-function getScreenell(mouseX: number, mouseY: number): {sx: number, sy: number} {
-  const cam_x = 116 - PLAYER.x;
-  const cam_y =  64 - PLAYER.y;
-  const mx = Math.floor(cam_x) % 8;
-  const my = Math.floor(cam_y) % 8;
-  
-  return {sx: mouseX - ((mouseX - mx) % 8), sy:  mouseY - ((mouseY - my) % 8)};
-}
 */
 
 class baseEntity {
@@ -72,6 +61,25 @@ class baseEntity {
   }
 }
 
+/*
+class stoneFurnace extends baseEntity {
+  public globalPos: {x: number, y: number};
+
+
+  constructor() {
+    super("stone_furnace");
+
+    this.globalPos = {x: 0, y: 0};
+  }
+
+  draw_item(x: number, y: number): void {
+    // local sx, sy = get_screen_cell(x, y);
+    // sspr(FURNACE_ID, sx, sy, FURNACE_COLORKEY, 1, 0, 0, 2, 2);
+  }
+}
+*/
+
+/*
 class TransportBelt extends baseEntity {
   public actualTick: number;
   public globalPos: {x: number, y: number};
@@ -117,7 +125,7 @@ class TransportBelt extends baseEntity {
     }
   }
 }
-
+*/
 
 function gameLoop() {
   RENDER.drawBg("black");
@@ -132,6 +140,9 @@ function gameLoop() {
     "white", "top", "left"
   );
   PLAYER.draw();
+
+  // const coord = UTILS.getScreenCell();
+  // RENDER.drawRect(coord.sx, coord.sy, 40, 40, "green", "green");
 }
 function mainMenuLoop() {
   RENDER.drawBg("gray");
@@ -140,11 +151,11 @@ function mainMenuLoop() {
     x: RENDER.canvas.width / 2, y: RENDER.canvas.height / 2
   };
   
-  if (RENDER.drawTextButton(CURSOR, middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", {x: 0, y: 2}), false)) {
+  if (RENDER.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", {x: 0, y: 2}), false)) {
     state = "game";
   }
   
-  if (RENDER.drawTextButton(CURSOR, middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", {x: 0, y: 2}), false)) {
+  if (RENDER.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", {x: 0, y: 2}), false)) {
     state = 'help';
   }
 }
@@ -180,7 +191,7 @@ function helpMenuLoop() {
     RENDER.drawText(info[i][0], panelCoords.x + panelCoords.w, panelCoords.y + (i * 20), 20, "black", "top", "right");
   }
 
-  if (RENDER.drawTextButton(CURSOR, middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", {x: 0, y: 2}), false)) {
+  if (RENDER.drawTextButton(middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", {x: 0, y: 2}), false)) {
     state = 'start';
   }
 }

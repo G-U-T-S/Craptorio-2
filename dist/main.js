@@ -1,17 +1,13 @@
-import { Render } from "./classes/render.js";
-import { Player } from "./classes/player.js";
-import { Cursor } from "./classes/cursor.js";
-import { Keyboard } from "./classes/keyboard.js";
+import RENDER from "./classes/render.js";
+import PLAYER from "./classes/player.js";
+import CURSOR from "./classes/cursor.js";
+import KEYBOARD from "./classes/keyboard.js";
 import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-const RENDER = new Render("mainCanvas", true);
-const PLAYER = new Player(RENDER);
-const TILEMAN = new Tilemanager(1, RENDER, PLAYER);
-const CURSOR = new Cursor();
-const KEYBOARD = new Keyboard();
+const TILEMAN = new Tilemanager(1);
 let tick = 0;
 let delta = 0;
 let lastTime = 0;
@@ -21,40 +17,6 @@ class baseEntity {
     type;
     constructor(type) {
         this.type = type;
-    }
-}
-class TransportBelt extends baseEntity {
-    actualTick;
-    globalPos;
-    drawn;
-    outputKey;
-    coordStraight;
-    coordCurved;
-    coordArrow;
-    tickrate;
-    maxTick;
-    constructor() {
-        super("transport_belt");
-        this.actualTick = 0;
-        this.globalPos = { x: 0, y: 0 };
-        this.drawn = false;
-        this.outputKey = "";
-        this.coordStraight = { x: 0, y: 0 };
-        this.coordCurved = { x: 0, y: 0 };
-        this.coordArrow = { x: 0, y: 0 };
-        this.tickrate = 5;
-        this.maxTick = 3;
-    }
-    draw(ents) {
-        if (!this.drawn) {
-            this.drawn = true;
-            if (ents[this.outputKey] !== undefined && ents[this.outputKey] instanceof TransportBelt) {
-                const outputBelt = ents[this.outputKey];
-                if (!outputBelt.drawn) {
-                    outputBelt.draw(ents);
-                }
-            }
-        }
     }
 }
 function gameLoop() {
@@ -70,10 +32,10 @@ function mainMenuLoop() {
     const middleScreen = {
         x: RENDER.canvas.width / 2, y: RENDER.canvas.height / 2
     };
-    if (RENDER.drawTextButton(CURSOR, middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", { x: 0, y: 2 }), false)) {
+    if (RENDER.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", { x: 0, y: 2 }), false)) {
         state = "game";
     }
-    if (RENDER.drawTextButton(CURSOR, middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", { x: 0, y: 2 }), false)) {
+    if (RENDER.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", { x: 0, y: 2 }), false)) {
         state = 'help';
     }
 }
@@ -105,7 +67,7 @@ function helpMenuLoop() {
         RENDER.drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
         RENDER.drawText(info[i][0], panelCoords.x + panelCoords.w, panelCoords.y + (i * 20), 20, "black", "top", "right");
     }
-    if (RENDER.drawTextButton(CURSOR, middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", { x: 0, y: 2 }), false)) {
+    if (RENDER.drawTextButton(middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", { x: 0, y: 2 }), false)) {
         state = 'start';
     }
 }

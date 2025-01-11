@@ -1,15 +1,15 @@
-import { Render } from "./render.js";
+import RENDER from "./render.js";
 
 
-export class Player {
+class Player {
   public x: number; public y: number;
   public lx: number; public ly: number;
   public animFrame: number; readonly animSpeed: 8; public animDir: number;
   readonly animMax: number; public lastDir: string; public moveSpeed: number;
   readonly directions: { [index: string]: {id: number, flip: number, rot: number, dust: {x: number, y: number}} };
-  public atlasCoord: {x: number, y: number}; private render: Render;
+  public atlasCoord: {x: number, y: number};
 
-  constructor(render: Render) {
+  constructor() {
     this.x = 0, this.y = 0;
     this.lx = 0, this.ly = 0
     this.animFrame = 0; this.animSpeed = 8; this.animDir = 0;
@@ -25,7 +25,6 @@ export class Player {
       '-1,1':  {id: 364, flip: 3, rot: 0, dust: {x: 10,y: -2}},  //--down-left
       '1,1':   {id: 364, flip: 2, rot: 0, dust: {x: -2,y: -2}}   //--down-right
     }
-    this.render = render;
     this.atlasCoord = {x: 0, y: 32};
   }
 
@@ -140,9 +139,12 @@ export class Player {
   // }
 
   public draw() {
-    this.render.drawSprite(
-      "sprites", this.render.centerCanvas.x - 16, this.render.centerCanvas.y + this.animFrame,
+    RENDER.drawSprite(
+      "sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }
 }
+
+const player = new Player();
+export default player;

@@ -1,4 +1,4 @@
-export class Cursor {
+class Cursor {
     x;
     y;
     l;
@@ -52,3 +52,5 @@ export class Cursor {
         const r = this.r;
     }
 }
+const cursor = new Cursor();
+export default cursor;
