@@ -1,3 +1,4 @@
+import entityManager from "./entityManager.js";
 class Cursor {
     x;
     y;
@@ -45,6 +46,7 @@ class Cursor {
             if (ev.button === 2) {
                 this.r = false;
             }
+            entityManager.addEnt("stone_furnace", { x: this.x, y: this.y });
         });
     }
     update() {

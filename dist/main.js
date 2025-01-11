@@ -2,6 +2,7 @@ import RENDER from "./classes/render.js";
 import PLAYER from "./classes/player.js";
 import CURSOR from "./classes/cursor.js";
 import KEYBOARD from "./classes/keyboard.js";
+import ENTYMAN from "./classes/entityManager.js";
 import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 window.addEventListener("contextmenu", (ev) => {
@@ -12,20 +13,12 @@ let tick = 0;
 let delta = 0;
 let lastTime = 0;
 let state = "game";
-let showMiniMap = false;
-class baseEntity {
-    type;
-    constructor(type) {
-        this.type = type;
-    }
-}
 function gameLoop() {
     RENDER.drawBg("black");
     PLAYER.update(delta, tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
-    TILEMAN.drawTerrain(showMiniMap);
-    RENDER.drawRect(0, 0, 250, 35, "black", "black");
-    RENDER.drawText(`Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30, "white", "top", "left");
+    ENTYMAN.update();
     PLAYER.draw();
+    ENTYMAN.draw();
 }
 function mainMenuLoop() {
     RENDER.drawBg("gray");

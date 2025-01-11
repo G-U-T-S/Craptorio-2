@@ -158,6 +158,14 @@ class Render {
       mouse.y <= box.y + box.h
     );
   }
+
+  isEntInside(x: number, y: number): boolean {
+    //TODO
+    // preciso tiras a player.position e trnasferir pra ca
+    // alem de adicionar topLeft pos e isInside.
+
+    return false;
+  }
 }
 
 

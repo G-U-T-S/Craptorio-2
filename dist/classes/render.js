@@ -92,6 +92,9 @@ class Render {
             mouse.y >= box.y &&
             mouse.y <= box.y + box.h);
     }
+    isEntInside(x, y) {
+        return false;
+    }
 }
 const render = new Render("mainCanvas", false);
 export default render;

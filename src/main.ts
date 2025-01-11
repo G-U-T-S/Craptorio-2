@@ -3,9 +3,9 @@
 
 import RENDER from "./classes/render.js";
 import PLAYER from "./classes/player.js";
-import UTILS from "./classes/utils.js";
 import CURSOR from "./classes/cursor.js";
 import KEYBOARD from "./classes/keyboard.js";
+import ENTYMAN from "./classes/entityManager.js";
 import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 
@@ -16,15 +16,14 @@ window.addEventListener("contextmenu", (ev) => {
 
 
 const TILEMAN = new Tilemanager(1);
-
-//TODO ajustar o noise, não esta na maneira ideal ainda
-// const NOISE = new FractalNoise2D(1, 3, 0.009, 1, 0.001);
+// const ENTS = {
+//   "stone_furnace": new Map<string, Object>()
+// };
 
 let tick: number = 0;
 let delta: number = 0;
 let lastTime: number = 0;
 let state: string = "game";
-let showMiniMap: boolean = false;
 // let integerScale: boolean = true;
 
 
@@ -51,7 +50,6 @@ function getWorldCell(mouseX: number, mouseY: number): {wx: number, wy: number} 
   //TODO return TileMan.tiles[wy][wx], wx, wy;
   return {wx: wx, wy: wy};
 }
-*/
 
 class baseEntity {
   public type: string;
@@ -60,7 +58,6 @@ class baseEntity {
     this.type = type;
   }
 }
-
 /*
 class stoneFurnace extends baseEntity {
   public globalPos: {x: number, y: number};
@@ -78,7 +75,6 @@ class stoneFurnace extends baseEntity {
   }
 }
 */
-
 /*
 class TransportBelt extends baseEntity {
   public actualTick: number;
@@ -131,15 +127,16 @@ function gameLoop() {
   RENDER.drawBg("black");
 
   PLAYER.update(delta, tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog);
+  ENTYMAN.update();
+  // TILEMAN.drawTerrain(showMiniMap);
 
-  TILEMAN.drawTerrain(showMiniMap);
-
-  RENDER.drawRect(0, 0, 250, 35, "black", "black");
-  RENDER.drawText(
-    `Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30,
-    "white", "top", "left"
-  );
+  // RENDER.drawRect(0, 0, 250, 35, "black", "black");
+  // RENDER.drawText(
+  //   `Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30,
+  //   "white", "top", "left"
+  // );
   PLAYER.draw();
+  ENTYMAN.draw();
 
   // const coord = UTILS.getScreenCell();
   // RENDER.drawRect(coord.sx, coord.sy, 40, 40, "green", "green");
