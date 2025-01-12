@@ -9,23 +9,25 @@
  
     <style>
       body {
-        margin: none;
-        padding: none;
+        margin: 0;
+        padding: 0;
+        background-color: darkgray;
       }
 
-      canvas {
-        margin: none;
-        padding: none;
-        position: absolute;
-        top: 0;
-        left: 0;
+      #canvasDiv {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
       }
     </style>
   </head>
  
   <body>
-    <canvas id="mainCanvas", width="240" height="136"></canvas>
+    <div id="canvasDiv">
+      <canvas id="mainCanvas" width="240" height="136"></canvas>
+    </div>
     
-    <script src="dist/script.js"></script>
+    <script type="module" src="dist/main.js"></script>
   </body>
 </html>

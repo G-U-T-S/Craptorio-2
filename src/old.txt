@@ -559,7 +559,7 @@ class Tilemanager {
         const worldX = startX + screenX;
         const worldY = startY + screenY;
         //BUG
-        //! a questão aqui é, na impolementação original
+        //! a questão aqui é, na implementação original
         //! quando se tenta acessar um tile inexistente, um novo é criado
         const tile = this.tiles[worldX][worldY];
 
