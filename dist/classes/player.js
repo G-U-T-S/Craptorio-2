@@ -1,7 +1,5 @@
 import RENDER from "./render.js";
 class Player {
-    x;
-    y;
     lx;
     ly;
     animFrame;
@@ -13,7 +11,6 @@ class Player {
     directions;
     atlasCoord;
     constructor() {
-        this.x = 0, this.y = 0;
         this.lx = 0, this.ly = 0;
         this.animFrame = 0;
         this.animSpeed = 8;
@@ -51,8 +48,6 @@ class Player {
                 }
             }
         }
-        this.lx = this.x;
-        this.ly = this.y;
         let xDir = 0;
         let yDir = 0;
         if (keys.w) {
@@ -69,8 +64,8 @@ class Player {
         }
         if (!cursorProg) {
             if (xDir !== 0 || yDir !== 0) {
-                this.x += (xDir * this.moveSpeed) * delta;
-                this.y += (yDir * this.moveSpeed) * delta;
+                RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
+                RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
             }
         }
         this.lastDir = `${xDir},${yDir}`;

@@ -3,12 +3,13 @@ import PLAYER from "./classes/player.js";
 import CURSOR from "./classes/cursor.js";
 import KEYBOARD from "./classes/keyboard.js";
 import ENTYMAN from "./classes/entityManager.js";
-import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-const TILEMAN = new Tilemanager(1);
+CURSOR.addMouseUpListener(() => {
+    ENTYMAN.addEnt("wood_chest", CURSOR.x + RENDER.topLeft.x, CURSOR.y + RENDER.topLeft.y);
+});
 let tick = 0;
 let delta = 0;
 let lastTime = 0;
@@ -16,9 +17,8 @@ let state = "game";
 function gameLoop() {
     RENDER.drawBg("black");
     PLAYER.update(delta, tick, { w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d }, CURSOR.prog);
-    ENTYMAN.update();
+    ENTYMAN.updateAndDraw();
     PLAYER.draw();
-    ENTYMAN.draw();
 }
 function mainMenuLoop() {
     RENDER.drawBg("gray");

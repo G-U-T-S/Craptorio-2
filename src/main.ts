@@ -6,19 +6,19 @@ import PLAYER from "./classes/player.js";
 import CURSOR from "./classes/cursor.js";
 import KEYBOARD from "./classes/keyboard.js";
 import ENTYMAN from "./classes/entityManager.js";
-import { Tilemanager } from "./classes/tileManager.js";
+// import { Tilemanager } from "./classes/tileManager.js";
 import { Label } from "./classes/label.js";
 
 
 window.addEventListener("contextmenu", (ev) => {
   ev.preventDefault();
 });
+CURSOR.addMouseUpListener(() => {
+  ENTYMAN.addEnt("wood_chest", CURSOR.x + RENDER.topLeft.x, CURSOR.y + RENDER.topLeft.y)
+});
 
 
-const TILEMAN = new Tilemanager(1);
-// const ENTS = {
-//   "stone_furnace": new Map<string, Object>()
-// };
+// const TILEMAN = new Tilemanager(1);
 
 let tick: number = 0;
 let delta: number = 0;
@@ -50,84 +50,13 @@ function getWorldCell(mouseX: number, mouseY: number): {wx: number, wy: number} 
   //TODO return TileMan.tiles[wy][wx], wx, wy;
   return {wx: wx, wy: wy};
 }
-
-class baseEntity {
-  public type: string;
-
-  constructor(type: string) {
-    this.type = type;
-  }
-}
-/*
-class stoneFurnace extends baseEntity {
-  public globalPos: {x: number, y: number};
-
-
-  constructor() {
-    super("stone_furnace");
-
-    this.globalPos = {x: 0, y: 0};
-  }
-
-  draw_item(x: number, y: number): void {
-    // local sx, sy = get_screen_cell(x, y);
-    // sspr(FURNACE_ID, sx, sy, FURNACE_COLORKEY, 1, 0, 0, 2, 2);
-  }
-}
-*/
-/*
-class TransportBelt extends baseEntity {
-  public actualTick: number;
-  public globalPos: {x: number, y: number};
-  public drawn: boolean;
-  public outputKey: string;
-
-  readonly coordStraight: {x: number, y: number};
-  readonly coordCurved: {x: number, y: number};
-  readonly coordArrow: {x: number, y: number};
-  readonly tickrate: number;
-  readonly maxTick: number;
-
-  constructor() {
-    super("transport_belt");
-
-    this.actualTick = 0;
-    this.globalPos = {x: 0, y: 0};
-    this.drawn = false;
-    this.outputKey = "";
-
-    this.coordStraight = {x: 0, y: 0};
-    this.coordCurved = {x: 0, y: 0};
-    this.coordArrow = {x: 0, y: 0};
-    this.tickrate = 5;
-    this.maxTick = 3;
-  }
-
-  draw(ents: { [index: string]: baseEntity}): void {
-    if (!this.drawn) {
-      //! esse algoritimo pode ser perigoso, por envolver recurção.
-      this.drawn = true;
-      if (ents[this.outputKey] !== undefined && ents[this.outputKey] instanceof TransportBelt) {
-        const outputBelt = ents[this.outputKey] as TransportBelt;
-        
-        if (!outputBelt.drawn) {
-          outputBelt.draw(ents);
-        }
-      }
-      // if (self.id == BELT_ID_CURVED) {rot = self.sprite_rot; flip = self.flip}
-      // local sx, sy = world_to_screen(self.pos.x, self.pos.y)
-      // self.screen_pos = {x = sx, y = sy}
-      // sspr(self.id + belt_tick, sx, sy, BELT_COLORKEY, 1, flip, rot, 1, 1)
-    }
-  }
-}
 */
 
 function gameLoop() {
   RENDER.drawBg("black");
 
   PLAYER.update(delta, tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog);
-  ENTYMAN.update();
+  ENTYMAN.updateAndDraw();
   // TILEMAN.drawTerrain(showMiniMap);
 
   // RENDER.drawRect(0, 0, 250, 35, "black", "black");
@@ -136,7 +65,6 @@ function gameLoop() {
   //   "white", "top", "left"
   // );
   PLAYER.draw();
-  ENTYMAN.draw();
 
   // const coord = UTILS.getScreenCell();
   // RENDER.drawRect(coord.sx, coord.sy, 40, 40, "green", "green");

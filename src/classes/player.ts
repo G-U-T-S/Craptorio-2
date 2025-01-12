@@ -2,7 +2,7 @@ import RENDER from "./render.js";
 
 
 class Player {
-  public x: number; public y: number;
+  // public x: number; public y: number;
   public lx: number; public ly: number;
   public animFrame: number; readonly animSpeed: 8; public animDir: number;
   readonly animMax: number; public lastDir: string; public moveSpeed: number;
@@ -10,7 +10,7 @@ class Player {
   public atlasCoord: {x: number, y: number};
 
   constructor() {
-    this.x = 0, this.y = 0;
+    // this.x = 0, this.y = 0;
     this.lx = 0, this.ly = 0
     this.animFrame = 0; this.animSpeed = 8; this.animDir = 0;
     this.animMax = 4; this.lastDir = "0,0"; this.moveSpeed = 50.0
@@ -49,8 +49,8 @@ class Player {
 
     }
 
-    this.lx = this.x;
-    this.ly = this.y;
+    // this.lx = this.x;
+    // this.ly = this.y;
 
     let xDir = 0; let yDir = 0;
     
@@ -85,8 +85,8 @@ class Player {
         // sound('move');
         //! removi o delta time
         // this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
-        this.x += (xDir * this.moveSpeed) * delta;
-        this.y += (yDir * this.moveSpeed) * delta;
+        RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
+        RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
       }
     }
   

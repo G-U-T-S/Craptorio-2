@@ -2,6 +2,8 @@ import CURSOR from "./cursor.js";
 class Render {
     canvas;
     context;
+    topLeft;
+    size;
     centerCanvas;
     integerScale;
     spriteAtlas;
@@ -9,6 +11,8 @@ class Render {
     constructor(canvasId, integerScale) {
         this.canvas = document.getElementById(canvasId);
         this.context = this.canvas.getContext("2d");
+        this.topLeft = { x: 0, y: 0 };
+        this.size = { w: 0, h: 0 };
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.spriteAtlas = new Image();
         this.spriteAtlas.src = "./assets/sprites.png";
@@ -82,6 +86,7 @@ class Render {
             this.canvas.width = Math.floor(this.canvas.width);
             this.canvas.height = Math.floor(this.canvas.height);
         }
+        this.size = { w: this.canvas.width, h: this.canvas.height };
         this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");
@@ -92,7 +97,10 @@ class Render {
             mouse.y >= box.y &&
             mouse.y <= box.y + box.h);
     }
-    isEntInside(x, y) {
+    isInsideCamera(x, y) {
+        if (x >= this.topLeft.x && x <= this.topLeft.x + this.size.w && y >= this.topLeft.y && y <= this.topLeft.y + this.size.h) {
+            return true;
+        }
         return false;
     }
 }

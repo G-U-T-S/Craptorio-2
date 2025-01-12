@@ -5,6 +5,8 @@ import { Label } from "./label.js";
 class Render {
   public canvas: HTMLCanvasElement;
   public context: CanvasRenderingContext2D;
+  public topLeft: {x: number, y: number};
+  public size: {w: number, h: number};
   public centerCanvas: {x: number, y: number};
   public integerScale: boolean;
   private spriteAtlas: HTMLImageElement;
@@ -13,6 +15,8 @@ class Render {
   constructor(canvasId: string, integerScale: boolean) {
     this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
+    this.topLeft = {x: 0, y: 0};
+    this.size = {w: 0, h: 0};
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.spriteAtlas = new Image();
     this.spriteAtlas.src = "./assets/sprites.png";
@@ -145,6 +149,7 @@ class Render {
       this.canvas.height = Math.floor(this.canvas.height);
     }
   
+    this.size = {w: this.canvas.width, h: this.canvas.height};
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;
     this.drawBg("black");
@@ -159,10 +164,10 @@ class Render {
     );
   }
 
-  isEntInside(x: number, y: number): boolean {
-    //TODO
-    // preciso tiras a player.position e trnasferir pra ca
-    // alem de adicionar topLeft pos e isInside.
+  isInsideCamera(x: number, y: number): boolean {
+    if (x >= this.topLeft.x && x <= this.topLeft.x + this.size.w && y >= this.topLeft.y && y <= this.topLeft.y + this.size.h) {
+      return true;
+    }
 
     return false;
   }

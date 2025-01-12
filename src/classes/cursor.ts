@@ -1,5 +1,3 @@
-import entityManager from "./entityManager.js";
-
 // export class CURSOR {
 //   x: 0, y: 0, lx: 8, ly: 8,
 //   tx: 8, ty: 8, wx: 0, wy: 0,
@@ -15,13 +13,21 @@ class Cursor {
   public x: number; public y: number;
   public l: boolean; public ll: boolean;
   public m: boolean; public r: boolean
+  public heldLeft: boolean; public heldRight: boolean;
+  public holdTime: number;
   public prog: boolean; public canvasId: string;
+  public mouseDownListeners: Array<CallableFunction>;
+  public mouseUpListeners: Array<CallableFunction>;
 
   constructor(canvasId = "mainCanvas") {
     this.x = 0; this.y = 0;
     this.l = false; this.ll = false;
     this.m = false; this.r = false;
+    this.heldLeft = false; this.heldRight = false;
+    this.holdTime = 0;
     this.prog = false; this.canvasId = canvasId;
+    this.mouseDownListeners = [];
+    this.mouseUpListeners = [];
 
     window.addEventListener("mousemove", (ev) => {
       const canvas = ev.target;
@@ -42,6 +48,10 @@ class Cursor {
       if (ev.button === 2) {
         this.r = true;
       }
+
+      this.mouseDownListeners.forEach((func) => {
+        func();
+      });
     });
     window.addEventListener("mouseup", (ev) => {
       if (ev.button === 0) {
@@ -54,8 +64,9 @@ class Cursor {
         this.r = false;
       }
 
-      //! TEMP
-      entityManager.addEnt("stone_furnace", {x: this.x, y: this.y});
+      this.mouseUpListeners.forEach((func) => {
+        func();
+      });
     });
   }
 
@@ -66,28 +77,28 @@ class Cursor {
     // // const { wx, wy } = get_world_cell(this.x, this.y);
     // // const { tx, ty } = world_to_screen(wx, wy);
   
-    // // --update hold state for left and right click
-    // if (l && this.l &&  !this.heldLeft && !this.r) {
-    //   this.heldLeft = true
-    // }
+    // --update hold state for left and right click
+    if (l && this.l && !this.heldLeft && !this.r) {
+      this.heldLeft = true
+    }
   
-    // if (r && this.r && !this.heldRight && !this.l) {
-    //   this.heldRight = true;
-    // }
+    if (r && this.r && !this.heldRight && !this.l) {
+      this.heldRight = true;
+    }
   
-    // if (this.heldLeft || this.heldRight) {
-    //   this.holdTime = this.holdTime + 1;
-    // }
+    if (this.heldLeft || this.heldRight) {
+      this.holdTime = this.holdTime + 1;
+    }
   
-    // if (!l && this.heldLeft) {
-    //   this.heldLeft = false;
-    //   this.holdTime = 0;
-    // }
+    if (!l && this.heldLeft) {
+      this.heldLeft = false;
+      this.holdTime = 0;
+    }
   
-    // if (!r && this.heldRight) {
-    //   this.heldRight = false;
-    //   this.holdTime = 0;
-    // }
+    if (!r && this.heldRight) {
+      this.heldRight = false;
+      this.holdTime = 0;
+    }
   
     // this.ltx = this.tx; this.lty = this.ty;
     // // this.wx = wx; this.wy = wy;
@@ -102,6 +113,14 @@ class Cursor {
     // if (this.tx !== this.ltx || this.ty !== this.lty) {
     //   this.holdTime = 0;
     // }
+  }
+
+  addMouseDownListener(func: CallableFunction): void {
+    this.mouseDownListeners.push(func);
+  }
+
+  addMouseUpListener(func: CallableFunction): void {
+    this.mouseUpListeners.push(func);
   }
 }
 

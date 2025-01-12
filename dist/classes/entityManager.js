@@ -1,41 +1,42 @@
 import RENDER from "./render.js";
 import StoneFurnace from "./entities/stone_furnace.js";
+import { WoodChest } from "./entities/wood_chest.js";
 class EntityManager {
     ents;
-    entsToBeDraw;
     constructor() {
         this.ents = {
             stone_furnace: new Map(),
-            conveyor_belt: new Map()
-        };
-        this.entsToBeDraw = {
-            stone_furnace: [],
-            conveyor_belt: []
+            conveyor_belt: new Map(),
+            wood_chest: new Map()
         };
     }
-    update() {
+    updateAndDraw() {
         this.ents.stone_furnace.forEach((ent) => {
             if (ent instanceof StoneFurnace) {
                 ent.update();
-                if (RENDER.isEntInside(ent.globalPos.x, ent.globalPos.y)) {
-                    this.entsToBeDraw.stone_furnace.push(ent.coord);
+                if (RENDER.isInsideCamera(ent.globalPos.x, ent.globalPos.y)) {
+                    ent.draw();
                 }
             }
         });
-    }
-    draw() {
-        this.entsToBeDraw.stone_furnace.forEach((value) => {
-            const stoFurn = this.ents.stone_furnace.get(value);
-            if (stoFurn instanceof StoneFurnace) {
-                stoFurn.draw();
+        this.ents.wood_chest.forEach((ent) => {
+            if (ent instanceof WoodChest) {
+                if (RENDER.isInsideCamera(ent.globalPos.x, ent.globalPos.y)) {
+                    ent.draw();
+                }
             }
         });
-        this.entsToBeDraw.stone_furnace = [];
+        RENDER.drawRect(0, 0, 250, 35, "black", "black");
+        RENDER.drawText(`Total chests: ${this.ents.wood_chest.size}`, 0, 0, 30, "white", "top", "left");
     }
-    addEnt(type, globalPos) {
+    addEnt(type, globalX, globalY) {
         switch (type) {
             case "stone_furnace": {
-                this.ents.stone_furnace.set(`${globalPos.x}_${globalPos.y}`, new StoneFurnace({ ...globalPos }));
+                this.ents.stone_furnace.set(`${globalX}_${globalY}`, new StoneFurnace({ x: globalX, y: globalY }));
+                break;
+            }
+            case "wood_chest": {
+                this.ents.wood_chest.set(`${globalX}_${globalY}`, new WoodChest({ x: globalX, y: globalY }));
                 break;
             }
         }
