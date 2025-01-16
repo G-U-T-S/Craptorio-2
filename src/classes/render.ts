@@ -12,8 +12,8 @@ class Render {
   private spriteAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
   
-  constructor(canvasId: string, integerScale: boolean) {
-    this.canvas = document.getElementById(canvasId) as HTMLCanvasElement;
+  constructor() {
+    this.canvas = document.getElementsByTagName("Canvas")[0] as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.topLeft = {x: 0, y: 0};
     this.size = {w: 0, h: 0};
@@ -22,14 +22,13 @@ class Render {
     this.spriteAtlas.src = "./assets/sprites.png";
     this.tilesAtlas = new Image();
     this.tilesAtlas.src = "./assets/tiles.png";
-    this.integerScale = integerScale;
+    this.integerScale = true;
 
     window.addEventListener("resize", this.resizeCanvas.bind(this));
+    this.resizeCanvas();
   }
   
-  drawSprite(src: "sprites" | "tiles", x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
-    const scale = 5;
-  
+  drawSprite(src: "sprites" | "tiles", scale: number, x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
     if (src === "sprites") {
       this.context.drawImage(
         this.spriteAtlas, coordX, coordY,
@@ -174,5 +173,5 @@ class Render {
 }
 
 
-const render = new Render("mainCanvas", false);
+const render = new Render();
 export default render;

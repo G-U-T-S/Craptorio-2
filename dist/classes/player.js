@@ -110,7 +110,7 @@ class Player {
         }
     }
     draw() {
-        RENDER.drawSprite("sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
+        RENDER.drawSprite("sprites", 5, RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
 const player = new Player();

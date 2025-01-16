@@ -140,7 +140,7 @@ class Player {
 
   public draw() {
     RENDER.drawSprite(
-      "sprites", RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame,
+      "sprites", 5, RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }

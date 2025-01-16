@@ -225,7 +225,7 @@ export class Tilemanager {
             // RENDER.drawRect(tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
             //sspr(ores[tile.ore].tile_id, tile.position.x, tile.position.y, ores[tile.ore].color_keys, 1, 0, tile.rot)
             // RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y)
-            RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
+            RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
           }
           if (!tile.isBorder) {
             // let rot = tile.rot;
@@ -249,12 +249,12 @@ export class Tilemanager {
               //TODO RENDER.drawRect(tile.position.x, tile.position.y, 40, 40, this.biomes[tile.biome].mapCol, this.biomes[tile.biome].mapCol);
               //sspr(biomes[tile.biome].tile_id_offset, tile.position.x, tile.position.y, biomes[tile.biome].map_col, 1, 0, tile.rot)
               RENDER.drawSprite(
-                "tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y
+                "tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y
               )
 
               const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
               if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
-                RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
               }
             }
           }
@@ -274,11 +274,11 @@ export class Tilemanager {
             }
 
             //TODO sspr(224, tile.position.x, tile.position.y, -1, 1, flip)
-            RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
+            RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
           }
           else {
             //TODO sspr(tile.sprite_id, tile.position.x, tile.position.y, -1, 1, 0, tile.rot)
-            RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
+            RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
           }
         }
       }

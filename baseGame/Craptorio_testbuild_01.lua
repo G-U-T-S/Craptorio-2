@@ -3226,7 +3226,7 @@ end
 
 function ui.draw_endgame_window()
   cls(0)
-  if TICK % 60 > 30 then
+  if tick % 60 > 30 then
     print('Congratulations!', 31, 44, 15, false, 2, false)
     print('Congratulations!', 30, 44, 4, false, 2, false)
     print('You\'ve won the game!', 11, 64, 15, false, 2, false)
@@ -5494,7 +5494,7 @@ local Inserter = {
 }
 
 function Inserter:draw_hover_widget()
-  if TICK % 60 == 0 then
+  if tick % 60 == 0 then
     trace('state: ' .. self.state)
     trace('id = ' .. self.held_item_id)
   end
@@ -5881,7 +5881,7 @@ function Drill.update(self)
       self:yield()
     end
 
-    --if TICK % 60 == 0 then trace(tostring(ENTS[self.output_key] and ENTS[self.output_key].type or 'nil')) end
+    --if tick % 60 == 0 then trace(tostring(ENTS[self.output_key] and ENTS[self.output_key].type or 'nil')) end
     --check for other ents
     if self.output.count > 0 and ENTS[self.output_key] then
       if ENTS[self.output_key].type == 'transport_belt' or
@@ -5925,7 +5925,7 @@ function Drill.draw(self)
     --draw main drill body
     local sx, sy = world_to_screen(self.pos.x, self.pos.y)
     local belt_pos = DRILL_MINI_BELT_MAP[self.rot]
-    --trace(TICK % 2)
+    --trace(tick % 2)
     --sspr(DRILL_BURNER_SPRITE_ID + (DRILL_ANIM_TICK * 2), sx, sy, 0, 1, 0, self.rot, 2, 2)
     sspr(DRILL_BIT_ID, sx + 0 + (DRILL_BIT_TICK), sy + 5, 0, 1, 0, 0, 1, 1)
     sspr(DRILL_BURNER_SPRITE_ID, sx, sy, 0, 1, 0, 0, 2, 2)
@@ -6666,7 +6666,7 @@ end
 function Crafter:draw()
   local x, y = world_to_screen(self.x, self.y)
   local offset = 0
-  local blink = TICK % 60 < 30
+  local blink = tick % 60 < 30
   sspr(CRAFTER_ID, x, y, 0, 1, 0, 0, 3, 3)
   if self.recipe and alt_mode then
     sspr(ITEMS[self.recipe.id].sprite_id, x + 6, y + 5, ITEMS[self.recipe.id].color_key)
@@ -7234,7 +7234,7 @@ end
 
 function Lab:draw()
   local sx, sy = world_to_screen(self.x, self.y)
-  if self.progress > 0 and TICK%60 > math.random(60) then
+  if self.progress > 0 and tick%60 > math.random(60) then
     local r =  math.random()
     if r > 0.75 then
       pal(9, 4)
@@ -8984,7 +8984,7 @@ local Refinery = {
   updated = false,
   drawn = false,
   state = 'ready',
-  requests = false,
+  -- requests = false,
   progress = 0,
   requests = {},
   dummy_keys = {},
@@ -9815,7 +9815,7 @@ function Silo:return_all()
 end
 
 function rocket_fx(x, y)
-  spr(ROCKET_FX_ID, x, y, 0, 1, TICK%10 > 5 and 0 or 1, 0, 2, 1)
+  spr(ROCKET_FX_ID, x, y, 0, 1, tick%10 > 5 and 0 or 1, 0, 2, 1)
 end
 
 function new_rocket(wx, wy)
@@ -9896,7 +9896,7 @@ STATE = 'start'
 current_recipe = {x = 0, y = 0, id = 0}
 --image = require('\\assets\\fullscreen_images')
 --------------------COUNTERS--------------------------
-TICK = 0
+tick = 0
 -------------GAME-OBJECTS-AND-CONTAINERS---------------
 ENTS = {}
 ORES = {}
@@ -10528,7 +10528,7 @@ function update_player(dt)
     local dx, dy = 240/2 - 4 + dust_dir.x, 136/2 - 4 + player.anim_frame + dust_dir.y
     if dust_dir and (x_dir ~= 0 or y_dir ~= 0) then
       new_dust(dx, dy, 2, math.random(-1,1) + (3*-x_dir), math.random() + (3*-y_dir))
-    elseif TICK%24 == 0 then
+    elseif tick%24 == 0 then
       new_dust(dx, dy, 2, math.random(-1,1) + (3*-x_dir), math.random() + (3*-y_dir))
     end
     if x_dir ~= 0 or y_dir ~= 0 then
@@ -11122,7 +11122,7 @@ function dispatch_input()
     local result = resources[tostring(tile.sprite_id)]
     local k = get_ent(cursor.x, cursor.y)
     if not result and not tile.is_tree and not ENTS[k] and not tile.ore then cursor.prog = false return end
-    if TICK % 4 == 0 then
+    if tick % 4 == 0 then
       local px, py = sx + 4, sy + 4
       line(120, 67 + player.anim_frame, px, py, floor(math.random(1, 3) + 0.5))
       for i = 1, 3 do
@@ -11220,7 +11220,7 @@ end
 
 function update_ents()
   for k, v in pairs(ENTS) do
-    if v.update and TICK % v.tickrate == 0 then
+    if v.update and tick % v.tickrate == 0 then
       v:update()
     end
   end
@@ -11337,14 +11337,14 @@ function TIC()
   if STATE == "start" or STATE == 'help' then
     update_cursor_state()
     ui.draw_menu()
-    TICK = TICK + 1
+    tick = tick + 1
     return
   end
 
   if STATE == 'first_launch' then
     update_cursor_state()
     ui:draw_endgame_window()
-    TICK = TICK + 1
+    tick = tick + 1
     return
   end
   
@@ -11359,24 +11359,24 @@ function TIC()
   local up_time = lapse(update_player, dt)
   local hi_time = lapse(dispatch_input, dt)
 
-  if TICK % BELT_TICKRATE == 0 then
+  if tick % BELT_TICKRATE == 0 then
     BELT_TICK = BELT_TICK + 1
     if BELT_TICK > BELT_MAXTICK then BELT_TICK = 0 end
   end
 
-  if TICK % UBELT_TICKRATE == 0 then
+  if tick % UBELT_TICKRATE == 0 then
     UBELT_TICK = UBELT_TICK + 1
     if UBELT_TICK > UBELT_MAXTICK then UBELT_TICK = 0 end
   end
 
-  if TICK % DRILL_TICK_RATE == 0 then
+  if tick % DRILL_TICK_RATE == 0 then
     DRILL_BIT_TICK = DRILL_BIT_TICK + DRILL_BIT_DIR
     if DRILL_BIT_TICK > 7 or DRILL_BIT_TICK < 0 then DRILL_BIT_DIR = DRILL_BIT_DIR * -1 end
     DRILL_ANIM_TICK = DRILL_ANIM_TICK + 1
     if DRILL_ANIM_TICK > 2 then DRILL_ANIM_TICK = 0 end
   end
 
-  if TICK % FURNACE_ANIM_TICKRATE == 0 then
+  if tick % FURNACE_ANIM_TICKRATE == 0 then
     FURNACE_ANIM_TICK = FURNACE_ANIM_TICK + 1
     for y = 0, 3 do
       set_sprite_pixel(490, 0, y, floor(math.random(2, 4)))
@@ -11387,7 +11387,7 @@ function TIC()
     end
   end
 
-  if TICK % CRAFTER_ANIM_RATE == 0 then
+  if tick % CRAFTER_ANIM_RATE == 0 then
     CRAFTER_ANIM_FRAME = CRAFTER_ANIM_FRAME + CRAFTER_ANIM_DIR
     if CRAFTER_ANIM_FRAME > 5 then
       CRAFTER_ANIM_DIR = -1
@@ -11482,7 +11482,7 @@ function TIC()
   
   update_rockets()
   if show_help then ui:draw_help_screen() end
-  TICK = TICK + 1
+  tick = tick + 1
 end
 
 --11488

@@ -155,17 +155,17 @@ export class Tilemanager {
                         this.autoMap(worldX, worldY);
                     }
                     if (tile.ore !== -1) {
-                        RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
+                        RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.ores[tile.ore].spriteAtlasCoord.x, this.ores[tile.ore].spriteAtlasCoord.y);
                     }
                     if (!tile.isBorder) {
                         let flip = tile.flip;
                         if (!tile.isLand) {
                         }
                         else {
-                            RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                            RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             const tileCoordOff = { ...this.biomes[tile.biome].tileCoordOffset };
                             if (tile.atlasCoord.x !== tileCoordOff.x && tile.atlasCoord.y !== tileCoordOff.y) {
-                                RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
+                                RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, this.biomes[tile.biome].tileCoordOffset.x, this.biomes[tile.biome].tileCoordOffset.y);
                             }
                         }
                     }
@@ -182,10 +182,10 @@ export class Tilemanager {
                         else if (worldY % 2 == 1) {
                             flip = 2;
                         }
-                        RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
+                        RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                     else {
-                        RENDER.drawSprite("tiles", tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
+                        RENDER.drawSprite("tiles", 5, tile.globalPos.x - RENDER.topLeft.x, tile.globalPos.y - RENDER.topLeft.y, tile.atlasCoord.x, tile.atlasCoord.y);
                     }
                 }
             }

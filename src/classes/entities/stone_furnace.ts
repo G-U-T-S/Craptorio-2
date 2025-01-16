@@ -7,7 +7,7 @@ export default class StoneFurnace extends BaseEntity {
 
   public draw(): void {
     RENDER.drawSprite(
-      "sprites", this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
+      "sprites", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
       64, 64, 16, 16
     );
   }
