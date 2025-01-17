@@ -106,15 +106,15 @@ class Player {
         break;
       }
       case "0,1": {
-        this.atlasCoord.x = 64.1;
+        this.atlasCoord.x = 64;
         break;
       }
       case "0,-1": {
-        this.atlasCoord.x = 56.1;
+        this.atlasCoord.x = 56;
         break;
       }
       case "1,0": {
-        this.atlasCoord.x = 8.1;
+        this.atlasCoord.x = 8;
         break;
       }
       case "1,1": {
