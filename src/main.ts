@@ -1,5 +1,8 @@
 import cursor from "./classes/cursor.js";
 import Belt from "./classes/entities/belt.js";
+import Crafter from "./classes/entities/crafter.js";
+import Drill from "./classes/entities/drill.js";
+import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import keyboard from "./classes/keyboard.js";
 import player from "./classes/player.js";
@@ -15,15 +18,28 @@ window.addEventListener("contextmenu", (ev) => {
 const currentRecipe = {x: 0, y: 0, id: 0}; 
 
 let tick: number = 0;
+
 let beltTick: number = 0;
+
 let uBeltTick: number = 0;
+
 let drillTick: number = 0;
+let drillBitTick: number = 0;
+let drillBitDir: number = 1;
+let drillAnimTick: number = 0;
+
 let furnaceTick: number = 0;
+let furnaceAnimTick: number = 0;
+
 let crafterTick: number = 0;
+let crafterAnimTick: number = 0;
+let crafterAnimDir: number = 1;
 
 let delta: number = 0;
 let lastTime: number = 0;
-let state: string = "start";
+
+type stateType = "start" | "help" | "firstLaunch";
+let state: stateType = "start";
 
 
 // function dispatchInput(delta: number): void {}
@@ -42,22 +58,22 @@ function TIC(currentTime: number) {
 
   if (state === "start") {
     cursor.update();
-    state = ui.drawStartMenu();
+    state = ui.drawStartMenu() as stateType;
     tick += 1;
     requestAnimationFrame(TIC);
     return;
   }
   else if (state === "help") {
     cursor.update();
-    state = ui.drawHelpMenu();
+    state = ui.drawHelpMenu() as stateType;
     tick += 1;
     requestAnimationFrame(TIC);
     return;
   }
 
-  if (state === 'first_launch') {
+  if (state === 'firstLaunch') {
     cursor.update();
-    state = ui.drawEndgameWindow(tick);
+    state = ui.drawEndgameWindow(tick) as stateType;
     tick += 1;
     requestAnimationFrame(TIC);
     return;
@@ -82,36 +98,43 @@ function TIC(currentTime: number) {
     if (beltTick > UndergroundBelt.maxTick) { uBeltTick = 0; }
   }
 
-  // if tick % DRILL_TICK_RATE == 0 then
-  //   DRILL_BIT_TICK = DRILL_BIT_TICK + DRILL_BIT_DIR
-  //   if DRILL_BIT_TICK > 7 or DRILL_BIT_TICK < 0 then DRILL_BIT_DIR = DRILL_BIT_DIR * -1 end
-  //   DRILL_ANIM_TICK = DRILL_ANIM_TICK + 1
-  //   if DRILL_ANIM_TICK > 2 then DRILL_ANIM_TICK = 0 end
-  // end
+  if (tick % Drill.tickRate === 0) {
+    drillTick = drillTick + drillBitDir;
+    if (drillBitTick > 7 && drillBitTick < 0) {
+      drillBitDir = drillBitDir * -1;
+    }
+    
+    drillAnimTick += 1;
+    if (drillAnimTick > 2) {
+      drillAnimTick = 0;
+    }
+  }
 
-  // if tick % FURNACE_ANIM_TICKRATE == 0 then
-  //   FURNACE_ANIM_TICK = FURNACE_ANIM_TICK + 1
-  //   for y = 0, 3 do
-  //     set_sprite_pixel(490, 0, y, floor(math.random(2, 4)))
-  //     set_sprite_pixel(490, 1, y, floor(math.random(2, 4)))
-  //   end
-  //   if FURNACE_ANIM_TICK > FURNACE_ANIM_TICKS then
-  //     FURNACE_ANIM_TICK = 0
-  //   end
-  // end
+  if (tick % StoneFurnace.animTickRate === 0) {
+    furnaceAnimTick += 1;
+    for (let y = 0; y < 3; y++) {
+      // set_sprite_pixel(490, 0, y, floor(math.random(2, 4)))
+      // set_sprite_pixel(490, 1, y, floor(math.random(2, 4)))
+    }
+    
+    if (furnaceAnimTick > StoneFurnace.animMaxTick) {
+      furnaceAnimTick = 0;
+    }
+  }
 
-  // if tick % CRAFTER_ANIM_RATE == 0 then
-  //   CRAFTER_ANIM_FRAME = CRAFTER_ANIM_FRAME + CRAFTER_ANIM_DIR
-  //   if CRAFTER_ANIM_FRAME > 5 then
-  //     CRAFTER_ANIM_DIR = -1
-  //   elseif CRAFTER_ANIM_FRAME < 1 then
-  //     CRAFTER_ANIM_DIR = 1
-  //   end
-  // end
+  if (tick % Crafter.animTickRate === 0) {
+    crafterAnimTick = crafterAnimTick + crafterAnimDir;
+    
+    if (crafterAnimTick > 5) {
+      crafterAnimDir = -1;
+    }
+    else if (crafterAnimTick < 1) {
+      crafterAnimDir = 1;
+    }
+  }
 
-  // local ue_time = lapse(update_ents)
-  // local de_time = lapse(draw_ents)
-  // local dcl_time = 0
+  // update_ents();
+  // draw_ents();
   // if not show_mini_map then
   //   local st_time = time()
   //   TileMan:draw_clutter(player, 32, 21)
@@ -119,7 +142,7 @@ function TIC(currentTime: number) {
   // end
   // particles()
 
-  // draw_player()
+  player.draw();
 
   // local x, y, l, m, r = mouse()
   // local col = 5
@@ -135,18 +158,9 @@ function TIC(currentTime: number) {
   //     end
   //   end
   // end
-  // local dc_time = lapse(draw_cursor)
-  // local info = {
-  //   [1] = 'draw_clutter: ' .. dcl_time,
-  //   [2] = 'draw_terrain: ' .. m_time,
-  //   [3] = 'update_player: ' .. up_time,
-  //   [4] = 'handle_input: ' .. hi_time,
-  //   [5] = 'draw_ents: ' .. de_time,
-  //   [6] = 'update_ents:' .. ue_time,
-  //   [7] = 'draw_cursor: ' .. dc_time,    
-  //   [8] = 'draw_belt_items: ' .. db_time,
-  //   [9] = 'get_vis_ents: ' .. gv_time,
-  // }
+
+  // draw_cursor();
+
   // local ents = 0
   // for k, v in pairs(vis_ents) do
   //   for _, ent in ipairs(v) do
@@ -154,20 +168,14 @@ function TIC(currentTime: number) {
   //   end
   // end
 
-  // info[9] = 0
   // if show_mini_map then
-  //   local st_time = time()
   //   TileMan:draw_worldmap(player, 0, 0, 192, 109, true)
   //   pix(121, 69, 2)
-  //   info[9] = 'draw_worldmap: ' .. floor(time() - st_time) .. 'ms'
   // end
 
   // local tile, wx, wy = get_world_cell(cursor.x, cursor.y)
   // local sx, sy = get_screen_cell(cursor.x, cursor.y)
   // local k
-  // info[10] = 'Frame Time: ' .. floor(time() - start) .. 'ms'
-  // info[11] = 'Seed: ' .. seed
-  // info[12] = 'hold time: ' .. cursor.hold_time
   // local _, wx, wy  = get_world_cell(cursor.tx, cursor.ty)
   // local k = wx .. '-' .. wy
   // if key(64) and ENTS[k] and not inv:is_hovered(cursor.x, cursor.y) then
@@ -185,7 +193,6 @@ function TIC(currentTime: number) {
   //   if v.type == 'transport_belt' then v.belt_drawn = false; v.curve_checked = false; end
   // end
   // if show_tech then draw_research_screen() end
-  // if debug then ui.draw_text_window(info, 2, 2, 'Debug - Y to toggle', 0, 2, 0, 4) end
   // if show_tile_widget and not ENTS[k] then draw_tile_widget() end
   // if current_recipe.id > 0 then
   //   show_recipe_widget()
@@ -195,7 +202,6 @@ function TIC(currentTime: number) {
   
   // update_rockets()
   // if show_help then ui:draw_help_screen() end
-  // tick = tick + 1
   
 
   tick = tick + 1;

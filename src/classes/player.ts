@@ -106,15 +106,15 @@ class Player {
         break;
       }
       case "0,1": {
-        this.atlasCoord.x = 64;
+        this.atlasCoord.x = 64.1;
         break;
       }
       case "0,-1": {
-        this.atlasCoord.x = 56;
+        this.atlasCoord.x = 56.1;
         break;
       }
       case "1,0": {
-        this.atlasCoord.x = 8
+        this.atlasCoord.x = 8.1;
         break;
       }
       case "1,1": {
@@ -140,7 +140,7 @@ class Player {
 
   public draw() {
     RENDER.drawSprite(
-      "sprites", 5, RENDER.centerCanvas.x - 16, RENDER.centerCanvas.y + this.animFrame,
+      "sprites", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y  - ((8 * 5) / 2) + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }

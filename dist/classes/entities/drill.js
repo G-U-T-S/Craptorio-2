@@ -1,7 +1,6 @@
 import BaseEntity from "./base_entity.js";
-export default class UndergroundBelt extends BaseEntity {
-    static tickRate = 5;
-    static maxTick = 3;
+export default class Drill extends BaseEntity {
+    static tickRate = 8;
     constructor(globalPos) {
         super({ ...globalPos });
     }
