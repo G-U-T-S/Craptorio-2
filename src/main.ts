@@ -57,6 +57,7 @@ let lastTime: number = 0;
 
 type stateType = "start" | "help" | "firstLaunch";
 let state: stateType = "start";
+let showTech: boolean = false;
 let showHelp: boolean = false;
 
 
@@ -140,7 +141,7 @@ function TIC(currentTime: number) {
   // draw_terrain();
 
   player.update(delta, tick, {w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d}, cursor.prog);
-  // dispatchInput(delta);
+  // dispatchInput();
 
   if (tick % UndergroundBelt.tickRate === 0) {
     beltTick += 1;

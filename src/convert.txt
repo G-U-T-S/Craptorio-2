@@ -1,0 +1,1443 @@
+const ITEMS = {
+    0: false,
+    1: {
+        name: 'advanced_circuit',
+        fancy_name: 'Advanced Circuit',
+        id: 1,
+        sprite_id: 457,
+        belt_id: 296,
+        color_key: 0,
+        type: 'consumable',
+        craftable: ['player', 'machine'],
+        sub_type: 'icon_only',
+        stack_size: 100,
+        recipe: {
+            id: 1,
+            crafting_time: 360, // 60*6
+            count: 1,
+            ingredients: [
+                { id: 21, count: 4 }, // copper_cable
+                { id: 2, count: 2 }, // green_circuit
+                { id: 36, count: 2 }, // plastic_bar
+            ],
+        },
+    },
+    2: {
+        name: 'electronic_circuit',
+        fancy_name: 'Electronic Circuit',
+        id: 2,
+        sprite_id: 456,
+        belt_id: 280,
+        color_key: 0,
+        type: 'consumable',
+        craftable: ['player', 'machine'],
+        sub_type: 'icon_only',
+        stack_size: 100,
+        recipe: {
+            id: 2,
+            crafting_time: 30, // 60*0.5
+            count: 1,
+            ingredients: [
+                { id: 21, count: 3 }, // copper_cable
+                { id: 15, count: 1 }, // iron_plate
+            ],
+        },
+    },
+    3: {
+        name: 'iron_ore',
+        fancy_name: 'Iron Ore',
+        info: 'Collected by laser, or mining drill. Found at iron ore deposits in the wild',
+        id: 3,
+        sprite_id: 162,
+        smelted_id: 15,
+        belt_id: 178,
+        color_key: 4,
+        type: 'ore',
+        craftable: false,
+        stack_size: 100,
+        smelting_time: 60, // 1 * 60
+        mining_time: 240, // 4 * 60
+        recipe: false,
+    },
+    4: {
+        name: 'copper_ore',
+        fancy_name: 'Copper Ore',
+        info: 'Collected by laser, or mining drill. Found at copper ore deposits in the wild',
+        id: 4,
+        sprite_id: 161,
+        belt_id: 177,
+        color_key: 1,
+        type: 'ore',
+        craftable: false,
+        stack_size: 100,
+        smelted_id: 16,
+        smelting_time: 300, // 5 * 60
+        mining_time: 240, // 4 * 60
+        recipe: false,
+    },
+    5: {
+        name: 'stone',
+        fancy_name: 'Stone Ore',
+        info: 'Collected by laser, or mining drill. Found at stone ore deposits, and loose stones in the wild',
+        id: 5,
+        sprite_id: 160,
+        belt_id: 176,
+        color_key: 4,
+        type: 'ore',
+        craftable: false,
+        stack_size: 100,
+        smelted_id: 17,
+        smelting_time: 120, // 2 * 60
+        mining_time: 120, // 2 * 60
+        recipe: false,
+    },
+    6: {
+        name: 'coal',
+        fancy_name: 'Coal',
+        info: 'Collected by laser, or mining drill. Found at coal ore deposits in the wild',
+        id: 6,
+        sprite_id: 163,
+        belt_id: 179,
+        color_key: 4,
+        type: 'fuel',
+        craftable: false,
+        stack_size: 100,
+        fuel_time: 900, // 60*15
+        mining_time: 180, // 3 * 60
+        recipe: false,
+    },
+    7: {
+        name: 'uranium',
+        fancy_name: 'Uranium Ore',
+        info: 'Collected by mining drill only. Found at uranium ore deposits in the wild',
+        id: 7,
+        sprite_id: 164,
+        belt_id: 180,
+        color_key: 4,
+        type: 'liquid',
+        craftable: false,
+        stack_size: 100,
+        smelting_time: 300, // 5 * 60
+        mining_time: 240, // 4 * 60
+        recipe: false,
+    },
+    8: {
+        name: 'oil_shale',
+        fancy_name: 'Oil Shale',
+        info: 'Collected by laser, or mining drill. Found at oil-shale deposits in the wild',
+        id: 8,
+        sprite_id: 165,
+        belt_id: 181,
+        color_key: 4,
+        type: 'liquid',
+        craftable: false,
+        stack_size: 100,
+        smelting_time: 300, // 5 * 60
+        mining_time: 240, // 4 * 60
+        recipe: false,
+    },
+    9: {
+        name: 'transport_belt',
+        fancy_name: 'Transport Belt',
+        id: 9,
+        sprite_id: 256,
+        belt_id: 434,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 100,
+        recipe: {
+            id: 9,
+            crafting_time: 30, // 60*0.5
+            count: 2,
+            ingredients: [
+                { id: 20, count: 1 },
+                { id: 15, count: 1 },
+            ],
+        },
+    },
+    10: {
+        name: 'splitter',
+        fancy_name: 'Splitter',
+        id: 10,
+        sprite_id: 323,
+        belt_id: 433,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 100,
+        recipe: {
+            id: 10,
+            crafting_time: 60, // 60*1
+            count: 2,
+            ingredients: [
+                { id: 2, count: 5 },
+                { id: 15, count: 5 },
+                { id: 9, count: 4 },
+            ],
+        },
+    },
+    11: {
+        name: 'inserter',
+        fancy_name: 'Inserter',
+        id: 11,
+        sprite_id: 267,
+        belt_id: 417,
+        color_key: 15,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 100,
+        recipe: {
+            id: 11,
+            crafting_time: 30, // 60*0.5
+            count: 1,
+            ingredients: [
+                { id: 2, count: 1 },
+                { id: 20, count: 1 },
+                { id: 15, count: 1 },
+            ],
+        },
+    },
+    12: {
+        name: 'power_pole',
+        fancy_name: 'Power Pole',
+        id: 12,
+        sprite_id: 478,
+        belt_id: 433,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 100,
+        recipe: {},
+    },
+    13: {
+        name: 'mining_drill',
+        fancy_name: 'Mining Drill',
+        id: 13,
+        sprite_id: 276,
+        belt_id: 416,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 50,
+        recipe: {
+            id: 13,
+            crafting_time: 120, // 60*2
+            count: 2,
+            ingredients: [
+                { id: 2, count: 3 },
+                { id: 15, count: 10 },
+                { id: 20, count: 5 },
+            ],
+        },
+    },
+    14: {
+        name: 'stone_furnace',
+        fancy_name: 'Stone Furnace',
+        id: 14,
+        sprite_id: 503,
+        belt_id: 502,
+        color_key: 6,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 50,
+        recipe: {
+            id: 14,
+            crafting_time: 30, // 60*0.5
+            count: 1,
+            ingredients: [
+                { id: 5, count: 5 },
+            ],
+        },
+    },
+    15: {
+        name: 'iron_plate',
+        fancy_name: 'Iron Plate',
+        info: 'Obtained via smelting iron ore in a furnace',
+        id: 15,
+        sprite_id: 448,
+        belt_id: 299,
+        color_key: 1,
+        type: 'ore',
+        craftable: false,
+        stack_size: 50,
+        smelted_id: 27,
+        required_tech: 4,
+        smelting_time: 300, // 5*60
+        recipe: false,
+    },
+    16: {
+        name: 'copper_plate',
+        fancy_name: 'Copper Plate',
+        info: 'Obtained via smelting copper ore in a furnace',
+        id: 16,
+        sprite_id: 449,
+        belt_id: 300,
+        color_key: 1,
+        type: 'intermediate',
+        craftable: false,
+        stack_size: 50,
+        recipe: false,
+    },
+    17: {
+        name: 'stone_brick',
+        fancy_name: 'Stone Brick',
+        info: 'Obtained via smelting stone ore in a furnace',
+        id: 17,
+        sprite_id: 450,
+        belt_id: 282,
+        color_key: 1,
+        type: 'intermediate',
+        craftable: false,
+        stack_size: 50,
+        smelting_time: 10,
+        recipe: false,
+    },
+    18: {
+        name: 'underground_belt',
+        fancy_name: 'Underground Belt',
+        id: 18,
+        sprite_id: 301,
+        belt_id: 279,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        stack_size: 50,
+        recipe: {
+            id: 18,
+            crafting_time: 60, // 60*1
+            count: 2,
+            ingredients: [
+                { id: 15, count: 10 }, // plate
+                { id: 9, count: 5 }, // transport_belt
+            ],
+        },
+    },
+    19: {
+        name: 'assembly_machine',
+        fancy_name: 'Assembly Machine',
+        id: 19,
+        sprite_id: 331,
+        belt_id: 347,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 21,
+            crafting_time: 30, // 60*0.5
+            count: 2,
+            ingredients: [
+                { id: 2, count: 3 },
+                { id: 20, count: 5 },
+                { id: 15, count: 9 },
+            ],
+        },
+    },
+    20: {
+        name: 'gear',
+        fancy_name: 'Gear',
+        id: 20,
+        sprite_id: 452,
+        belt_id: 432,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: ['player', 'machine'],
+        stack_size: 100,
+        recipe: {
+            id: 20,
+            crafting_time: 30, // 60*0.5
+            count: 1,
+            ingredients: [
+                { id: 15, count: 2 },
+            ],
+        },
+    },
+    21: {
+        name: 'copper_cable',
+        fancy_name: 'Copper Cable',
+        sprite_id: 453,
+        id: 21,
+        belt_id: 281,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: ['player', 'machine'],
+        sub_type: 'craftable',
+        stack_size: 100,
+        recipe: {
+            id: 21,
+            crafting_time: 30, // 60*0.5
+            count: 2,
+            ingredients: [
+                { id: 16, count: 1 },
+            ],
+        },
+    },
+    22: {
+        name: 'research_lab',
+        fancy_name: 'Research Lab',
+        sprite_id: 399,
+        id: 22,
+        belt_id: 281,
+        color_key: 0,
+        type: 'placeable',
+        craftable: ['player', 'machine'],
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 22,
+            crafting_time: 120, // 60*2
+            count: 1,
+            ingredients: [
+                { id: 2, count: 10 },
+                { id: 20, count: 10 },
+                { id: 9, count: 4 },
+            ],
+        },
+    },
+    23: {
+        name: 'automation_pack',
+        fancy_name: 'Automation Pack',
+        id: 23,
+        sprite_id: 460,
+        belt_id: 444,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: ['player', 'machine'],
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 23,
+            crafting_time: 300, // 60*5
+            count: 1,
+            ingredients: [
+                { id: 16, count: 1 },
+                { id: 20, count: 1 },
+            ],
+        },
+    },
+    24: {
+        name: 'logistics_pack',
+        fancy_name: 'Logistics Pack',
+        id: 24,
+        sprite_id: 461,
+        belt_id: 445,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: ['player', 'machine'],
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 24,
+            crafting_time: 360, // 60*6
+            count: 1,
+            ingredients: [
+                { id: 11, count: 1 },
+                { id: 9, count: 1 },
+            ],
+        },
+    },
+    25: {
+        name: 'biology_pack',
+        fancy_name: 'Biology Pack',
+        info: 'Crafted in a Bio Refinery',
+        id: 25,
+        sprite_id: 462,
+        belt_id: 446,
+        color_key: 0,
+        type: 'oil',
+        craftable: true,
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 25,
+            crafting_time: 600, // 60*10
+            count: 1,
+            ingredients: [
+                { id: 32, count: 25 },
+                { id: 6, count: 5 },
+                { id: 8, count: 10 },
+            ],
+        },
+    },
+    26: {
+        name: 'production_pack',
+        fancy_name: 'Production Pack',
+        id: 26,
+        sprite_id: 463,
+        belt_id: 447,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: true,
+        sub_type: 'craftable',
+        stack_size: 50,
+        recipe: {
+            id: 26,
+            crafting_time: 1200, // 60*20
+            count: 1,
+            ingredients: [
+                { id: 30, count: 1 },
+                { id: 27, count: 5 },
+                { id: 37, count: 1 },
+            ],
+        },
+    },
+    27: {
+        name: 'steel_plate',
+        fancy_name: 'Steel Plate',
+        info: 'Obtained via smelting 2x iron plates in a furnace',
+        id: 27,
+        sprite_id: 468,
+        belt_id: 469,
+        color_key: 1,
+        type: 'intermediate',
+        craftable: false,
+        stack_size: 50,
+        smelting_time: 180,
+        recipe: false,
+    },
+    28: {
+        name: 'wood',
+        fancy_name: 'Wood Planks',
+        info: 'Obtained via chopping trees in the wild',
+        id: 28,
+        sprite_id: 451,
+        belt_id: 467,
+        color_key: 0,
+        type: 'fuel',
+        craftable: false,
+        stack_size: 100,
+        fuel_time: 120, // 1 * 2 * 60
+        recipe: false,
+    },
+    29: {
+        name: 'solar_panel',
+        fancy_name: 'Solar Panel',
+        id: 29,
+        sprite_id: 510,
+        belt_id: 493,
+        color_key: 1,
+        type: 'placeable',
+        craftable: true,
+        stack_size: 50,
+        recipe: {
+            id: 29,
+            crafting_time: 270, // 4.5 * 60
+            count: 1,
+            ingredients: [
+                { id: 16, count: 5 },
+                { id: 2, count: 15 },
+                { id: 27, count: 5 },
+            ],
+        },
+    },
+    30: {
+        name: 'bio_refinery',
+        fancy_name: 'Bio-Refinery',
+        id: 30,
+        sprite_id: 374,
+        belt_id: 390,
+        color_key: 1,
+        type: 'placeable',
+        craftable: true,
+        stack_size: 10,
+        recipe: {
+            id: 30,
+            crafting_time: 600, // 10*60
+            count: 1,
+            ingredients: [
+                { id: 16, count: 5 },
+                { id: 2, count: 15 },
+                { id: 27, count: 5 },
+            ],
+        },
+    },
+    31: {
+        name: 'engine_unit',
+        fancy_name: 'Biofuel Engine',
+        id: 31,
+        sprite_id: 483,
+        belt_id: 484,
+        color_key: 1,
+        type: 'intermediate',
+        craftable: false,
+        stack_size: 5,
+        recipe: {
+            id: 31,
+            crafting_time: 600, // 10*60
+            count: 1,
+            ingredients: [
+                { id: 20, count: 3 },
+                { id: 27, count: 2 },
+                { id: 2, count: 1 },
+            ],
+        },
+    },
+    32: {
+        name: 'fiber',
+        fancy_name: 'Organic Fibers',
+        info: 'Acquired via laser mining or made in Bio Refinery',
+        id: 32,
+        sprite_id: 268,
+        belt_id: 269,
+        color_key: 0,
+        type: 'oil',
+        craftable: false,
+        stack_size: 200,
+        recipe: {
+            id: 32,
+            crafting_time: 180, // 60*3
+            count: 50,
+            ingredients: [
+                { id: 28, count: 10 },
+            ],
+        },
+    },
+    33: {
+        name: 'chest',
+        fancy_name: 'Storage Chest',
+        id: 33,
+        sprite_id: 464,
+        belt_id: 470,
+        color_key: 0,
+        type: 'placeable',
+        craftable: true,
+        stack_size: 50,
+        recipe: {
+            id: 33,
+            crafting_time: 180, // 60*3
+            count: 1,
+            ingredients: [
+                { id: 28, count: 10 },
+            ],
+        },
+    },
+    34: {
+        name: 'laser_mining_speed',
+        fancy_name: 'Laser Mining 1 Upgrade',
+        info: 'Increases mining speed by 150%',
+        id: 34,
+        sprite_id: 358,
+        belt_id: -1,
+        color_key: 1,
+        type: 'upgrade',
+        craftable: false,
+        recipe: false,
+    },
+    35: {
+        name: 'biofuel',
+        fancy_name: 'Solid Biofuel',
+        info: 'Crafted in a Bio Refinery',
+        id: 35,
+        sprite_id: 482,
+        belt_id: 481,
+        color_key: 6,
+        type: 'oil',
+        craftable: false,
+        stack_size: 20,
+        recipe: {
+            id: 35,
+            crafting_time: 180, // 60*3
+            count: 5,
+            ingredients: [
+                { id: 6, count: 1 },
+                { id: 8, count: 5 },
+                { id: 32, count: 10 },
+            ],
+        },
+    },
+    36: {
+        name: 'plastic_bar',
+        fancy_name: 'Plastic Bar',
+        info: 'Crafted in a Bio Refinery',
+        id: 36,
+        sprite_id: 455,
+        belt_id: 471,
+        color_key: 0,
+        type: 'oil',
+        craftable: false,
+        stack_size: 100,
+        recipe: {
+            id: 36,
+            crafting_time: 15,
+            count: 2,
+            ingredients: [
+                { id: 6, count: 1 },
+                { id: 8, count: 5 },
+                { id: 32, count: 10 },
+            ],
+        },
+    },
+    37: {
+        name: 'processing_unit',
+        fancy_name: 'Processing Unit',
+        info: 'Crafted in a Bio Refinery',
+        id: 37,
+        sprite_id: 472,
+        belt_id: 295,
+        color_key: 0,
+        type: 'oil',
+        craftable: false,
+        stack_size: 100,
+        recipe: {
+            id: 37,
+            crafting_time: 10,
+            count: 2,
+            ingredients: [
+                { id: 2, count: 10 },
+                { id: 1, count: 10 },
+                { id: 35, count: 10 },
+            ],
+        },
+    },
+    38: {
+        name: 'laser_mining_speed2',
+        fancy_name: 'Laser Mining 2 Upgrade',
+        info: 'Increases mining speed by +150%',
+        id: 38,
+        sprite_id: 359,
+        belt_id: -1,
+        color_key: 1,
+        type: 'upgrade',
+        craftable: false,
+        recipe: false,
+    },
+    39: {
+        name: 'laser_mining_speed3',
+        fancy_name: 'Laser Mining 3 Upgrade',
+        info: 'Increases mining speed by +150%',
+        id: 39,
+        sprite_id: 359,
+        belt_id: -1,
+        color_key: 1,
+        type: 'upgrade',
+        craftable: false,
+        recipe: false,
+    },
+    40: {
+        name: 'rocket_silo',
+        fancy_name: 'Rocket Silo',
+        info: 'placeholder rocket text',
+        id: 40,
+        sprite_id: 386,
+        belt_id: 402,
+        color_key: 1,
+        type: 'placeable',
+        craftable: true,
+        stack_size: 1,
+        recipe: {
+            id: 40,
+            crafting_time: 600, // 60*10
+            count: 2,
+            ingredients: [
+                { id: 17, count: 250 },
+                { id: 15, count: 100 },
+                { id: 16, count: 100 },
+                { id: 45, count: 100 },
+            ],
+        },
+    },
+    41: {
+        name: 'rocket_part',
+        fancy_name: 'Rocket Part',
+        info: 'An intermediate product used in repairing rockets',
+        id: 41,
+        sprite_id: 400,
+        belt_id: 401,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: true,
+        stack_size: 100,
+        recipe: {
+            id: 41,
+            crafting_time: 300, // 60*5
+            count: 2,
+            ingredients: [
+                { id: 2, count: 10 },
+                { id: 1, count: 10 },
+                { id: 17, count: 25 },
+                { id: 15, count: 25 },
+            ],
+        },
+    },
+    42: {
+        name: 'rocket_fuel',
+        fancy_name: 'Rocket Fuel',
+        info: "Like my grandpa's whiskey",
+        id: 42,
+        sprite_id: 391,
+        belt_id: 377,
+        color_key: 0,
+        type: 'oil',
+        craftable: false,
+        stack_size: 100,
+        recipe: {
+            id: 42,
+            crafting_time: 300, // 60*5
+            count: 5,
+            ingredients: [
+                { id: 15, count: 5 },
+                { id: 16, count: 5 },
+                { id: 45, count: 10 },
+                { id: 35, count: 10 },
+            ],
+        },
+    },
+    43: {
+        name: 'rocket_control_unit',
+        fancy_name: 'Rocket Control Unit',
+        info: 'High-tech electronics used to re-build rockets',
+        id: 43,
+        sprite_id: 375,
+        belt_id: 376,
+        color_key: 0,
+        type: 'intermediate',
+        craftable: true,
+        stack_size: 100,
+        recipe: {
+            id: 43,
+            crafting_time: 300, // 60*5
+            count: 2,
+            ingredients: [
+                { id: 37, count: 5 },
+                { id: 1, count: 10 },
+                { id: 2, count: 10 },
+                { id: 15, count: 5 },
+            ],
+        },
+    },
+    44: {
+        name: 'rocket_science_pack',
+        // Incomplete entry
+    },
+};
+
+
+function removeTile(x, y) {
+    let [sx, sy] = getScreenCell(x, y);
+    let [tile, wx, wy] = getWorldCell(x, y);
+    // let [sx, sy] = screenToWorld(x, y)
+    // let [tile, wx, wy] = getWorldCell(sx, sy)
+    let k = getEnt(x, y);
+    if (k && cursor.tx === cursor.ltx && cursor.ty === cursor.lty) {
+        // Add item back to inventory
+        let stack = { id: ENTS[k].item_id, count: 1 };
+        if (ENTS[k].type === 'underground_belt' && ENTS[k].exit_key) {
+            stack.count = 2;
+        }
+        if (ENTS[k].return_all) ENTS[k].return_all();
+        callbacks[ENTS[k].type].removeItem(x, y);
+        // trace('adding item_id: ' + stack.id + ' to inventory')
+        ui.newAlert(cursor.x, cursor.y, '+ ' + stack.count + ' ' + ITEMS[stack.id].fancy_name, 1500, 0, 4);
+        inv.addItem(stack, 1);
+        return;
+    }
+    if (cursor.held_right && cursor.tx === cursor.ltx && cursor.ty === cursor.lty) {
+        let result = resources[tile.sprite_id.toString()];
+        if (result) {
+            let deposit = { id: result.id, count: Math.floor(Math.random() * (result.max - result.min + 1)) + result.min };
+            ui.newAlert(cursor.x, cursor.y, '+ ' + deposit.count + ' ' + ITEMS[deposit.id].fancy_name, 1000, 0, 6);
+            inv.addItem(deposit, 1);
+            // trace('adding mined resource to inventory')
+            TileMan.setTile(wx, wy);
+            sound('delete');
+        }
+
+        if (tile.is_tree) {
+            // Deposit wood to inventory
+            let count = Math.floor(Math.random() * (10 - 3 + 1)) + 3;
+            let [resultAdd, stack] = inv.addItem({ id: 28, count }, 1);
+            if (resultAdd) {
+                ui.newAlert(cursor.x, cursor.y, '+ ' + count + ' ' + ITEMS[28].fancy_name, 1000, 0, 6);
+            }
+            TileMan.setTile(wx, wy);
+            sound('delete');
+        }
+
+        if (tile.ore) {
+            let key = getKey(x, y);
+            if (!ORES[key]) {
+                let maxOre = Math.floor(Math.random() * (5000 - 250 + 1)) + 250;
+                let ore = {
+                    type: ores[tile.ore].name,
+                    tile_id: ores[tile.ore].tile_id,
+                    sprite_id: ores[tile.ore].sprite_id,
+                    id: ores[tile.ore].id,
+                    total_ore: maxOre,
+                    ore_remaining: maxOre,
+                    wx: wx,
+                    wy: wy,
+                };
+                ORES[key] = ore;
+            }
+            if (ORES[key].ore_remaining > 0) {
+                ORES[key].ore_remaining -= 1;
+                ui.newAlert(cursor.x, cursor.y, '+ 1 ' + ITEMS[ORES[key].id].fancy_name, 1000, 0, 6);
+                inv.addItem({ id: ORES[key].id, count: 1 }, 1);
+                sound('delete');
+            }
+            if (ORES[key].ore_remaining < 1) {
+                TileManager.setTile(wx, wy);
+            }
+        }
+        // let result = rocks[tile.sprite_id.toString()]
+        // if (result) {
+        //     // Deposit stone ore to inventory
+        //     let [unused, stack] = inv.addItem({ id: 5, count: Math.floor(Math.random() * (result[2] - result[1] + 1)) + result[1] }, 1);
+        // }
+        // if (stack) {
+        //     // TODO: deposit remaining stack to ground
+        // }
+    }
+}
+
+
+
+function pipette() {
+  if (cursor.type === 'pointer') {
+    let k = get_ent(cursor.x, cursor.y);
+    let ent = ENTS[k];
+    if (ent) {
+      if (dummies[ent.type]) {
+        ent = ENTS[ent.other_key];
+      }
+      for (let i = 56; i < inv.slots.length; i++) { // Lua indices 57 to #inv.slots
+        if (inv.slots[i].id === ENTS[k].item_id) {
+          cursor.type = 'item';
+          cursor.item = ent.type;
+          cursor.item_stack = { id: inv.slots[i].id, count: inv.slots[i].count, slot: i };
+          // inv.slots[i].id = 0
+          // inv.slots[i].count = 0
+          if (ent.rot) {
+            cursor.rot = ent.rot;
+          }
+          if (i > 56) inv.active_slot = i - 56;
+          return;
+        }
+      }
+      for (let i = 0; i < inv.slots.length - INVENTORY_COLS; i++) { // Lua indices 1 to #inv.slots - INVENTORY_COLS
+        if (inv.slots[i].id === ENTS[k].item_id) {
+          cursor.type = 'item';
+          cursor.item = ent.type;
+          cursor.item_stack = { id: inv.slots[i].id, count: inv.slots[i].count, slot: i };
+          // inv.slots[i].id = 0
+          // inv.slots[i].count = 0
+          if (ent.rot) {
+            cursor.rot = ent.rot;
+          }
+          if (i > 56) inv.active_slot = i - 56;
+          return;
+        }
+      }
+      // cursor.type = 'item'
+      // cursor.item = ent.type
+      // cursor.item_stack = {id: ent.id, count: 5}
+      // if (ent.rot) {
+      //   cursor.rot = ent.rot;
+      // }
+      // return
+    } else if (cursor.item_stack.slot && inv.slots[cursor.item_stack.slot].id !== 0) {
+      set_cursor_item(
+        { id: inv.slots[cursor.item_stack.slot].id, count: inv.slots[cursor.item_stack.slot].count },
+        cursor.item_stack.slot
+      );
+      // inv.slots[cursor.item_stack.slot].id = 0
+      // inv.slots[cursor.item_stack.slot].count = 0
+    }
+  } else if (cursor.type === 'item') {
+    if (!cursor.item_stack.slot) {
+      inv.add_item({ id: cursor.item_stack.id, count: cursor.item_stack.count });
+    } else {
+      inv.slots[cursor.item_stack.slot].id = cursor.item_stack.id;
+      inv.slots[cursor.item_stack.slot].count = cursor.item_stack.count;
+    }
+    set_cursor_item();
+    // cursor.item = false
+    // cursor.item_stack.id = 0
+    // cursor.item_stack.count = 0
+    // cursor.type = 'pointer'
+  }
+}
+
+
+function dispatchInput() {
+    updateCursorState();
+    dispatchKeypress();
+    if (showTech) {
+        return;
+    }
+
+    const [tile, wx, wy] = getWorldCell(cursor.x, cursor.y);
+    const k = getEnt(cursor.x, cursor.y);
+    if (ENTS[k]) ENTS[k].isHovered = true;
+    if (cursor.sy !== 0) cycleHotbar(-cursor.sy);
+    if (!cursor.l) {
+        cursor.panelDrag = false;
+        cursor.drag = false;
+    }
+    
+    // begin mouse-over priority dispatch
+    if (ui.activeWindow && ui.activeWindow.isHovered(cursor.x, cursor.y)) {
+        if ((cursor.l && !cursor.ll) || (cursor.r && !cursor.lr)) {
+            if (ui.activeWindow.click(cursor.x, cursor.y)) {
+                // trace('clicked active window')
+            }
+        }
+        return;
+    }
+    
+    if (craftMenu.vis && craftMenu.isHovered(cursor.x, cursor.y)) {
+        if (cursor.l && !cursor.ll) {
+            if (craftMenu.click(cursor.x, cursor.y, 'left')) return;
+        } else if (cursor.r && cursor.lr) {
+            if (craftMenu.click(cursor.x, cursor.y, 'right')) return;
+        }
+        if (craftMenu.vis && cursor.panelDrag) {
+            craftMenu.x = Math.max(1, Math.min(cursor.x + cursor.dragOffset.x, 239 - craftMenu.w));
+            craftMenu.y = Math.max(1, Math.min(cursor.y + cursor.dragOffset.y, 135 - craftMenu.h));
+            return;
+            // consumed = true
+        }
+        if (craftMenu.vis && !cursor.panelDrag && cursor.l && !cursor.ll && craftMenu.isHovered(cursor.x, cursor.y)) {
+            if (craftMenu.click(cursor.x, cursor.y)) {
+                return;
+            } else if (!craftMenu.docked) {
+                cursor.panelDrag = true;
+                cursor.dragOffset.x = craftMenu.x - cursor.x;
+                cursor.dragOffset.y = craftMenu.y - cursor.y;
+                return;
+            }
+        }
+        return;
+    }
+    
+    if (inv.isHovered(cursor.x, cursor.y)) {
+        if ((cursor.l && !cursor.ll) || (cursor.r && !cursor.lr)) {
+            inv.clicked(cursor.x, cursor.y);
+        }
+        return;
+    }
+  
+    if (cursor.type === 'item' && cursor.itemStack.id !== 0) {
+        // check other visible widgets
+        const item = ITEMS[cursor.itemStack.id];
+        const count = cursor.itemStack.count;
+        // check for ents to deposit item stack
+        if (key(63) && ENTS[k] && ENTS[k].depositStack) { // TODO
+            if (cursor.r && !cursor.lr) {
+                const [result, stack] = ENTS[k].depositStack({ id: cursor.itemStack.id, count: 1 });
+                if (result) {
+                    cursor.itemStack.count -= 1;
+                    if (cursor.itemStack.slot) {
+                        inv.slots[cursor.itemStack.slot].count -= 1;
+                        if (inv.slots[cursor.itemStack.slot].count < 1) {
+                            inv.slots[cursor.itemStack.slot].count = 0;
+                            inv.slots[cursor.itemStack.slot].id = 0;
+                        }
+                    }
+                    ui.newAlert(cursor.x, cursor.y, `-1 ${ITEMS[cursor.itemStack.id].fancyName}`, 1000, 0, 6);
+                    sound('deposit');
+                    if (cursor.itemStack.count < 1) {
+                        setCursorItem();
+                    }
+                }
+            } else if (cursor.l && !cursor.ll) {
+                const [result, stack] = ENTS[k].depositStack(cursor.itemStack);
+                const oldStack = { id: cursor.itemStack.id, count: cursor.itemStack.count };
+                if (stack.count === 0) {
+                    if (cursor.itemStack.slot) {
+                        inv.slots[cursor.itemStack.slot].count = 0;
+                        inv.slots[cursor.itemStack.slot].id = 0;
+                    }
+                    ui.newAlert(cursor.x, cursor.y, `-${oldStack.count} ${ITEMS[oldStack.id].fancyName}`, 1000, 0, 6);
+                    sound('deposit');
+                    setCursorItem();
+                } else {
+                    ui.newAlert(cursor.x, cursor.y, `- ${oldStack.count - stack.count} ${ITEMS[oldStack.id].fancyName}`, 1000, 0, 6);
+                    sound('deposit');
+                    cursor.itemStack.count = stack.count;
+                    if (cursor.itemStack.slot) {
+                        inv.slots[cursor.itemStack.slot].count = stack.count;
+                    }
+                }
+            }
+            return;
+            // if item is placeable, run callback for item type
+            // checking transport_belt's first (for drag-placement), then other items
+        } else {
+            if (cursor.l && cursor.item === 'transport_belt' && (cursor.tx !== cursor.ltx || cursor.ty !== cursor.lty)) {
+                // trace('placing belt')
+                const slot = cursor.itemStack.slot;
+                const itemConsumed = callbacks[cursor.item].placeItem(cursor.x, cursor.y);
+                if (slot && itemConsumed) {
+                    inv.slots[slot].count -= 1;
+                    cursor.itemStack.count = inv.slots[slot].count;
+                } else if (itemConsumed !== false) {
+                    cursor.itemStack.count -= 1;
+                    if (cursor.itemStack.count < 1) {
+                        setCursorItem();
+                    }
+                }
+                if (slot && inv.slots[slot].count < 1) {
+                    inv.slots[slot].id = 0;
+                    inv.slots[slot].count = 0;
+                    setCursorItem();
+                }
+                return;
+            } else if (cursor.l && !cursor.ll && ITEMS[cursor.itemStack.id].type === 'placeable') {
+                if (callbacks[cursor.item]) {
+                    const itemConsumed = callbacks[cursor.item].placeItem(cursor.x, cursor.y);
+                    if (itemConsumed !== false) {
+                        cursor.itemStack.count -= 1;
+                        if (cursor.itemStack.count < 1) {
+                            setCursorItem();
+                        }
+                        if (cursor.itemStack.slot) {
+                            inv.slots[cursor.itemStack.slot].count -= 1;
+                            if (inv.slots[cursor.itemStack.slot].count < 1) {
+                                inv.slots[cursor.itemStack.slot].id = 0;
+                                inv.slots[cursor.itemStack.slot].count = 0;
+                                setCursorItem();
+                            }
+                        }
+                    }
+                }
+                return;
+            } else if (cursor.r) {
+                // remove_tile(cursor.x, cursor.y)
+                return;
+            }
+        }
+    } else if (cursor.type === 'pointer') {
+        if (cursor.l && !cursor.ll && key(63) && ENTS[k] && ENTS[k].returnAll) {
+            // try to take all items
+            ENTS[k].returnAll();
+            return;
+        }
+    }
+  
+    if (cursor.heldRight && cursor.type === 'pointer') {
+        const [sx, sy] = getScreenCell(cursor.x, cursor.y);
+        const [tile, wx, wy] = getWorldCell(cursor.x, cursor.y);
+        const result = resources[tile.spriteId.toString()];
+        const k = getEnt(cursor.x, cursor.y);
+        if (!result && !tile.isTree && !ENTS[k] && !tile.ore) {
+            cursor.prog = false;
+            return;
+        }
+        if (tick % 4 === 0) {
+            const px = sx + 4, py = sy + 4;
+            line(120, 67 + player.animFrame, px, py, Math.floor(Math.random() * 3 + 0.5));
+            for (let i = 1; i <= 3; i++) {
+                const rr = 1 + Math.floor((Math.random() + 0.5) * 4);
+                const rc = 1 + Math.floor(Math.random() * 6 + 0.5);
+                circb(px, py, rr, rc);
+            }
+        }
+        if (tile.isTree) {
+            let c1 = 3, c2 = 4;
+            if (tile.biome < 2) {
+                c1 = 2;
+                c2 = 3;
+            }
+            ui.highlight(cursor.tx - 9 + tile.offset.x, cursor.ty - 27 + tile.offset.y, 24, 32, false, c1, c2);
+            ui.highlight(cursor.tx + tile.offset.x - 2, cursor.ty - 1 + tile.offset.y, 8, 8, false, c1, c2);
+        }
+        if (result || tile.ore || ENTS[k]) {
+            ui.highlight(sx - 1, sy - 1, 8, 8, false, 3, 4);
+        }
+        if (ENTS[k] || tile.isTree || tile.ore || result) {
+            sound('laser');
+            cursor.prog = remap(clamp(cursor.holdTime, 0, CURSOR_MINING_SPEED), 0, CURSOR_MINING_SPEED, 0, 9);
+            if (cursor.prog >= 9) {
+                removeTile(cursor.x, cursor.y);
+                cursor.prog = false;
+                cursor.heldRight = false;
+                cursor.holdTime = 0;
+                return;
+            }
+        }
+    } else {
+        cursor.prog = false;
+    }
+  
+    // check for held item placement/deposit to other ents
+    if (cursor.l && !cursor.ll && !craftMenu.isHovered(cursor.x, cursor.y) && inv.isHovered(cursor.x, cursor.y)) {
+        const slot = inv.getHoveredSlot(cursor.x, cursor.y);
+        if (slot) {
+            inv.slots[slot.index].callback();
+            return;
+        }
+    }
+  
+    if (cursor.l && !cursor.ll && ENTS[k]) {
+        if (dummies[ENTS[k].type]) {
+            k = ENTS[k].otherKey;
+        }
+    
+        if (opensies[ENTS[k].type]) {
+            if (key(63) && cursor.type === 'pointer') {
+                
+            }
+            if (key(64) && cursor.type === 'item' && ENTS[k].depositStack) {
+                const oldStack = cursor.itemStack;
+                const [result, stack] = ENTS[k].depositStack(cursor.itemStack);
+                if (result) {
+                    if (stack) {
+                        if (stack.count > 0) {
+                            cursor.itemStack.count = stack.count;
+                        } else {
+                            cursor.itemStack = { id: 0, count: 0, slot: false };
+                            cursor.type = 'pointer';
+                        }
+                        sound('deposit');
+                        ui.newAlert(cursor.x, cursor.y, `${stack.count - oldStack.count} ${ITEMS[oldStack.id].fancyName}`, 1000, 0, 2);
+                    }
+                }
+            } else {
+                ui.activeWindow = ENTS[k].open();
+            }
+        }
+        return;
+    }
+}
+
+
+function drawEnts() {
+    if (showMiniMap || showHelp || state !== 'game') return;
+
+    vis_ents['transport_belt'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    const start = Date.now();
+    vis_ents['transport_belt'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].drawItems();
+    });
+    db_time = Math.floor(Date.now() - start);
+
+    vis_ents['stone_furnace'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['underground_belt'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['underground_belt'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].drawItems();
+    });
+
+    vis_ents['splitter'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['mining_drill'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['assembly_machine'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['research_lab'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['chest'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['rocket_silo'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['bio_refinery'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    vis_ents['inserter'].forEach((k) => {
+        if (ENTS[k]) ENTS[k].draw();
+    });
+
+    // for (let k of vis_ents['power_pole']) {
+    //     if (ENTS[k]) ENTS[k].draw();
+    // }
+}
+
+
+function TIC() {
+    let dt = time() - lastFrameTime;
+    lastFrameTime = time();
+    if (!loaded) {
+        loadSprites();
+        return;
+    }
+    currentRecipe = { x: 0, y: 0, id: 0 };
+    
+    // change mouse cursor
+    poke(0x3FFB, 286);
+
+    // draw main menu
+    if (STATE === "start" || STATE === "help") {
+        updateCursorState();
+        ui.drawMenu();
+        tick += 1;
+        return;
+    }
+
+    if (STATE === "first_launch") {
+        updateCursorState();
+        ui.drawEndgameWindow();
+        tick += 1;
+        return;
+    }
+
+    let start = time();
+    updateWaterEffect(time());
+    cls(0);
+
+    let mTime = 0;
+    let gvTime = lapse(getVisibleEnts);
+    mTime = lapse(drawTerrain);
+
+    let upTime = lapse(updatePlayer, dt);
+    let hiTime = lapse(dispatchInput, dt);
+
+    if (tick % BELT_TICKRATE === 0) {
+        BELT_TICK += 1;
+        if (BELT_TICK > BELT_MAXTICK) {
+            BELT_TICK = 0;
+        }
+    }
+
+    if (tick % UBELT_TICKRATE === 0) {
+        UBELT_TICK += 1;
+        if (UBELT_TICK > UBELT_MAXTICK) {
+            UBELT_TICK = 0;
+        }
+    }
+
+    if (tick % DRILL_TICK_RATE === 0) {
+        DRILL_BIT_TICK += DRILL_BIT_DIR;
+        if (DRILL_BIT_TICK > 7 || DRILL_BIT_TICK < 0) {
+            DRILL_BIT_DIR *= -1;
+        }
+        DRILL_ANIM_TICK += 1;
+        if (DRILL_ANIM_TICK > 2) {
+            DRILL_ANIM_TICK = 0;
+        }
+    }
+
+    if (tick % FURNACE_ANIM_TICKRATE === 0) {
+        FURNACE_ANIM_TICK += 1;
+        for (let y = 0; y <= 3; y++) {
+            setSpritePixel(490, 0, y, Math.floor(Math.random() * (4 - 2) + 2));
+            setSpritePixel(490, 1, y, Math.floor(Math.random() * (4 - 2) + 2));
+        }
+        if (FURNACE_ANIM_TICK > FURNACE_ANIM_TICKS) {
+            FURNACE_ANIM_TICK = 0;
+        }
+    }
+
+    if (tick % CRAFTER_ANIM_RATE === 0) {
+        CRAFTER_ANIM_FRAME += CRAFTER_ANIM_DIR;
+        if (CRAFTER_ANIM_FRAME > 5) {
+            CRAFTER_ANIM_DIR = -1;
+        } else if (CRAFTER_ANIM_FRAME < 1) {
+            CRAFTER_ANIM_DIR = 1;
+        }
+    }
+
+    let ueTime = lapse(updateEnts);
+    let deTime = lapse(drawEnts);
+    let dclTime = 0;
+    if (!showMiniMap) {
+        let stTime = time();
+        TileMan.drawClutter(player, 32, 21);
+        dclTime = Math.floor(time() - stTime);
+    }
+    particles();
+
+    drawPlayer();
+
+    let [x, y, l, m, r] = mouse();
+    let col = 5;
+    if (r) col = 2;
+    if (!showMiniMap) {
+        inv.draw();
+        craftMenu.draw();
+        if (ui.activeWindow) {
+            if (ENTS[ui.activeWindow.entKey]) {
+                ui.activeWindow.draw();
+            } else {
+                ui.activeWindow = null;
+            }
+        }
+    }
+    let dcTime = lapse(drawCursor);
+    let info = {
+        1: 'draw_clutter: ' + dclTime,
+        2: 'draw_terrain: ' + mTime,
+        3: 'update_player: ' + upTime,
+        4: 'handle_input: ' + hiTime,
+        5: 'draw_ents: ' + deTime,
+        6: 'update_ents: ' + ueTime,
+        7: 'draw_cursor: ' + dcTime,    
+        8: 'draw_belt_items: ' + dbTime,
+        9: 'get_vis_ents: ' + gvTime,
+    };
+    let ents = 0;
+    for (let [k, v] of Object.entries(vis_ents)) {
+        for (let ent of v) {
+            ents += 1;
+        }
+    }
+
+    info[9] = 0;
+    if (showMiniMap) {
+        let stTime = time();
+        TileMan.drawWorldmap(player, 0, 0, 192, 109, true);
+        pix(121, 69, 2);
+        info[9] = 'draw_worldmap: ' + Math.floor(time() - stTime) + 'ms';
+    }
+
+    let [tile, wx, wy] = getWorldCell(cursor.x, cursor.y);
+    let [sx, sy] = getScreenCell(cursor.x, cursor.y);
+    let k;
+    info[10] = 'Frame Time: ' + Math.floor(time() - start) + 'ms';
+    info[11] = 'Seed: ' + seed;
+    info[12] = 'hold time: ' + cursor.holdTime;
+    let [_, wx2, wy2] = getWorldCell(cursor.tx, cursor.ty);
+    k = `${wx2}-${wy2}`;
+    if (key(64) && ENTS[k] && !inv.isHovered(cursor.x, cursor.y)) {
+        if (ENTS[k].type === 'underground_belt_exit') {
+            ENTS[ENTS[k].otherKey].drawHoverWidget(k);
+        } else {
+            k = getEnt(cursor.x, cursor.y);
+            if (ENTS[k]) ENTS[k].drawHoverWidget();
+        }
+    }
+    for (let [k, v] of Object.entries(ENTS)) {
+        v.updated = false;
+        v.drawn = false;
+        v.isHovered = false;
+        if (v.type === 'transport_belt') { 
+            v.beltDrawn = false; 
+            v.curveChecked = false; 
+        }
+    }
+    if (showTech) drawResearchScreen();
+    if (debug) ui.drawTextWindow(info, 2, 2, 'Debug - Y to toggle', 0, 2, 0, 4);
+    if (showTileWidget && !ENTS[k]) drawTileWidget();
+    if (currentRecipe.id > 0) {
+        showRecipeWidget();
+    }
+    renderCursorProgress();
+    ui.updateAlerts();
+
+    updateRockets();
+    if (showHelp) ui.drawHelpScreen();
+    tick += 1;
+}

@@ -1,147 +1,496 @@
-//TODOS OS SPRITES SÃO ESCALONADOS POR CINCO
-
-
-import RENDER from "./classes/render.js";
-import PLAYER from "./classes/player.js";
-import CURSOR from "./classes/cursor.js";
-import KEYBOARD from "./classes/keyboard.js";
-import ENTYMAN from "./classes/entityManager.js";
-// import { Tilemanager } from "./classes/tileManager.js";
-import { Label } from "./classes/label.js";
+import cursor from "./classes/cursor.js";
+import BaseEntity from "./classes/entities/base_entity.js";
+import StoneFurnace from "./classes/entities/stone_furnace.js";
+import UndergroundBelt from "./classes/entities/undergroundBelt.js";
+import keyboard from "./classes/keyboard.js";
+import player from "./classes/player.js";
+import render from "./classes/render.js";
+import ui from "./classes/ui.js";
+import MiningDrill from "./classes/entities/mining_drill.js";
+import TransportBelt from "./classes/entities/transport_belt.js";
+import AssemblyMachine from "./classes/entities/assembly_machine.js";
 
 
 window.addEventListener("contextmenu", (ev) => {
   ev.preventDefault();
 });
-CURSOR.addMouseUpListener(() => {
-  ENTYMAN.addEnt("wood_chest", CURSOR.x + RENDER.topLeft.x, CURSOR.y + RENDER.topLeft.y)
-});
 
 
-// const TILEMAN = new Tilemanager(1);
+const tileScale = 5;
+const tileSize = 8 * tileScale;
+const currentRecipe = {x: 0, y: 0, id: 0}; 
+const ents: { [index: string]: BaseEntity} = {};
+const visEnts: { [index: string]: Array<string>} = {
+  transport_belt: [],
+  inserter: [],
+  splitter: [],
+  mining_drill: [],
+  stone_furnace: [],
+  underground_belt: [],
+  assembly_machine: [],
+  research_lab: [],
+  chest: [],
+  bio_refinary: [],
+  rocket_silo: []
+};
 
 let tick: number = 0;
+
+let beltTick: number = 0;
+
+let uBeltTick: number = 0;
+
+let drillTick: number = 0;
+let drillBitTick: number = 0;
+let drillBitDir: number = 1;
+let drillAnimTick: number = 0;
+
+let furnaceTick: number = 0;
+let furnaceAnimTick: number = 0;
+
+let crafterTick: number = 0;
+let crafterAnimTick: number = 0;
+let crafterAnimDir: number = 1;
+
 let delta: number = 0;
 let lastTime: number = 0;
-let state: string = "game";
-// let integerScale: boolean = true;
+
+type stateType = "start" | "help" | "firstLaunch";
+let state: stateType = "start";
+let showTech: boolean = false;
+let showHelp: boolean = false;
 
 
-/*
-function randRange(min: number, max: number): number {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+function getVisibleEnts(): void {
+  Object.entries(visEnts).forEach((value) => {
+    const index = value[0];
+    visEnts[index] = [];
+  });
+
+  for (let worldX = render.topLeft.x - tileSize; worldX < render.topLeft.x + render.canvas.width; worldX++) {
+    if (worldX % tileSize !== 0) { continue; }
+    for (let worldY = render.topLeft.y - tileSize; worldY < render.topLeft.y + render.canvas.height; worldY++) {
+      if (worldY % tileSize !== 0) { continue; }
+
+      const coord = worldX + '-' + worldY;
+      if (ents[coord] !== undefined && visEnts[ents[coord].type] !== undefined) {
+        const type = ents[coord].type;
+        visEnts[type].push(coord);
+      }
+    }
+  }
 }
-function worldToScreen(worldX: number, worldY: number): {tx: number, ty: number} {
-  const screen_x = (worldX * 8) - (PLAYER.x - 116);
-  const screen_y = (worldY * 8) - (PLAYER.y - 64);
+function updateEnts(): void {
+  Object.entries(ents).forEach((value) => {
+    const ent = value[1];
+
+    if (ent instanceof MiningDrill && tick % MiningDrill.tickRate === 0) {
+      ent.update()
+    }
+    else if (ent instanceof StoneFurnace && tick % StoneFurnace.tickRate === 0) {
+      ent.update();
+    }
+    else if (ent instanceof TransportBelt && tick % TransportBelt.tickRate === 0) {
+      ent.update();
+    }
+    else if (ent instanceof UndergroundBelt && tick % UndergroundBelt.tickRate === 0) {
+      ent.update();
+    }
+  });
+}
+function dispatchInput(): void {
+  cursor.update();
+  // dispatch_keypress()
+  if (showTech) { return; }
+
+  // local tile, wx, wy = get_world_cell(cursor.x, cursor.y)
+  // local k = get_ent(cursor.x, cursor.y)
+  // if ENTS[k] then ENTS[k].is_hovered = true end
+  // if cursor.sy ~= 0 then cycle_hotbar(cursor.sy*-1) end
+  // if not cursor.l then
+  //   cursor.panel_drag = false
+  //   cursor.drag = false
+  // end
   
-  return {tx: screen_x - 8, ty: screen_y - 8};
-}
-function getWorldCell(mouseX: number, mouseY: number): {wx: number, wy: number} {
-  const cam_x = PLAYER.x - 116 + 1;
-  const cam_y = PLAYER.y - 64 + 1;
-  const sub_tile_x = cam_x % 8;
-  const sub_tile_y = cam_y % 8;
-  const sx = Math.floor((mouseX + sub_tile_x) / 8);
-  const sy = Math.floor((mouseY + sub_tile_y) / 8);
-  const wx = Math.floor(cam_x / 8) + sx + 1;
-  const wy = Math.floor(cam_y / 8) + sy + 1;
-
-  //TODO return TileMan.tiles[wy][wx], wx, wy;
-  return {wx: wx, wy: wy};
-}
-*/
-
-function gameLoop() {
-  RENDER.drawBg("black");
-
-  PLAYER.update(delta, tick, {w: KEYBOARD.w, a: KEYBOARD.a, s: KEYBOARD.s, d: KEYBOARD.d}, CURSOR.prog);
-  ENTYMAN.updateAndDraw();
-  // TILEMAN.drawTerrain(showMiniMap);
-
-  // RENDER.drawRect(0, 0, 250, 35, "black", "black");
-  // RENDER.drawText(
-  //   `Total Tiles: ${TILEMAN.totalTiles}`, 0, 0, 30,
-  //   "white", "top", "left"
-  // );
-  PLAYER.draw();
-
-  // const coord = UTILS.getScreenCell();
-  // RENDER.drawRect(coord.sx, coord.sy, 40, 40, "green", "green");
-}
-function mainMenuLoop() {
-  RENDER.drawBg("gray");
-
-  const middleScreen = {
-    x: RENDER.canvas.width / 2, y: RENDER.canvas.height / 2
-  };
+  // --begin mouse-over priority dispatch
+  // if ui.active_window and ui.active_window:is_hovered(cursor.x, cursor.y) then
+  //   if (cursor.l and not cursor.ll) or (cursor.r and not cursor.lr) then
+  //     if ui.active_window:click(cursor.x, cursor.y) then
+  //       --trace('clicked active window')
+  //     end
+  //   end
+  //   return
+  // end
   
-  if (RENDER.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", {x: 0, y: 2}), false)) {
-    state = "game";
-  }
+  // if craft_menu.vis and craft_menu:is_hovered(cursor.x, cursor.y) then
+  //   if cursor.l and not cursor.ll then
+  //     if craft_menu:click(cursor.x, cursor.y, 'left') then return end
+  //   elseif cursor.r and cursor.lr then
+  //     if craft_menu:click(cursor.x, cursor.y, 'right') then return end
+  //   end
+  //   if craft_menu.vis and cursor.panel_drag then
+  //     craft_menu.x = math.max(1, math.min(cursor.x + cursor.drag_offset.x, 239 - craft_menu.w))
+  //     craft_menu.y = math.max(1, math.min(cursor.y + cursor.drag_offset.y, 135 - craft_menu.h))
+  //     return
+  //     --consumed = true
+  //   end
+  //   if craft_menu.vis and not cursor.panel_drag and cursor.l and not cursor.ll and craft_menu:is_hovered(cursor.x, cursor.y) then
+  //     if craft_menu:click(cursor.x, cursor.y) then
+  //       return
+  //     elseif not craft_menu.docked then
+  //       cursor.panel_drag = true
+  //       cursor.drag_offset.x = craft_menu.x - cursor.x
+  //       cursor.drag_offset.y = craft_menu.y - cursor.y
+  //       return
+  //     end
+  //   end
+  //   return
+  // end
   
-  if (RENDER.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", {x: 0, y: 2}), false)) {
-    state = 'help';
-  }
-}
-function helpMenuLoop() {
-  RENDER.drawBg("gray");
+  // if inv:is_hovered(cursor.x, cursor.y) then
+  //   if (cursor.l and not cursor.ll) or (cursor.r and not cursor.lr) then
+  //     inv:clicked(cursor.x, cursor.y)
+  //   end
+  //   return
+  // end
 
-  const middleScreen = {
-    x: RENDER.canvas.width / 2, y: RENDER.canvas.height / 2
-  };
-  const info = [
-    ['W A S D', 'Move PLAYER'],
-    ['ESC', 'Exit game'],
-    ['CTRL + R', 'Reload game'],
-    ['I or TAB', 'Toggle inventory window'],
-    ['C', 'Toggle crafting window'],
-    ['T', 'Toggle research window'],
-    ['R', 'Rotate held item or hovered object'],
-    ['Q', 'Pipette tool - copy/swap objects'],
-    ['Left-click', 'Place/deposit item/open machine'],
-    ['Right-click hold', 'Mine resource or destroy object'],
-    ['Scroll +/-', 'Scroll active hotbar slot']
-  ];
+  // if cursor.type == 'item' and cursor.item_stack.id ~= 0 then
+  //   --check other visible widgets
+  //   local item = ITEMS[cursor.item_stack.id]
+  //   local count = cursor.item_stack.count
+  //   --check for ents to deposit item stack
+  //   if key(63) and ENTS[k] and ENTS[k].deposit_stack then --TODO
+  //     if cursor.r and not cursor.lr then
+  //       local result, stack = ENTS[k]:deposit_stack({id = cursor.item_stack.id, count = 1})
+  //       if result then
+  //         cursor.item_stack.count = cursor.item_stack.count - 1
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = inv.slots[cursor.item_stack.slot].count - 1
+  //           if inv.slots[cursor.item_stack.slot].count < 1 then
+  //             inv.slots[cursor.item_stack.slot].count = 0
+  //             inv.slots[cursor.item_stack.slot].id = 0
+  //           end
+  //         end
+  //         ui.new_alert(cursor.x, cursor.y, '-1 ' .. ITEMS[cursor.item_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         if cursor.item_stack.count < 1 then
+  //           set_cursor_item()
+  //         end
+  //       end
+  //     elseif cursor.l and not cursor.ll then
+  //       local result, stack = ENTS[k]:deposit_stack(cursor.item_stack)
+  //       local old_stack = {id = cursor.item_stack.id, count = cursor.item_stack.count}
+  //       if stack.count == 0 then
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = 0
+  //           inv.slots[cursor.item_stack.slot].id = 0
+  //         end
+  //         ui.new_alert(cursor.x, cursor.y, -old_stack.count .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         set_cursor_item()
+  //       else
+  //         ui.new_alert(cursor.x, cursor.y, '- ' .. (old_stack.count - stack.count) .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         cursor.item_stack.count = stack.count
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = stack.count
+  //         end
+  //       end
+  //     end
+  //     return
+  //     --if item is placeable, run callback for item type
+  //     --checking transport_belt's first (for drag-placement), then other items
+  //   else
+  //     if cursor.l and cursor.item == 'transport_belt' and (cursor.tx ~= cursor.ltx or cursor.ty ~= cursor.lty)  then
+  //       --trace('placing belt')
+  //       local slot = cursor.item_stack.slot
+  //       local item_consumed = callbacks[cursor.item].place_item(cursor.x, cursor.y)
+  //       if slot and item_consumed then
+  //         inv.slots[slot].count = inv.slots[slot].count - 1
+  //         cursor.item_stack.count = inv.slots[slot].count
+  //       elseif item_consumed ~= false then
+  //         cursor.item_stack.count = cursor.item_stack.count - 1
+  //         if cursor.item_stack.count < 1 then
+  //           set_cursor_item()
+  //         end
+  //       end
+  //       if slot and inv.slots[slot].count < 1 then
+  //         inv.slots[slot].id = 0
+  //         inv.slots[slot].count = 0
+  //         set_cursor_item()
+  //       end
+  //       return
+  //     elseif cursor.l and not cursor.ll and ITEMS[cursor.item_stack.id].type == 'placeable' then
+  //       if callbacks[cursor.item] then
+  //         local item_consumed = callbacks[cursor.item].place_item(cursor.x, cursor.y)
+  //         if item_consumed ~= false then
+  //           cursor.item_stack.count = cursor.item_stack.count - 1
+  //           if cursor.item_stack.count < 1 then
+  //             set_cursor_item()
+  //           end
+  //           if cursor.item_stack.slot then
+  //             inv.slots[cursor.item_stack.slot].count = inv.slots[cursor.item_stack.slot].count - 1
+  //             if inv.slots[cursor.item_stack.slot].count < 1 then
+  //               inv.slots[cursor.item_stack.slot].id = 0
+  //               inv.slots[cursor.item_stack.slot].count = 0
+  //               set_cursor_item()
+  //             end
+  //           end
+  //         end
+  //       end
+  //       return
+  //     elseif cursor.r then
+  //       --remove_tile(cursor.x, cursor.y)
+  //       return
+  //     end
+  //   end
+  // elseif cursor.type == 'pointer' then
+  //   if cursor.l and not cursor.ll and key(63) and ENTS[k] and ENTS[k].return_all then
+  //     --try to take all items
+  //     ENTS[k]:return_all()
+  //     return
+  //   end
+  // end
 
-  const panelCoords = {
-    x: middleScreen.x - 250,
-    y: middleScreen.y - 150,
-    w: 500, h: 300
-  };
+  // if cursor.held_right and cursor.type == 'pointer' then
+  //   local sx, sy = get_screen_cell(cursor.x, cursor.y)
+  //   local tile, wx, wy = get_world_cell(cursor.x, cursor.y)
+  //   local result = resources[tostring(tile.sprite_id)]
+  //   local k = get_ent(cursor.x, cursor.y)
+  //   if not result and not tile.is_tree and not ENTS[k] and not tile.ore then cursor.prog = false return end
+  //   if tick % 4 == 0 then
+  //     local px, py = sx + 4, sy + 4
+  //     line(120, 67 + player.anim_frame, px, py, floor(math.random(1, 3) + 0.5))
+  //     for i = 1, 3 do
+  //       local rr = 1 + floor((math.random() + 0.5) * 4)
+  //       local rc = 1 + floor((math.random(6) + 0.5))
+  //       circb(px, py, rr, rc)
+  //     end
+  //   end
+  //   if tile.is_tree then
+  //     local c1, c2 = 3, 4
+  //     if tile.biome < 2 then c1, c2 = 2, 3 end
+  //     ui.highlight(cursor.tx - 9 + tile.offset.x, cursor.ty - 27 + tile.offset.y, 24, 32, false, c1, c2)
+  //     ui.highlight(cursor.tx + tile.offset.x - 2, cursor.ty - 1 + tile.offset.y, 8, 8, false, c1, c2)
+  //   end
+  //   if result or tile.ore or ENTS[k] then
+  //     ui.highlight(sx - 1, sy - 1, 8, 8, false, 3, 4)
+  //   end
+  //   if (ENTS[k] or tile.is_tree or tile.ore or result) then
+  //     sound('laser')
+  //     cursor.prog = remap(clamp(cursor.hold_time, 0, CURSOR_MINING_SPEED), 0, CURSOR_MINING_SPEED, 0, 9)
+  //     if cursor.prog >= 9 then
+  //       remove_tile(cursor.x, cursor.y)
+  //       cursor.prog = false
+  //       cursor.held_right = false
+  //       cursor.hold_time = 0
+  //       return
+  //     end
+  //   end
+  // else
+  //   cursor.prog = false
+  // end
 
-  RENDER.drawPanel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "white", "blue", "black", new Label("Controls", "black", "black", {x: 0, y: 0}));
-  for (let i = 0; i < info.length; i++) {
-    RENDER.drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
-    RENDER.drawText(info[i][0], panelCoords.x + panelCoords.w, panelCoords.y + (i * 20), 20, "black", "top", "right");
-  }
+  //   --check for held item placement/deposit to other ents
+  // if cursor.l and not cursor.ll and not craft_menu:is_hovered(cursor.x, cursor.y) and inv:is_hovered(cursor.x, cursor.y) then
+  //   local slot = inv:get_hovered_slot(cursor.x, cursor.y)
+  //   if slot then
+  //     inv.slots[slot.index]:callback()
+  //     return
+  //   end
+  // end
 
-  if (RENDER.drawTextButton(middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", {x: 0, y: 2}), false)) {
-    state = 'start';
-  }
+  // if cursor.l and not cursor.ll and ENTS[k] then
+
+  //   if dummies[ENTS[k].type] then
+  //     k = ENTS[k].other_key
+  //   end
+
+  //   if opensies[ENTS[k].type] then
+  //     if key(63) and cursor.type == 'pointer' then
+        
+  //     end
+  //     if key(64) and cursor.type == 'item' and ENTS[k].deposit_stack then
+  //       local old_stack = cursor.item_stack
+  //       local result, stack = ENTS[k]:deposit_stack(cursor.item_stack)
+  //       if result then
+  //         if stack then
+  //           if stack.count > 0 then
+  //             cursor.item_stack.count = stack.count
+  //           else
+  //             cursor.item_stack = {id = 0, count = 0, slot = false}
+  //             cursor.type = 'pointer'
+  //           end
+  //           sound('deposit')
+  //           ui.new_alert(cursor.x, cursor.y, stack.count - old_stack.count .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 2)
+  //         end
+  //       end
+  //     else
+  //       ui.active_window = ENTS[k]:open()
+  //     end
+  //   end
+  //   return
+  // end
 }
 
 
 function BOOT(): void {
-  RENDER.resizeCanvas();
-
   TIC(1);
 }
 function TIC(currentTime: number) {
-  CURSOR.update();
-
   delta = (currentTime - lastTime) / 100;
   lastTime = currentTime;
 
+  currentRecipe.x = 0;
+  currentRecipe.y = 0;
+  currentRecipe.id = 0;
+
   if (state === "start") {
-    mainMenuLoop();
+    cursor.update();
+    state = ui.drawStartMenu() as stateType;
+    tick += 1;
+    requestAnimationFrame(TIC);
+    return;
   }
   else if (state === "help") {
-    helpMenuLoop();
+    cursor.update();
+    state = ui.drawHelpMenu() as stateType;
+    tick += 1;
+    requestAnimationFrame(TIC);
+    return;
   }
-  else if (state === "game") {
-    gameLoop();
+
+  if (state === 'firstLaunch') {
+    cursor.update();
+    state = ui.drawEndgameWindow(tick) as stateType;
+    tick += 1;
+    requestAnimationFrame(TIC);
+    return;
   }
+  
+  // update_water_effect(time())
+  render.drawBg("black");
+
+  getVisibleEnts();
+  // draw_terrain();
+
+  player.update(delta, tick, {w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d}, cursor.prog);
+  dispatchInput();
+
+  if (tick % UndergroundBelt.tickRate === 0) {
+    beltTick += 1;
+    if (beltTick > UndergroundBelt.maxTick) { beltTick = 0; }
+  }
+
+  if (tick % UndergroundBelt.tickRate === 0) {
+    uBeltTick += 1;
+    if (beltTick > UndergroundBelt.maxTick) { uBeltTick = 0; }
+  }
+
+  if (tick % MiningDrill.tickRate === 0) {
+    drillTick = drillTick + drillBitDir;
+    if (drillBitTick > 7 && drillBitTick < 0) {
+      drillBitDir = drillBitDir * -1;
+    }
+    
+    drillAnimTick += 1;
+    if (drillAnimTick > 2) {
+      drillAnimTick = 0;
+    }
+  }
+
+  if (tick % StoneFurnace.animTickRate === 0) {
+    furnaceAnimTick += 1;
+    for (let y = 0; y < 3; y++) {
+      // set_sprite_pixel(490, 0, y, floor(math.random(2, 4)))
+      // set_sprite_pixel(490, 1, y, floor(math.random(2, 4)))
+    }
+    
+    if (furnaceAnimTick > StoneFurnace.animMaxTick) {
+      furnaceAnimTick = 0;
+    }
+  }
+
+  if (tick % AssemblyMachine.animTickRate === 0) {
+    crafterAnimTick = crafterAnimTick + crafterAnimDir;
+    
+    if (crafterAnimTick > 5) {
+      crafterAnimDir = -1;
+    }
+    else if (crafterAnimTick < 1) {
+      crafterAnimDir = 1;
+    }
+  }
+
+  updateEnts();
+  // draw_ents();
+  // if not show_mini_map then
+  //   local st_time = time()
+  //   TileMan.draw_clutter(player, 32, 21)
+  //   dcl_time = floor(time() - st_time)
+  // end
+  // particles()
+
+  player.draw();
+
+  // local x, y, l, m, r = mouse()
+  // local col = 5
+  // if r then col = 2 end
+  // if not show_mini_map then
+  //   inv:draw()
+  //   craft_menu:draw()
+  //   if ui.active_window then
+  //     if ENTS[ui.active_window.ent_key] then
+  //       ui.active_window:draw()
+  //     else
+  //       ui.active_window = nil
+  //     end
+  //   end
+  // end
+
+  // draw_cursor();
+
+  // local ents = 0
+  // for k, v in pairs(vis_ents) do
+  //   for _, ent in ipairs(v) do
+  //     ents = ents + 1
+  //   end
+  // end
+
+  // if show_mini_map then
+  //   TileMan.draw_worldmap(player, 0, 0, 192, 109, true)
+  //   pix(121, 69, 2)
+  // end
+
+  // local tile, wx, wy = get_world_cell(cursor.x, cursor.y)
+  // local sx, sy = get_screen_cell(cursor.x, cursor.y)
+  // local k
+  // local _, wx, wy  = get_world_cell(cursor.tx, cursor.ty)
+  // local k = wx .. '-' .. wy
+  // if key(64) and ENTS[k] and not inv:is_hovered(cursor.x, cursor.y) then
+  //   if ENTS[k].type == 'underground_belt_exit' then
+  //     ENTS[ENTS[k].other_key]:draw_hover_widget(k)
+  //   else
+  //     k = get_ent(cursor.x, cursor.y)
+  //     if ENTS[k] then ENTS[k]:draw_hover_widget() end
+  //   end
+  // end
+  // for k, v in pairs(ENTS) do
+  //   v.updated = false
+  //   v.drawn = false
+  //   v.is_hovered = false
+  //   if v.type == 'transport_belt' then v.belt_drawn = false; v.curve_checked = false; end
+  // end
+  // if show_tech then draw_research_screen() end
+  // if show_tile_widget and not ENTS[k] then draw_tile_widget() end
+  // if current_recipe.id > 0 then
+  //   show_recipe_widget()
+  // end
+  // render_cursor_progress()
+  // ui.update_alerts()
+  
+  // update_rockets()
+  // if (showHelp) {ui.drawHelpScreen();}  
 
   tick = tick + 1;
   requestAnimationFrame(TIC);
