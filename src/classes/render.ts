@@ -9,7 +9,8 @@ class Render {
   public size: {w: number, h: number};
   public centerCanvas: {x: number, y: number};
   public integerScale: boolean;
-  private spriteAtlas: HTMLImageElement;
+  private staticSpritesAtlas: HTMLImageElement;
+  private rotatableSpritesAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
   
   constructor() {
@@ -18,8 +19,10 @@ class Render {
     this.topLeft = {x: 0, y: 0};
     this.size = {w: 0, h: 0};
     this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
-    this.spriteAtlas = new Image();
-    this.spriteAtlas.src = "./assets/sprites.png";
+    this.staticSpritesAtlas = new Image();
+    this.staticSpritesAtlas.src = "./assets/staticSprites.png";
+    this.rotatableSpritesAtlas = new Image();
+    this.rotatableSpritesAtlas.src = "./assets/rotatableSprites.png";
     this.tilesAtlas = new Image();
     this.tilesAtlas.src = "./assets/tiles.png";
     this.integerScale = true;
@@ -28,10 +31,16 @@ class Render {
     this.resizeCanvas();
   }
   
-  drawSprite(src: "sprites" | "tiles", scale: number, x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
-    if (src === "sprites") {
+  drawSprite(src: "staticSprite" | "rotatableSprite" | "tiles", scale: number, x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
+    if (src === "staticSprite") {
       this.context.drawImage(
-        this.spriteAtlas, coordX, coordY,
+        this.staticSpritesAtlas, coordX, coordY,
+        sizeX, sizeY, x, y, sizeX * scale, sizeY * scale
+      )
+    }
+    else if (src === "rotatableSprite") {
+      this.context.drawImage(
+        this.rotatableSpritesAtlas, coordX, coordY,
         sizeX, sizeY, x, y, sizeX * scale, sizeY * scale
       )
     }
