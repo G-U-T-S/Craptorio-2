@@ -25,7 +25,7 @@ class Player {
       '-1,1':  {id: 364, flip: 3, rot: 0, dust: {x: 10,y: -2}},  //--down-left
       '1,1':   {id: 364, flip: 2, rot: 0, dust: {x: -2,y: -2}}   //--down-right
     }
-    this.atlasCoord = {x: 0, y: 32};
+    this.atlasCoord = {x: 0, y: 0};
   }
 
   public update(delta: number, tick: number, keys: {w: boolean, a: boolean, s: boolean, d: boolean}, cursorProg: boolean): void {
@@ -127,7 +127,6 @@ class Player {
       }
       default: {
         this.atlasCoord.x = 0;
-        this.atlasCoord.y = 32;
         break;
       }
     }

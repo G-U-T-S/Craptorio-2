@@ -6,6 +6,9 @@ export default class UndergroundBelt extends BaseEntity {
   static readonly maxTick = 3;
 
   constructor(globalPos: {x: number, y: number}) {
-    super({ ...globalPos });
+    super({ ...globalPos }, "underground_belt");
   }
+
+  update(): void {}
+  draw(): void {}
 }

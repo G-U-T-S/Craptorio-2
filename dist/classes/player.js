@@ -29,7 +29,7 @@ class Player {
             '-1,1': { id: 364, flip: 3, rot: 0, dust: { x: 10, y: -2 } },
             '1,1': { id: 364, flip: 2, rot: 0, dust: { x: -2, y: -2 } }
         };
-        this.atlasCoord = { x: 0, y: 32 };
+        this.atlasCoord = { x: 0, y: 0 };
     }
     update(delta, tick, keys, cursorProg) {
         if (tick % this.animSpeed === 0) {
@@ -83,15 +83,15 @@ class Player {
                 break;
             }
             case "0,1": {
-                this.atlasCoord.x = 64.1;
+                this.atlasCoord.x = 64;
                 break;
             }
             case "0,-1": {
-                this.atlasCoord.x = 56.1;
+                this.atlasCoord.x = 56;
                 break;
             }
             case "1,0": {
-                this.atlasCoord.x = 8.1;
+                this.atlasCoord.x = 8;
                 break;
             }
             case "1,1": {
@@ -104,13 +104,12 @@ class Player {
             }
             default: {
                 this.atlasCoord.x = 0;
-                this.atlasCoord.y = 32;
                 break;
             }
         }
     }
     draw() {
-        RENDER.drawSprite("sprites", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y - ((8 * 5) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
+        RENDER.drawSprite("rotatableSprite", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y - ((8 * 5) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
 const player = new Player();

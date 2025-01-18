@@ -6,6 +6,10 @@ export default class StoneFurnace extends BaseEntity {
   static readonly tickRate = 5;
   static readonly animTickRate = 9;
   static readonly animMaxTick = 2;
+
+  constructor(globalPos: {x: number, y: number}) {
+    super({ ...globalPos }, "stone_furnace");
+  }
   
   public update(): void {}
 

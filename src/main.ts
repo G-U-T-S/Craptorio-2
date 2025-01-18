@@ -1,13 +1,14 @@
 import cursor from "./classes/cursor.js";
-import Belt from "./classes/entities/belt.js";
-import Crafter from "./classes/entities/crafter.js";
-import Drill from "./classes/entities/drill.js";
+import BaseEntity from "./classes/entities/base_entity.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import keyboard from "./classes/keyboard.js";
 import player from "./classes/player.js";
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
+import MiningDrill from "./classes/entities/mining_drill.js";
+import TransportBelt from "./classes/entities/transport_belt.js";
+import AssemblyMachine from "./classes/entities/assembly_machine.js";
 
 
 window.addEventListener("contextmenu", (ev) => {
@@ -15,7 +16,23 @@ window.addEventListener("contextmenu", (ev) => {
 });
 
 
+const tileScale = 5;
+const tileSize = 8 * tileScale;
 const currentRecipe = {x: 0, y: 0, id: 0}; 
+const ents: { [index: string]: BaseEntity} = {};
+const visEnts: { [index: string]: Array<string>} = {
+  transport_belt: [],
+  inserter: [],
+  splitter: [],
+  mining_drill: [],
+  stone_furnace: [],
+  underground_belt: [],
+  assembly_machine: [],
+  research_lab: [],
+  chest: [],
+  bio_refinary: [],
+  rocket_silo: []
+};
 
 let tick: number = 0;
 
@@ -40,9 +57,46 @@ let lastTime: number = 0;
 
 type stateType = "start" | "help" | "firstLaunch";
 let state: stateType = "start";
+let showHelp: boolean = false;
 
 
-// function dispatchInput(delta: number): void {}
+function getVisibleEnts(): void {
+  Object.entries(visEnts).forEach((value) => {
+    const index = value[0];
+    visEnts[index] = [];
+  });
+
+  for (let worldX = render.topLeft.x - tileSize; worldX < render.topLeft.x + render.canvas.width; worldX++) {
+    if (worldX % tileSize !== 0) { continue; }
+    for (let worldY = render.topLeft.y - tileSize; worldY < render.topLeft.y + render.canvas.height; worldY++) {
+      if (worldY % tileSize !== 0) { continue; }
+
+      const coord = worldX + '-' + worldY;
+      if (ents[coord] !== undefined && visEnts[ents[coord].type] !== undefined) {
+        const type = ents[coord].type;
+        visEnts[type].push(coord);
+      }
+    }
+  }
+}
+function updateEnts(): void {
+  Object.entries(ents).forEach((value) => {
+    const ent = value[1];
+
+    if (ent instanceof MiningDrill && tick % MiningDrill.tickRate === 0) {
+      ent.update()
+    }
+    else if (ent instanceof StoneFurnace && tick % StoneFurnace.tickRate === 0) {
+      ent.update();
+    }
+    else if (ent instanceof TransportBelt && tick % TransportBelt.tickRate === 0) {
+      ent.update();
+    }
+    else if (ent instanceof UndergroundBelt && tick % UndergroundBelt.tickRate === 0) {
+      ent.update();
+    }
+  });
+}
 
 
 function BOOT(): void {
@@ -82,15 +136,15 @@ function TIC(currentTime: number) {
   // update_water_effect(time())
   render.drawBg("black");
 
-  // get_visible_ents();
+  getVisibleEnts();
   // draw_terrain();
 
   player.update(delta, tick, {w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d}, cursor.prog);
   // dispatchInput(delta);
 
-  if (tick % Belt.tickRate === 0) {
+  if (tick % UndergroundBelt.tickRate === 0) {
     beltTick += 1;
-    if (beltTick > Belt.maxTick) { beltTick = 0; }
+    if (beltTick > UndergroundBelt.maxTick) { beltTick = 0; }
   }
 
   if (tick % UndergroundBelt.tickRate === 0) {
@@ -98,7 +152,7 @@ function TIC(currentTime: number) {
     if (beltTick > UndergroundBelt.maxTick) { uBeltTick = 0; }
   }
 
-  if (tick % Drill.tickRate === 0) {
+  if (tick % MiningDrill.tickRate === 0) {
     drillTick = drillTick + drillBitDir;
     if (drillBitTick > 7 && drillBitTick < 0) {
       drillBitDir = drillBitDir * -1;
@@ -122,7 +176,7 @@ function TIC(currentTime: number) {
     }
   }
 
-  if (tick % Crafter.animTickRate === 0) {
+  if (tick % AssemblyMachine.animTickRate === 0) {
     crafterAnimTick = crafterAnimTick + crafterAnimDir;
     
     if (crafterAnimTick > 5) {
@@ -133,11 +187,11 @@ function TIC(currentTime: number) {
     }
   }
 
-  // update_ents();
+  updateEnts();
   // draw_ents();
   // if not show_mini_map then
   //   local st_time = time()
-  //   TileMan:draw_clutter(player, 32, 21)
+  //   TileMan.draw_clutter(player, 32, 21)
   //   dcl_time = floor(time() - st_time)
   // end
   // particles()
@@ -169,7 +223,7 @@ function TIC(currentTime: number) {
   // end
 
   // if show_mini_map then
-  //   TileMan:draw_worldmap(player, 0, 0, 192, 109, true)
+  //   TileMan.draw_worldmap(player, 0, 0, 192, 109, true)
   //   pix(121, 69, 2)
   // end
 
@@ -201,8 +255,7 @@ function TIC(currentTime: number) {
   // ui.update_alerts()
   
   // update_rockets()
-  // if show_help then ui:draw_help_screen() end
-  
+  // if (showHelp) {ui.drawHelpScreen();}  
 
   tick = tick + 1;
   requestAnimationFrame(TIC);

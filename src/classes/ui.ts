@@ -3,6 +3,12 @@ import { Label } from "./label.js";
 
 
 class Ui {
+  public currentHelp: number;
+
+  constructor() {
+    this.currentHelp = 0;
+  }
+
   drawStartMenu(): string {
     render.drawBg("gray");
     // this.draw_logo();
@@ -82,6 +88,54 @@ class Ui {
 
     return "firstLaunch";
   }
+
+  /*
+  drawHelpScreen(): void {
+    // this.draw_panel(0, 0, 240, 136, 8, 9, {text = help[current_help].name, bg = 15, fg = 4})
+    if (this.currentHelp < 3) {
+      for k, v in ipairs(help[current_help].info) do
+        prints(v[2], 3, 10 + ((k-1) * 7), 15, 4)
+        prints(v[1], 150, 10 + ((k-1) * 7), 15, 11, _, true)
+      end
+    }
+    else {
+      local y = 10
+      for k, v in ipairs(help[current_help].info) do
+        local lines = text_wrap(v, 232, false)
+        for i, line in ipairs(lines) do
+          prints(line, 3, y, 15, 4)
+          y = y + 8
+        end
+        y = y + 8
+      end
+    }
+    // --page left button
+    if (ui.draw_button(240 - 20, 1, 1, UI_BUTTON, 2, 8, 3)) {
+      current_help = clamp(current_help - 1, 1, #help)
+      return;
+    }
+
+    // --page right button
+    if (ui.draw_button(240 - 12, 1, 0, UI_BUTTON, 2, 8, 3)) {
+      current_help = clamp(current_help + 1, 1, #help)
+      return;
+    }
+
+    if (ui.draw_text_button(2, 1, UI_BUTTON2, _, 8, 2, 15, 3, {text = ' Back ', x = 1, y = 1, bg = 15, fg = 4, shadow = {x = 1, y = 0}})) {
+      if (STATE === 'help') {
+        cls()
+        STATE = 'start'
+        return;
+      }
+      else {
+        show_help = false
+      }
+      
+      return;
+    }
+
+  }
+  */
 }
 
 

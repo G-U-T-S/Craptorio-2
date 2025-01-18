@@ -3,6 +3,10 @@ import BaseEntity from "./base_entity.js";
 
 
 export class WoodChest extends BaseEntity {
+  constructor(globalPos: {x: number, y: number}) {
+    super({ ...globalPos}, "wood_chest");
+  }
+  
   draw(): void {
     RENDER.drawSprite(
       "staticSprite", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,

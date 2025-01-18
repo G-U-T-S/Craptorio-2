@@ -6,6 +6,6 @@ export default class StoneFurnace extends BaseEntity {
     static animMaxTick = 2;
     update() { }
     draw() {
-        RENDER.drawSprite("sprites", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, 64, 64, 16, 16);
+        RENDER.drawSprite("staticSprite", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, 64, 64, 16, 16);
     }
 }
