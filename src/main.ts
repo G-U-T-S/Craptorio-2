@@ -29,7 +29,7 @@ const visEnts: { [index: string]: Array<string>} = {
   underground_belt: [],
   assembly_machine: [],
   research_lab: [],
-  chest: [],
+  wood_chest: [],
   bio_refinary: [],
   rocket_silo: []
 };
@@ -94,7 +94,7 @@ function drawEnts(): void {
   if (showMiniMap || showHelp || state !== 'game') { return; }
   
   visEnts.transport_belt.forEach((coord) => {
-    if (ents[coord] !== undefined) {ents[coord].draw()}
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
   });
   visEnts.transport_belt.forEach((coord) => {
     if (ents[coord] !== undefined) {
@@ -102,39 +102,42 @@ function drawEnts(): void {
       belt.drawItems();
     }
   });
-  // for i, k in pairs(vis_ents['stone_furnace']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['underground_belt']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['underground_belt']) do
-  //   if ENTS[k] then ENTS[k]:draw_items() end
-  // end
-  // for i, k in pairs(vis_ents['splitter']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['mining_drill']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['assembly_machine']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['research_lab']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['chest']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['rocket_silo']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['bio_refinery']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
-  // for i, k in pairs(vis_ents['inserter']) do
-  //   if ENTS[k] then ENTS[k]:draw() end
-  // end
+  visEnts.underground_belt.forEach((coord) => {
+    if (ents[coord] !== undefined) {ents[coord].draw()}
+  });
+  visEnts.underground_belt.forEach((coord) => {
+    if (ents[coord] !== undefined) {
+      const uBelt = ents[coord] as UndergroundBelt;
+      uBelt.drawItems();
+    }
+  });
+  visEnts.stone_furnace.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw();}
+  });
+  visEnts.splitter.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.mining_drill.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.assembly_machine.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.research_lab.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.wood_chest.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.rocket_silo.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.bio_refinary.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
+  visEnts.inserter.forEach((coord) => {
+    if (ents[coord] !== undefined) { ents[coord].draw(); }
+  });
 }
 
 
@@ -228,43 +231,41 @@ function TIC(currentTime: number) {
 
   updateEnts();
   drawEnts();
-  // if not show_mini_map then
-  //   local st_time = time()
-  //   TileMan.draw_clutter(player, 32, 21)
-  //   dcl_time = floor(time() - st_time)
-  // end
+  if (!showMiniMap) {
+    // TileMan.draw_clutter(player, 32, 21)
+  }
   // particles()
 
   player.draw();
 
-  // local x, y, l, m, r = mouse()
-  // local col = 5
-  // if r then col = 2 end
-  // if not show_mini_map then
-  //   inv:draw()
-  //   craft_menu:draw()
-  //   if ui.active_window then
-  //     if ENTS[ui.active_window.ent_key] then
-  //       ui.active_window:draw()
-  //     else
-  //       ui.active_window = nil
-  //     end
-  //   end
-  // end
+  let col = 5;
+  if (cursor.r) { col = 2; }
+  
+  if (!showMiniMap) {
+    // inv.draw();
+    // craft_menu.draw();
+    // if (ui.active_window) {
+    //   if (ents[ui.active_window.entKey]) {
+    //     ui.active_window.draw();
+    //   }
+    //   else {
+    //     ui.active_window = null
+    //   }
+    // }
+  }
 
   // draw_cursor();
 
-  // local ents = 0
-  // for k, v in pairs(vis_ents) do
-  //   for _, ent in ipairs(v) do
-  //     ents = ents + 1
-  //   end
-  // end
+  let totalEnts = 0;
+  Object.entries(visEnts).forEach((value) => {
+    const arr = value[1];
+    totalEnts += arr.length;
+  });
 
-  // if show_mini_map then
+  // if (showMiniMap) {
   //   TileMan.draw_worldmap(player, 0, 0, 192, 109, true)
   //   pix(121, 69, 2)
-  // end
+  // }
 
   // local tile, wx, wy = get_world_cell(cursor.x, cursor.y)
   // local sx, sy = get_screen_cell(cursor.x, cursor.y)
@@ -279,22 +280,31 @@ function TIC(currentTime: number) {
   //     if ENTS[k] then ENTS[k]:draw_hover_widget() end
   //   end
   // end
-  // for k, v in pairs(ENTS) do
-  //   v.updated = false
-  //   v.drawn = false
-  //   v.is_hovered = false
-  //   if v.type == 'transport_belt' then v.belt_drawn = false; v.curve_checked = false; end
-  // end
-  // if show_tech then draw_research_screen() end
-  // if show_tile_widget and not ENTS[k] then draw_tile_widget() end
-  // if current_recipe.id > 0 then
-  //   show_recipe_widget()
-  // end
-  // render_cursor_progress()
-  // ui.update_alerts()
+
+  Object.entries(ents).forEach((value) => {
+    const ent = value[1];
+    
+    if (!(ent instanceof WoodChest)) {
+      ent.updated = false;
+    }
+    ent.drawn = false;
+    ent.isHovered = false;
+
+    if (ent instanceof TransportBelt) {
+      ent.beltDrawn = false;
+      ent.curveChecked = false;
+    }
+  });
+
+  // if (show_tech) { draw_research_screen(); }
+  // if (showTileWidget && ents[k] === undefined) { drawTileWidget(); }
+  // if (currentRecipe.id > 0) { show_recipe_widget(); }
   
-  // update_rockets()
-  // if (showHelp) {ui.drawHelpScreen();}  
+  // renderCursorProgress();
+  // ui.updateAlerts();
+  
+  // updateRockets();
+  // if (showHelp) { ui.drawHelpScreen(); }  
 
   tick = tick + 1;
   requestAnimationFrame(TIC);

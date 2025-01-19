@@ -7,6 +7,9 @@ export default class StoneFurnace {
   static readonly animMaxTick = 2;
   public type = "stone_furnace";
   public globalPos: {x: number, y: number};
+  public updated: boolean = false;
+  public drawn: boolean = false;
+  public isHovered: boolean = false;
 
   constructor(globalPos: {x: number, y: number}) {
     this.globalPos = { ...globalPos };
