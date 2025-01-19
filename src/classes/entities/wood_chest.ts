@@ -1,10 +1,12 @@
 import RENDER from "../render.js";
-import BaseEntity from "./base_entity.js";
 
 
-export class WoodChest extends BaseEntity {
+export default class WoodChest {
+  public type = "assembly_machine";
+  public globalPos: {x: number, y: number};
+  
   constructor(globalPos: {x: number, y: number}) {
-    super({ ...globalPos}, "wood_chest");
+    this.globalPos = { ...globalPos };
   }
   
   draw(): void {

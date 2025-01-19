@@ -1,14 +1,15 @@
 import RENDER from "../render.js";
-import BaseEntity from "./base_entity.js";
 
 
-export default class StoneFurnace extends BaseEntity {
+export default class StoneFurnace {
   static readonly tickRate = 5;
   static readonly animTickRate = 9;
   static readonly animMaxTick = 2;
+  public type = "stone_furnace";
+  public globalPos: {x: number, y: number};
 
   constructor(globalPos: {x: number, y: number}) {
-    super({ ...globalPos }, "stone_furnace");
+    this.globalPos = { ...globalPos };
   }
   
   public update(): void {}

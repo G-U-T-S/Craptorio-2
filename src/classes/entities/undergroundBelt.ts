@@ -1,12 +1,11 @@
-import BaseEntity from "./base_entity.js";
-
-
-export default class UndergroundBelt extends BaseEntity {
+export default class UndergroundBelt {
   static readonly tickRate = 5;
   static readonly maxTick = 3;
+  public type = "underground_belt";
+  public globalPos: {x: number, y: number};
 
   constructor(globalPos: {x: number, y: number}) {
-    super({ ...globalPos }, "underground_belt");
+    this.globalPos = { ...globalPos };
   }
 
   update(): void {}

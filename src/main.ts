@@ -1,14 +1,14 @@
-import cursor from "./classes/cursor.js";
-import BaseEntity from "./classes/entities/base_entity.js";
-import StoneFurnace from "./classes/entities/stone_furnace.js";
-import UndergroundBelt from "./classes/entities/undergroundBelt.js";
-import keyboard from "./classes/keyboard.js";
-import player from "./classes/player.js";
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
+import keyboard from "./classes/keyboard.js";
+import cursor from "./classes/cursor.js";
+import player from "./classes/player.js";
+import StoneFurnace from "./classes/entities/stone_furnace.js";
+import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
+import WoodChest from "./classes/entities/wood_chest.js";
 
 
 window.addEventListener("contextmenu", (ev) => {
@@ -19,7 +19,7 @@ window.addEventListener("contextmenu", (ev) => {
 const tileScale = 5;
 const tileSize = 8 * tileScale;
 const currentRecipe = {x: 0, y: 0, id: 0}; 
-const ents: { [index: string]: BaseEntity} = {};
+const ents: { [index: string]: AssemblyMachine | MiningDrill | StoneFurnace | TransportBelt | UndergroundBelt | WoodChest} = {};
 const visEnts: { [index: string]: Array<string>} = {
   transport_belt: [],
   inserter: [],
@@ -55,10 +55,11 @@ let crafterAnimDir: number = 1;
 let delta: number = 0;
 let lastTime: number = 0;
 
-type stateType = "start" | "help" | "firstLaunch";
+type stateType = "start" | "game" | "help" | "firstLaunch";
 let state: stateType = "start";
 let showTech: boolean = false;
 let showHelp: boolean = false;
+let showMiniMap: boolean = false;
 
 
 function getVisibleEnts(): void {
@@ -84,19 +85,56 @@ function updateEnts(): void {
   Object.entries(ents).forEach((value) => {
     const ent = value[1];
 
-    if (ent instanceof MiningDrill && tick % MiningDrill.tickRate === 0) {
-      ent.update()
-    }
-    else if (ent instanceof StoneFurnace && tick % StoneFurnace.tickRate === 0) {
-      ent.update();
-    }
-    else if (ent instanceof TransportBelt && tick % TransportBelt.tickRate === 0) {
-      ent.update();
-    }
-    else if (ent instanceof UndergroundBelt && tick % UndergroundBelt.tickRate === 0) {
+    if (!(ent instanceof WoodChest)) {
       ent.update();
     }
   });
+}
+function drawEnts(): void {
+  if (showMiniMap || showHelp || state !== 'game') { return; }
+  
+  visEnts.transport_belt.forEach((coord) => {
+    if (ents[coord] !== undefined) {ents[coord].draw()}
+  });
+  visEnts.transport_belt.forEach((coord) => {
+    if (ents[coord] !== undefined) {
+      const belt = ents[coord] as TransportBelt;
+      belt.drawItems();
+    }
+  });
+  // for i, k in pairs(vis_ents['stone_furnace']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['underground_belt']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['underground_belt']) do
+  //   if ENTS[k] then ENTS[k]:draw_items() end
+  // end
+  // for i, k in pairs(vis_ents['splitter']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['mining_drill']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['assembly_machine']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['research_lab']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['chest']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['rocket_silo']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['bio_refinery']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
+  // for i, k in pairs(vis_ents['inserter']) do
+  //   if ENTS[k] then ENTS[k]:draw() end
+  // end
 }
 
 
@@ -189,7 +227,7 @@ function TIC(currentTime: number) {
   }
 
   updateEnts();
-  // draw_ents();
+  drawEnts();
   // if not show_mini_map then
   //   local st_time = time()
   //   TileMan.draw_clutter(player, 32, 21)

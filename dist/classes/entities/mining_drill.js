@@ -1,7 +1,10 @@
-import BaseEntity from "./base_entity.js";
-export default class Drill extends BaseEntity {
+export default class MiningDrill {
     static tickRate = 8;
+    type = "mining_drill";
+    globalPos;
     constructor(globalPos) {
-        super({ ...globalPos });
+        this.globalPos = { ...globalPos };
     }
+    update() { }
+    draw() { }
 }

@@ -1,8 +1,11 @@
-import BaseEntity from "./base_entity.js";
-export default class Crafter extends BaseEntity {
+export default class AssemblyMachine {
     static tickRate = 8;
     static animTickRate = 0;
+    type = "assembly_machine";
+    globalPos;
     constructor(globalPos) {
-        super({ ...globalPos });
+        this.globalPos = { ...globalPos };
     }
+    update() { }
+    draw() { }
 }

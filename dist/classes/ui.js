@@ -1,6 +1,10 @@
 import render from "./render.js";
 import { Label } from "./label.js";
 class Ui {
+    currentHelp;
+    constructor() {
+        this.currentHelp = 0;
+    }
     drawStartMenu() {
         render.drawBg("gray");
         const middleScreen = {
