@@ -108,8 +108,8 @@ class Player {
             }
         }
     }
-    draw() {
-        RENDER.drawSprite("rotatableSprite", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y - ((8 * 5) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
+    draw(scale) {
+        RENDER.drawSprite("rotatableSprite", scale, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y - ((8 * 5) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
 const player = new Player();

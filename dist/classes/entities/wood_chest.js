@@ -7,7 +7,7 @@ export default class WoodChest {
     constructor(globalPos) {
         this.globalPos = { ...globalPos };
     }
-    draw() {
-        RENDER.drawSprite("staticSprite", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, 48, 88, 8, 8);
+    draw(scale) {
+        RENDER.drawSprite("staticSprite", scale, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, 64, 16, 8, 8);
     }
 }

@@ -6,15 +6,13 @@ import player from "./classes/player.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
-import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-const tileScale = 5;
-const tileSize = 8 * tileScale;
-const currentRecipe = { x: 0, y: 0, id: 0 };
+let zoomScale = 5;
+let tileSize = 8 * zoomScale;
 const ents = {};
 const visEnts = {
     transport_belt: [],
@@ -43,188 +41,48 @@ let crafterAnimTick = 0;
 let crafterAnimDir = 1;
 let delta = 0;
 let lastTime = 0;
-let state = "start";
+let state = "game";
 let showTech = false;
 let showHelp = false;
 let showMiniMap = false;
 let showTileWidget = false;
 let altMode = false;
-function screenToWorld(x, y) {
-    return { x: x + render.topLeft.x, y: y + render.topLeft.y };
+const debugChest = new WoodChest({ x: 0, y: 0 });
+const chestMap = new Map();
+cursor.addMouseDownListener(() => {
+    const pos = screenToWorld(cursor.x, cursor.y, true);
+    const key = `${pos.x}-${pos.y}`;
+    if (!chestMap.has(key)) {
+        chestMap.set(key, new WoodChest({ ...pos }));
+    }
+});
+cursor.addMouseWheelListener((scrollAmount) => {
+    if (scrollAmount < 0) {
+        zoomScale += 1;
+    }
+    else {
+        zoomScale -= 1;
+    }
+    zoomScale = Math.min(Math.max(1, zoomScale), 6);
+});
+function screenToWorld(x, y, snapToGrid) {
+    const worldPos = { x: x + render.topLeft.x * zoomScale, y: y + render.topLeft.y * zoomScale };
+    if (snapToGrid) {
+        return {
+            x: Math.floor(worldPos.x / tileSize) * tileSize,
+            y: Math.floor(worldPos.y / tileSize) * tileSize
+        };
+    }
+    return { ...worldPos };
 }
-function getVisibleEnts() {
-    Object.entries(visEnts).forEach((value) => {
-        const index = value[0];
-        visEnts[index] = [];
-    });
-    for (let worldX = render.topLeft.x - tileSize; worldX < render.topLeft.x + render.canvas.width; worldX++) {
-        if (worldX % tileSize !== 0) {
-            continue;
-        }
-        for (let worldY = render.topLeft.y - tileSize; worldY < render.topLeft.y + render.canvas.height; worldY++) {
-            if (worldY % tileSize !== 0) {
-                continue;
-            }
-            const coord = worldX + '-' + worldY;
-            if (ents[coord] !== undefined && visEnts[ents[coord].type] !== undefined) {
-                const type = ents[coord].type;
-                visEnts[type].push(coord);
-            }
-        }
-    }
+function startMenuLoop() {
+    state = ui.drawStartMenu();
 }
-function updateEnts() {
-    Object.entries(ents).forEach((value) => {
-        const ent = value[1];
-        if (ent !== undefined && !(ent instanceof WoodChest)) {
-            ent.update();
-        }
-    });
+function helpMenuLoop() {
+    state = ui.drawHelpMenu();
 }
-function drawEnts() {
-    if (showMiniMap || showHelp || state !== 'game') {
-        return;
-    }
-    visEnts.transport_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.transport_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            const belt = ents[coord];
-            belt.drawItems();
-        }
-    });
-    visEnts.underground_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.underground_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            const uBelt = ents[coord];
-            uBelt.drawItems();
-        }
-    });
-    visEnts.stone_furnace.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.splitter.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.mining_drill.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.assembly_machine.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.research_lab.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.wood_chest.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.rocket_silo.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.bio_refinary.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.inserter.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-}
-function dispatchKeypress() {
-    if (keyboard.m) {
-        showMiniMap = !showMiniMap;
-    }
-    if (keyboard.r) {
-        if (keyboard.shift) {
-            cursor.rotate('l');
-        }
-        else {
-            cursor.rotate('r');
-        }
-    }
-    showTileWidget = keyboard.shift;
-    if (keyboard.alt) {
-        altMode = !altMode;
-    }
-    if (keyboard.t) {
-        showTech = !showTech;
-    }
-}
-function dispatchInput() {
-    cursor.update();
-    dispatchKeypress();
-    if (showTech) {
-        return;
-    }
-    const coord = screenToWorld(cursor.x, cursor.y);
-    const ent = ents[`${coord.x}-${coord.y}`];
-    if (ent !== undefined) {
-        ent.isHovered = true;
-    }
-    if (!cursor.l) {
-        cursor.panelDrag = false;
-        cursor.drag = false;
-    }
-    if (cursor.type === 'item' && cursor.itemStack.id !== 0) {
-    }
-}
-function BOOT() {
-    TIC(1);
-}
-function TIC(currentTime) {
-    delta = (currentTime - lastTime) / 100;
-    lastTime = currentTime;
-    currentRecipe.x = 0;
-    currentRecipe.y = 0;
-    currentRecipe.id = 0;
-    if (state === "start") {
-        cursor.update();
-        state = ui.drawStartMenu();
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    else if (state === "help") {
-        cursor.update();
-        state = ui.drawHelpMenu();
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    if (state === 'firstLaunch') {
-        cursor.update();
-        state = ui.drawEndgameWindow(tick);
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    render.drawBg("black");
-    getVisibleEnts();
+function gameLoop() {
     player.update(delta, tick, { w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d }, cursor.prog);
-    dispatchInput();
     if (tick % UndergroundBelt.tickRate === 0) {
         beltTick += 1;
         if (beltTick > UndergroundBelt.maxTick) {
@@ -264,36 +122,36 @@ function TIC(currentTime) {
             crafterAnimDir = 1;
         }
     }
-    updateEnts();
-    drawEnts();
-    if (!showMiniMap) {
-    }
-    player.draw();
-    let col = 5;
-    if (cursor.r) {
-        col = 2;
-    }
-    if (!showMiniMap) {
-    }
-    let totalEnts = 0;
-    Object.entries(visEnts).forEach((value) => {
-        const arr = value[1];
-        totalEnts += arr.length;
+    chestMap.forEach((chest) => {
+        chest.draw(zoomScale);
     });
-    Object.entries(ents).forEach((value) => {
-        const ent = value[1];
-        if (ent !== undefined) {
-            if (!(ent instanceof WoodChest)) {
-                ent.updated = false;
-            }
-            ent.drawn = false;
-            ent.isHovered = false;
-            if (ent instanceof TransportBelt) {
-                ent.beltDrawn = false;
-                ent.curveChecked = false;
-            }
+    player.draw(zoomScale);
+    debugChest.globalPos = screenToWorld(cursor.x, cursor.y, true);
+    debugChest.draw(zoomScale);
+    render.drawText(`chest quant: ${chestMap.size}`, 50, 50, 30, "white", "top", "left");
+}
+function BOOT() {
+    TIC(1);
+}
+function TIC(currentTime) {
+    delta = (currentTime - lastTime) / 100;
+    lastTime = currentTime;
+    render.drawBg("black");
+    cursor.update();
+    switch (state) {
+        case "start": {
+            startMenuLoop();
+            break;
         }
-    });
+        case "help": {
+            helpMenuLoop();
+            break;
+        }
+        case "game": {
+            gameLoop();
+            break;
+        }
+    }
     tick = tick + 1;
     requestAnimationFrame(TIC);
 }

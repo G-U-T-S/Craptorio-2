@@ -8,6 +8,8 @@ class Cursor {
     m = false;
     r = false;
     panelDrag = false;
+    lm = false;
+    lr = false;
     heldLeft = false;
     heldRight = false;
     holdTime = 0;
@@ -17,6 +19,7 @@ class Cursor {
     rot = 0;
     mouseDownListeners = [];
     mouseUpListeners = [];
+    mouseWheelListeners = [];
     constructor() {
         window.addEventListener("mousemove", (ev) => {
             const rect = render.canvas.getBoundingClientRect();
@@ -51,6 +54,11 @@ class Cursor {
                 func();
             });
         });
+        window.addEventListener("wheel", (ev) => {
+            this.mouseWheelListeners.forEach((func) => {
+                func(ev.deltaY);
+            });
+        });
     }
     update() {
         const l = this.l;
@@ -72,6 +80,9 @@ class Cursor {
             this.heldRight = false;
             this.holdTime = 0;
         }
+        this.ll = this.l;
+        this.lm = this.m;
+        this.lr = this.r;
     }
     rotate(dir) {
         if (cursor.drag) {
@@ -89,6 +100,9 @@ class Cursor {
     }
     addMouseUpListener(func) {
         this.mouseUpListeners.push(func);
+    }
+    addMouseWheelListener(func) {
+        this.mouseWheelListeners.push(func);
     }
 }
 const cursor = new Cursor();
