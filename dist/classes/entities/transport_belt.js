@@ -3,6 +3,11 @@ export default class TransportBelt {
     static maxTick = 3;
     type = "transport_belt";
     globalPos;
+    updated = false;
+    drawn = false;
+    isHovered = false;
+    beltDrawn = false;
+    curveChecked = false;
     constructor(globalPos) {
         this.globalPos = { ...globalPos };
     }

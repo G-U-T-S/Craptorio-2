@@ -1,38 +1,27 @@
+import render from "./render.js";
 class Cursor {
-    x;
-    y;
-    l;
-    ll;
-    m;
-    r;
-    heldLeft;
-    heldRight;
-    holdTime;
-    prog;
-    canvasId;
-    mouseDownListeners;
-    mouseUpListeners;
-    constructor(canvasId = "mainCanvas") {
-        this.x = 0;
-        this.y = 0;
-        this.l = false;
-        this.ll = false;
-        this.m = false;
-        this.r = false;
-        this.heldLeft = false;
-        this.heldRight = false;
-        this.holdTime = 0;
-        this.prog = false;
-        this.canvasId = canvasId;
-        this.mouseDownListeners = [];
-        this.mouseUpListeners = [];
+    x = 0;
+    y = 0;
+    l = false;
+    ll = false;
+    itemStack = { id: 0, count: 0 };
+    m = false;
+    r = false;
+    panelDrag = false;
+    heldLeft = false;
+    heldRight = false;
+    holdTime = 0;
+    type = "pointer";
+    prog = false;
+    drag = false;
+    rot = 0;
+    mouseDownListeners = [];
+    mouseUpListeners = [];
+    constructor() {
         window.addEventListener("mousemove", (ev) => {
-            const canvas = ev.target;
-            if (canvas instanceof HTMLCanvasElement && canvas.id === this.canvasId) {
-                const rect = canvas.getBoundingClientRect();
-                this.x = ev.clientX - rect.left;
-                this.y = ev.clientY - rect.top;
-            }
+            const rect = render.canvas.getBoundingClientRect();
+            this.x = ev.clientX - rect.left;
+            this.y = ev.clientY - rect.top;
         });
         window.addEventListener("mousedown", (ev) => {
             if (ev.button === 0) {
@@ -82,6 +71,17 @@ class Cursor {
         if (!r && this.heldRight) {
             this.heldRight = false;
             this.holdTime = 0;
+        }
+    }
+    rotate(dir) {
+        if (cursor.drag) {
+            this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
+            if (this.rot > 3) {
+                this.rot = 0;
+            }
+            if (this.rot < 0) {
+                this.rot = 3;
+            }
         }
     }
     addMouseDownListener(func) {

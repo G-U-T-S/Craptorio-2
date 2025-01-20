@@ -2,6 +2,8 @@ import RENDER from "../render.js";
 export default class WoodChest {
     type = "assembly_machine";
     globalPos;
+    drawn = false;
+    isHovered = false;
     constructor(globalPos) {
         this.globalPos = { ...globalPos };
     }

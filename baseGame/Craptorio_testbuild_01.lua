@@ -10914,7 +10914,7 @@ function dispatch_keypress()
   --F
   --if key(6) then add_item(cursor.x, cursor.y, 1) end
   --G
-  --if key(7) then add_item(cursor.x, cursor.y, 2) end
+  --if key(7) then rota(cursor.x, cursor.y, 2) end
   --M
   if keyp(13) then show_mini_map = not show_mini_map end
   --R

@@ -6,6 +6,7 @@ import player from "./classes/player.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
+import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
@@ -24,7 +25,7 @@ const visEnts = {
     underground_belt: [],
     assembly_machine: [],
     research_lab: [],
-    chest: [],
+    wood_chest: [],
     bio_refinary: [],
     rocket_silo: []
 };
@@ -46,6 +47,11 @@ let state = "start";
 let showTech = false;
 let showHelp = false;
 let showMiniMap = false;
+let showTileWidget = false;
+let altMode = false;
+function screenToWorld(x, y) {
+    return { x: x + render.topLeft.x, y: y + render.topLeft.y };
+}
 function getVisibleEnts() {
     Object.entries(visEnts).forEach((value) => {
         const index = value[0];
@@ -70,7 +76,7 @@ function getVisibleEnts() {
 function updateEnts() {
     Object.entries(ents).forEach((value) => {
         const ent = value[1];
-        if (!(ent instanceof WoodChest)) {
+        if (ent !== undefined && !(ent instanceof WoodChest)) {
             ent.update();
         }
     });
@@ -90,6 +96,100 @@ function drawEnts() {
             belt.drawItems();
         }
     });
+    visEnts.underground_belt.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.underground_belt.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            const uBelt = ents[coord];
+            uBelt.drawItems();
+        }
+    });
+    visEnts.stone_furnace.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.splitter.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.mining_drill.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.assembly_machine.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.research_lab.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.wood_chest.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.rocket_silo.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.bio_refinary.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+    visEnts.inserter.forEach((coord) => {
+        if (ents[coord] !== undefined) {
+            ents[coord].draw();
+        }
+    });
+}
+function dispatchKeypress() {
+    if (keyboard.m) {
+        showMiniMap = !showMiniMap;
+    }
+    if (keyboard.r) {
+        if (keyboard.shift) {
+            cursor.rotate('l');
+        }
+        else {
+            cursor.rotate('r');
+        }
+    }
+    showTileWidget = keyboard.shift;
+    if (keyboard.alt) {
+        altMode = !altMode;
+    }
+    if (keyboard.t) {
+        showTech = !showTech;
+    }
+}
+function dispatchInput() {
+    cursor.update();
+    dispatchKeypress();
+    if (showTech) {
+        return;
+    }
+    const coord = screenToWorld(cursor.x, cursor.y);
+    const ent = ents[`${coord.x}-${coord.y}`];
+    if (ent !== undefined) {
+        ent.isHovered = true;
+    }
+    if (!cursor.l) {
+        cursor.panelDrag = false;
+        cursor.drag = false;
+    }
+    if (cursor.type === 'item' && cursor.itemStack.id !== 0) {
+    }
 }
 function BOOT() {
     TIC(1);
@@ -124,6 +224,7 @@ function TIC(currentTime) {
     render.drawBg("black");
     getVisibleEnts();
     player.update(delta, tick, { w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d }, cursor.prog);
+    dispatchInput();
     if (tick % UndergroundBelt.tickRate === 0) {
         beltTick += 1;
         if (beltTick > UndergroundBelt.maxTick) {
@@ -165,7 +266,34 @@ function TIC(currentTime) {
     }
     updateEnts();
     drawEnts();
+    if (!showMiniMap) {
+    }
     player.draw();
+    let col = 5;
+    if (cursor.r) {
+        col = 2;
+    }
+    if (!showMiniMap) {
+    }
+    let totalEnts = 0;
+    Object.entries(visEnts).forEach((value) => {
+        const arr = value[1];
+        totalEnts += arr.length;
+    });
+    Object.entries(ents).forEach((value) => {
+        const ent = value[1];
+        if (ent !== undefined) {
+            if (!(ent instanceof WoodChest)) {
+                ent.updated = false;
+            }
+            ent.drawn = false;
+            ent.isHovered = false;
+            if (ent instanceof TransportBelt) {
+                ent.beltDrawn = false;
+                ent.curveChecked = false;
+            }
+        }
+    });
     tick = tick + 1;
     requestAnimationFrame(TIC);
 }

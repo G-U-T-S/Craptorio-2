@@ -1,3 +1,6 @@
+import render from "./render.js";
+
+
 // export class CURSOR {
 //   x: 0, y: 0, lx: 8, ly: 8,
 //   tx: 8, ty: 8, wx: 0, wy: 0,
@@ -10,33 +13,20 @@
 //   handItem: {id: 0, count: 0}, dragOffset: {x: 0, y: 0}, itemStack: {id: 9, count: 100}
 // };
 class Cursor {
-  public x: number; public y: number;
-  public l: boolean; public ll: boolean;
-  public m: boolean; public r: boolean
-  public heldLeft: boolean; public heldRight: boolean;
-  public holdTime: number;
-  public prog: boolean; public canvasId: string;
-  public mouseDownListeners: Array<CallableFunction>;
-  public mouseUpListeners: Array<CallableFunction>;
+  public x = 0; public y = 0;
+  public l = false; public ll = false; public itemStack = {id: 0, count: 0};
+  public m = false; public r = false; public panelDrag = false;
+  public heldLeft = false; public heldRight = false;
+  public holdTime = 0; public type: "pointer" | "item" = "pointer";
+  public prog = false; public drag = false; public rot = 0;
+  public mouseDownListeners: Array<CallableFunction> = [];
+  public mouseUpListeners: Array<CallableFunction> = [];
 
-  constructor(canvasId = "mainCanvas") {
-    this.x = 0; this.y = 0;
-    this.l = false; this.ll = false;
-    this.m = false; this.r = false;
-    this.heldLeft = false; this.heldRight = false;
-    this.holdTime = 0;
-    this.prog = false; this.canvasId = canvasId;
-    this.mouseDownListeners = [];
-    this.mouseUpListeners = [];
-
+  constructor() {
     window.addEventListener("mousemove", (ev) => {
-      const canvas = ev.target;
-
-      if (canvas instanceof HTMLCanvasElement && canvas.id === this.canvasId) {
-        const rect = canvas.getBoundingClientRect();
-        this.x = ev.clientX - rect.left;
-        this.y = ev.clientY - rect.top;
-      }
+      const rect = render.canvas.getBoundingClientRect();
+      this.x = ev.clientX - rect.left;
+      this.y = ev.clientY - rect.top;
     });
     window.addEventListener("mousedown", (ev) => {
       if (ev.button === 0) {
@@ -113,6 +103,38 @@ class Cursor {
     // if (this.tx !== this.ltx || this.ty !== this.lty) {
     //   this.holdTime = 0;
     // }
+  }
+
+  rotate(dir: string): void {
+    if (cursor.drag) {
+      this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
+      if (this.rot > 3) { this.rot = 0; }
+      if (this.rot < 0) { this.rot = 3; }
+    
+    //   local k = get_key(cursor.x, cursor.y)
+    //   local tile, cell_x, cell_y = get_world_cell(cursor.x, cursor.y)
+    //   if ENTS[k] then
+    //     if ENTS[k].type == 'transport_belt' and cursor.type == 'pointer' then
+    //       sound('rotate_' .. dir)
+    //       ENTS[k]:rotate(ENTS[k].rot + 1)
+    //       local tiles = {
+    //         [1] = {x = cell_x, y = cell_y - 1},
+    //         [2] = {x = cell_x + 1, y = cell_y},
+    //         [3] = {x = cell_x, y = cell_y + 1},
+    //         [4] = {x = cell_x - 1, y = cell_y}}
+    //       for i = 1, 4 do
+    //         local k = get_world_key(tiles[i].x, tiles[i].y)
+    //         if ENTS[k] and ENTS[k].type == 'transport_belt' then ENTS[k]:set_curved() end
+    //       end
+    //     end
+    //     if ENTS[k].type == 'inserter' and cursor.type == 'pointer' then
+    //       sound('rotate_' .. dir)
+    //       ENTS[k]:rotate(ENTS[k].rot + 1)
+    //     end
+    //   end
+    }
+
+    // if cursor.type == 'item' then sound('rotate_' + dir) end
   }
 
   addMouseDownListener(func: CallableFunction): void {

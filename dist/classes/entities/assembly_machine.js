@@ -3,6 +3,9 @@ export default class AssemblyMachine {
     static animTickRate = 0;
     type = "assembly_machine";
     globalPos;
+    updated = false;
+    drawn = false;
+    isHovered = false;
     constructor(globalPos) {
         this.globalPos = { ...globalPos };
     }

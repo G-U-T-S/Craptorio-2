@@ -1,11 +1,15 @@
 class Keyboard {
-  public w: boolean; public a: boolean
-  public s: boolean; public d: boolean;
+  public w = false; public a = false
+  public s = false; public d = false;
+  public m = false; public r = false;
+  public q = false; public i = false;
+  public h = false; public c = false;
+  public t = false;
+  public y = false; public shift = false;
+  public alt = false; public ctrl = false;
+  public tab = false;
 
   constructor() {
-    this.w = false; this.a = false;
-    this.s = false; this.d = false;
-
     window.addEventListener("keydown", (ev) => {
       switch (ev.key) {
         case "w": {
@@ -21,7 +25,55 @@ class Keyboard {
           break;
         }
         case "d": {
-          this.d = true
+          this.d = true;
+          break;
+        }
+        case "m": {
+          this.m = true;
+          break;
+        }
+        case "r": {
+          this.r = true;
+          break;
+        }
+        case "q": {
+          this.q = true;
+          break;
+        }
+        case "i": {
+          this.i = true;
+          break;
+        }
+        case "h": {
+          this.h = true;
+          break;
+        }
+        case "c": {
+          this.c = true;
+          break;
+        }
+        case "t": {
+          this.t = true;
+          break;
+        }
+        case "y": {
+          this.y = true;
+          break;
+        }
+        case "Shift": {
+          this.shift = true;
+          break;
+        }
+        case "Alt": {
+          this.alt = true;
+          break;
+        }
+        case "Control": {
+          this.ctrl = true;
+          break;
+        }
+        case "Tab": {
+          this.tab = true;
           break;
         }
       }
@@ -41,44 +93,62 @@ class Keyboard {
           break;
         }
         case "d": {
-          this.d = false
+          this.d = false;
+          break;
+        }
+        case "m": {
+          this.m = false;
+          break;
+        }
+        case "r": {
+          this.r = false;
+          break;
+        }
+        case "q": {
+          this.q = false;
+          break;
+        }
+        case "i": {
+          this.i = false;
+          break;
+        }
+        case "h": {
+          this.h = false;
+          break;
+        }
+        case "c": {
+          this.c = false;
+          break;
+        }
+        case "t": {
+          this.t = false;
+          break;
+        }
+        case "y": {
+          this.y = false;
+          break;
+        }
+        case "Shift": {
+          this.shift = false;
+          break;
+        }
+        case "Alt": {
+          this.alt = false;
+          break;
+        }
+        case "Control": {
+          this.ctrl = false;
+          break;
+        }
+        case "Tab": {
+          this.tab = false;
           break;
         }
       }
     });
   }
 }
-// const KEYBOARD: { [index: string]: boolean } = {
-//   "shift": false, // 16
-//   "alt": false,
-//   "ctrl": false,
-//   "tab": false,
-//   "w": false, // 87
-//   "a": false, // 65
-//   "s": false, // 83
-//   "d": false, // 68
-//   "f": false,
-//   "g": false,
-//   "m": false,
-//   "r": false,
-//   "q": false,
-//   "i": false,
-//   "h": false,
-//   "c": false,
-//   "y": false,
-//   "e": false,
-//   "t": false,
-//   "0": false,
-//   "1": false,
-//   "2": false,
-//   "3": false,
-//   "4": false,
-//   "5": false,
-//   "6": false,
-//   "7": false,
-//   "8": false,
-//   "9": false,
-// };
+
 
 const keyboard = new Keyboard();
 export default keyboard;
