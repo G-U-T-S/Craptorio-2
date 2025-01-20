@@ -19,7 +19,7 @@ export default class StoneFurnace {
 
   public draw(): void {
     RENDER.drawSprite(
-      "staticSprite", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
+      "staticSprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
       64, 64, 16, 16
     );
   }

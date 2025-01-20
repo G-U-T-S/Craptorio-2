@@ -1,3 +1,6 @@
+import render from "../render.js";
+
+
 export default class AssemblyMachine {
   static readonly tickRate = 8;
   static readonly animTickRate = 0;
@@ -12,5 +15,12 @@ export default class AssemblyMachine {
   }
 
   update(): void {}
-  draw(): void {}
+  draw(): void {
+    render.drawSprite(
+      "staticSprite", 4,
+      (this.globalPos.x - render.topLeft.x),
+      (this.globalPos.y - render.topLeft.y),
+      48, 64, 24, 24
+    );
+  }
 }

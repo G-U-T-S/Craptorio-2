@@ -2,16 +2,10 @@ import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    l = false;
-    ll = false;
     itemStack = { id: 0, count: 0 };
+    l = false;
     m = false;
     r = false;
-    panelDrag = false;
-    lm = false;
-    lr = false;
-    heldLeft = false;
-    heldRight = false;
     holdTime = 0;
     type = "pointer";
     prog = false;
@@ -63,26 +57,6 @@ class Cursor {
     update() {
         const l = this.l;
         const r = this.r;
-        if (l && this.l && !this.heldLeft && !this.r) {
-            this.heldLeft = true;
-        }
-        if (r && this.r && !this.heldRight && !this.l) {
-            this.heldRight = true;
-        }
-        if (this.heldLeft || this.heldRight) {
-            this.holdTime = this.holdTime + 1;
-        }
-        if (!l && this.heldLeft) {
-            this.heldLeft = false;
-            this.holdTime = 0;
-        }
-        if (!r && this.heldRight) {
-            this.heldRight = false;
-            this.holdTime = 0;
-        }
-        this.ll = this.l;
-        this.lm = this.m;
-        this.lr = this.r;
     }
     rotate(dir) {
         if (cursor.drag) {

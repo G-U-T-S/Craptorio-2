@@ -7,25 +7,13 @@ import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
-import WoodChest from "./classes/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-let zoomScale = 5;
-let tileSize = 8 * zoomScale;
-const ents = {};
-const visEnts = {
-    transport_belt: [],
-    inserter: [],
-    splitter: [],
-    mining_drill: [],
-    stone_furnace: [],
-    underground_belt: [],
-    assembly_machine: [],
-    research_lab: [],
-    wood_chest: [],
-    bio_refinary: [],
-    rocket_silo: []
+let tileSize = 8 * 4;
+const ents = {
+    assembly_machine: new Map(),
+    wood_chest: new Map(),
 };
 let tick = 0;
 let beltTick = 0;
@@ -47,26 +35,12 @@ let showHelp = false;
 let showMiniMap = false;
 let showTileWidget = false;
 let altMode = false;
-const debugChest = new WoodChest({ x: 0, y: 0 });
-const chestMap = new Map();
 cursor.addMouseDownListener(() => {
     const pos = screenToWorld(cursor.x, cursor.y, true);
-    const key = `${pos.x}-${pos.y}`;
-    if (!chestMap.has(key)) {
-        chestMap.set(key, new WoodChest({ ...pos }));
-    }
-});
-cursor.addMouseWheelListener((scrollAmount) => {
-    if (scrollAmount < 0) {
-        zoomScale += 1;
-    }
-    else {
-        zoomScale -= 1;
-    }
-    zoomScale = Math.min(Math.max(1, zoomScale), 6);
+    placeEnt("assembly_machine", pos.x, pos.y);
 });
 function screenToWorld(x, y, snapToGrid) {
-    const worldPos = { x: x + render.topLeft.x * zoomScale, y: y + render.topLeft.y * zoomScale };
+    const worldPos = { x: x + render.topLeft.x, y: y + render.topLeft.y };
     if (snapToGrid) {
         return {
             x: Math.floor(worldPos.x / tileSize) * tileSize,
@@ -75,6 +49,40 @@ function screenToWorld(x, y, snapToGrid) {
     }
     return { ...worldPos };
 }
+function canPlace(type, posX, posY, sizeInTiles) {
+    for (let x = 0; x < sizeInTiles.x; x++) {
+        for (let y = 0; y < sizeInTiles.y; y++) {
+            const key = `${posX + (x * tileSize)}-${posY + (y * tileSize)}`;
+            switch (type) {
+                case "wood_chest": {
+                    if (ents.wood_chest.has(key)) {
+                        return false;
+                    }
+                    break;
+                }
+                case "assembly_machine": {
+                    if (ents.assembly_machine.has(key)) {
+                        return false;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    return true;
+}
+function placeEnt(type, globalX, globalY) {
+    switch (type) {
+        case "wood_chest": {
+            break;
+        }
+        case "assembly_machine": {
+            break;
+        }
+    }
+    return false;
+}
+function removeEnt() { }
 function startMenuLoop() {
     state = ui.drawStartMenu();
 }
@@ -122,13 +130,11 @@ function gameLoop() {
             crafterAnimDir = 1;
         }
     }
-    chestMap.forEach((chest) => {
-        chest.draw(zoomScale);
+    ents.assembly_machine.forEach((machine) => {
+        machine.draw();
     });
-    player.draw(zoomScale);
-    debugChest.globalPos = screenToWorld(cursor.x, cursor.y, true);
-    debugChest.draw(zoomScale);
-    render.drawText(`chest quant: ${chestMap.size}`, 50, 50, 30, "white", "top", "left");
+    player.draw();
+    render.drawText(`machine quant: ${ents.assembly_machine.size}`, 50, 50, 30, "white", "top", "left");
 }
 function BOOT() {
     TIC(1);

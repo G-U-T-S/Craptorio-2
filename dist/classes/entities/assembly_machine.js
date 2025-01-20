@@ -1,3 +1,4 @@
+import render from "../render.js";
 export default class AssemblyMachine {
     static tickRate = 8;
     static animTickRate = 0;
@@ -10,5 +11,7 @@ export default class AssemblyMachine {
         this.globalPos = { ...globalPos };
     }
     update() { }
-    draw() { }
+    draw() {
+        render.drawSprite("staticSprite", 4, (this.globalPos.x - render.topLeft.x), (this.globalPos.y - render.topLeft.y), 48, 64, 24, 24);
+    }
 }

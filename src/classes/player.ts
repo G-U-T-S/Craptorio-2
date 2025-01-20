@@ -137,9 +137,9 @@ class Player {
   //   this.y = this.y + y;
   // }
 
-  public draw(scale: number) {
+  public draw() {
     RENDER.drawSprite(
-      "rotatableSprite", scale, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y  - ((8 * 5) / 2) + this.animFrame,
+      "rotatableSprite", 4, RENDER.centerCanvas.x - ((8 * 4) / 2), RENDER.centerCanvas.y  - ((8 * 4) / 2) + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }

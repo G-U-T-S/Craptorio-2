@@ -14,10 +14,9 @@ import render from "./render.js";
 // };
 class Cursor {
   public x = 0; public y = 0;
-  public l = false; public ll = false; public itemStack = {id: 0, count: 0};
-  public m = false; public r = false; public panelDrag = false;
-  public lm = false; public lr = false;
-  public heldLeft = false; public heldRight = false;
+  public itemStack = {id: 0, count: 0};
+  public l = false; public m = false; public r = false;
+  // public heldLeft = false; public heldRight = false;
   public holdTime = 0; public type: "pointer" | "item" = "pointer";
   public prog = false; public drag = false; public rot = 0;
   public mouseDownListeners: Array<CallableFunction> = [];
@@ -77,35 +76,35 @@ class Cursor {
     // // const { tx, ty } = world_to_screen(wx, wy);
   
     // --update hold state for left and right click
-    if (l && this.l && !this.heldLeft && !this.r) {
-      this.heldLeft = true
-    }
+    // if (l && this.l && !this.heldLeft && !this.r) {
+    //   this.heldLeft = true
+    // }
   
-    if (r && this.r && !this.heldRight && !this.l) {
-      this.heldRight = true;
-    }
+    // if (r && this.r && !this.heldRight && !this.l) {
+    //   this.heldRight = true;
+    // }
   
-    if (this.heldLeft || this.heldRight) {
-      this.holdTime = this.holdTime + 1;
-    }
+    // if (this.heldLeft || this.heldRight) {
+    //   this.holdTime = this.holdTime + 1;
+    // }
   
-    if (!l && this.heldLeft) {
-      this.heldLeft = false;
-      this.holdTime = 0;
-    }
+    // if (!l && this.heldLeft) {
+    //   this.heldLeft = false;
+    //   this.holdTime = 0;
+    // }
   
-    if (!r && this.heldRight) {
-      this.heldRight = false;
-      this.holdTime = 0;
-    }
+    // if (!r && this.heldRight) {
+    //   this.heldRight = false;
+    //   this.holdTime = 0;
+    // }
   
     // this.ltx = this.tx; this.lty = this.ty;
     // // this.wx = wx; this.wy = wy;
     // // this.tx = tx; this.ty = ty;
     // this.sx = sx; this.sy = sy;
     // this.lx = this.x; this.ly = this.y;
-    this.ll = this.l; this.lm = this.m;
-    this.lr = this.r;// this.lsx = this.sx;
+    // this.ll = this.l; this.lm = this.m;
+    // this.lr = this.r;// this.lsx = this.sx;
     // this.lsy = this.sy; this.sx = sx;
     // this.sy = sy;
     

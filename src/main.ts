@@ -16,22 +16,12 @@ window.addEventListener("contextmenu", (ev) => {
 });
 
 
-let zoomScale = 5;
-let tileSize = 8 * zoomScale;
-const ents: { [index: string]: undefined | AssemblyMachine | MiningDrill | StoneFurnace | TransportBelt | UndergroundBelt | WoodChest} = {};
-const visEnts: { [index: string]: Array<string>} = {
-  transport_belt: [],
-  inserter: [],
-  splitter: [],
-  mining_drill: [],
-  stone_furnace: [],
-  underground_belt: [],
-  assembly_machine: [],
-  research_lab: [],
-  wood_chest: [],
-  bio_refinary: [],
-  rocket_silo: []
+let tileSize = 8 * 4;
+const ents = {
+  assembly_machine: new Map<string, AssemblyMachine>(),
+  wood_chest: new Map<String, WoodChest>(),
 };
+
 
 let tick: number = 0;
 
@@ -62,30 +52,18 @@ let showMiniMap: boolean = false;
 let showTileWidget: boolean = false;
 let altMode: boolean = false;
 
-const debugChest = new WoodChest({x: 0, y: 0});
-const chestMap: Map<string, WoodChest> = new Map();
 cursor.addMouseDownListener(() => {
   const pos = screenToWorld(cursor.x, cursor.y, true);
   const key = `${pos.x}-${pos.y}`;
   
-  if (!chestMap.has(key)) {
-    chestMap.set(key, new WoodChest({ ...pos }));
+  if(!ents.assembly_machine.has(key)) {
+    ents.assembly_machine.set(key, new AssemblyMachine({ ...pos }));
   }
-});
-cursor.addMouseWheelListener((scrollAmount: number) => {
-  if (scrollAmount < 0) {
-    zoomScale += 1;
-  }
-  else {
-    zoomScale -= 1;
-  }
-
-  zoomScale = Math.min(Math.max(1, zoomScale), 6);
 });
 
 
 function screenToWorld(x: number, y: number, snapToGrid: boolean): {x: number, y: number} {
-  const worldPos = {x: x + render.topLeft.x * zoomScale, y: y + render.topLeft.y * zoomScale};
+  const worldPos = {x: x + render.topLeft.x, y: y + render.topLeft.y};
   
   if (snapToGrid) {
     return {
@@ -96,7 +74,6 @@ function screenToWorld(x: number, y: number, snapToGrid: boolean): {x: number, y
   
   return { ...worldPos };
 }
-
 
 function startMenuLoop(): void {
   state = ui.drawStartMenu() as stateType;
@@ -157,16 +134,13 @@ function gameLoop(): void {
 
   // updateEnts();
   // drawEnts();
-  chestMap.forEach((chest) => {
-    chest.draw(zoomScale);
+  ents.assembly_machine.forEach((machine) => {
+    machine.draw();
   });
-  player.draw(zoomScale);
-
-  debugChest.globalPos = screenToWorld(cursor.x, cursor.y, true);
-  debugChest.draw(zoomScale);
+  player.draw();
 
   render.drawText(
-    `chest quant: ${chestMap.size}`, 50, 50, 30, "white", "top", "left"
+    `machine quant: ${ents.assembly_machine.size}`, 50, 50, 30, "white", "top", "left"
   );
 }
 
