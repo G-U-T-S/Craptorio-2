@@ -41,7 +41,7 @@ class Cursor {
       }
 
       this.mouseDownListeners.forEach((func) => {
-        func();
+        func(ev);
       });
     });
     window.addEventListener("mouseup", (ev) => {
@@ -56,7 +56,7 @@ class Cursor {
       }
 
       this.mouseUpListeners.forEach((func) => {
-        func();
+        func(ev);
       });
     });
     window.addEventListener("wheel", (ev) => {
@@ -75,7 +75,6 @@ class Cursor {
     // // const { wx, wy } = get_world_cell(this.x, this.y);
     // // const { tx, ty } = world_to_screen(wx, wy);
   
-    // --update hold state for left and right click
     // if (l && this.l && !this.heldLeft && !this.r) {
     //   this.heldLeft = true
     // }

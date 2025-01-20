@@ -31,7 +31,7 @@ class Cursor {
                 this.r = true;
             }
             this.mouseDownListeners.forEach((func) => {
-                func();
+                func(ev);
             });
         });
         window.addEventListener("mouseup", (ev) => {
@@ -45,7 +45,7 @@ class Cursor {
                 this.r = false;
             }
             this.mouseUpListeners.forEach((func) => {
-                func();
+                func(ev);
             });
         });
         window.addEventListener("wheel", (ev) => {

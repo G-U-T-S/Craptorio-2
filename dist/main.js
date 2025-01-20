@@ -7,6 +7,7 @@ import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
+import WoodChest from "./classes/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -15,6 +16,7 @@ const ents = {
     assembly_machine: new Map(),
     wood_chest: new Map(),
 };
+const gridData = new Map();
 let tick = 0;
 let beltTick = 0;
 let uBeltTick = 0;
@@ -37,7 +39,17 @@ let showTileWidget = false;
 let altMode = false;
 cursor.addMouseDownListener(() => {
     const pos = screenToWorld(cursor.x, cursor.y, true);
-    placeEnt("assembly_machine", pos.x, pos.y);
+    if (cursor.l) {
+        if (Math.round(Math.random()) > 0) {
+            placeEnt("assembly_machine", pos);
+        }
+        else {
+            placeEnt("wood_chest", pos);
+        }
+    }
+    else if (cursor.r) {
+        removeEnt(pos);
+    }
 });
 function screenToWorld(x, y, snapToGrid) {
     const worldPos = { x: x + render.topLeft.x, y: y + render.topLeft.y };
@@ -49,40 +61,66 @@ function screenToWorld(x, y, snapToGrid) {
     }
     return { ...worldPos };
 }
-function canPlace(type, posX, posY, sizeInTiles) {
-    for (let x = 0; x < sizeInTiles.x; x++) {
-        for (let y = 0; y < sizeInTiles.y; y++) {
-            const key = `${posX + (x * tileSize)}-${posY + (y * tileSize)}`;
-            switch (type) {
-                case "wood_chest": {
-                    if (ents.wood_chest.has(key)) {
-                        return false;
-                    }
-                    break;
-                }
-                case "assembly_machine": {
-                    if (ents.assembly_machine.has(key)) {
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-    return true;
-}
-function placeEnt(type, globalX, globalY) {
+function placeEnt(type, globalPos) {
     switch (type) {
         case "wood_chest": {
+            const key = `${globalPos.x}-${globalPos.y}`;
+            if (!gridData.has(key)) {
+                gridData.set(key, ["wood_chest", key]);
+                ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
+                return true;
+            }
             break;
         }
         case "assembly_machine": {
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+                    if (gridData.has(key)) {
+                        return false;
+                    }
+                }
+            }
+            ents.assembly_machine.set(`${globalPos.x}-${globalPos.y}`, new AssemblyMachine({ ...globalPos }));
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+                    gridData.set(key, ["assembly_machine", `${globalPos.x}-${globalPos.y}`]);
+                }
+            }
+            return true;
             break;
         }
     }
     return false;
 }
-function removeEnt() { }
+function removeEnt(globalPos) {
+    const mouseKey = `${globalPos.x}-${globalPos.y}`;
+    if (gridData.has(mouseKey)) {
+        const mouseTile = gridData.get(mouseKey);
+        switch (mouseTile[0]) {
+            case "wood_chest": {
+                ents.wood_chest.delete(mouseKey);
+                gridData.delete(mouseKey);
+                break;
+            }
+            case "assembly_machine": {
+                console.log(mouseTile);
+                const machine = ents.assembly_machine.get(mouseTile[1]);
+                ents.assembly_machine.delete(mouseTile[1]);
+                for (let x = 0; x < 3; x++) {
+                    for (let y = 0; y < 3; y++) {
+                        const key = `${machine.globalPos.x + (x * tileSize)}-${machine.globalPos.y + (y * tileSize)}`;
+                        gridData.delete(key);
+                    }
+                }
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
 function startMenuLoop() {
     state = ui.drawStartMenu();
 }
@@ -130,6 +168,9 @@ function gameLoop() {
             crafterAnimDir = 1;
         }
     }
+    ents.wood_chest.forEach((chest) => {
+        chest.draw();
+    });
     ents.assembly_machine.forEach((machine) => {
         machine.draw();
     });
