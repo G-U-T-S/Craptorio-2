@@ -1,4 +1,4 @@
-export class Label {
+export default class Label {
   public text: string;
   public fg: string; public bg: string;
   public shadow: {x: number, y: number};

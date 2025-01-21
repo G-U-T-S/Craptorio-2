@@ -2,7 +2,7 @@ import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    itemStack = { id: 0, count: 0 };
+    itemStack = { id: -1, count: -1, slot: -1 };
     l = false;
     m = false;
     r = false;
@@ -11,9 +11,6 @@ class Cursor {
     prog = false;
     drag = false;
     rot = 0;
-    mouseDownListeners = [];
-    mouseUpListeners = [];
-    mouseWheelListeners = [];
     constructor() {
         window.addEventListener("mousemove", (ev) => {
             const rect = render.canvas.getBoundingClientRect();
@@ -30,9 +27,6 @@ class Cursor {
             if (ev.button === 2) {
                 this.r = true;
             }
-            this.mouseDownListeners.forEach((func) => {
-                func(ev);
-            });
         });
         window.addEventListener("mouseup", (ev) => {
             if (ev.button === 0) {
@@ -44,14 +38,6 @@ class Cursor {
             if (ev.button === 2) {
                 this.r = false;
             }
-            this.mouseUpListeners.forEach((func) => {
-                func(ev);
-            });
-        });
-        window.addEventListener("wheel", (ev) => {
-            this.mouseWheelListeners.forEach((func) => {
-                func(ev.deltaY);
-            });
         });
     }
     update() {
@@ -68,15 +54,6 @@ class Cursor {
                 this.rot = 3;
             }
         }
-    }
-    addMouseDownListener(func) {
-        this.mouseDownListeners.push(func);
-    }
-    addMouseUpListener(func) {
-        this.mouseUpListeners.push(func);
-    }
-    addMouseWheelListener(func) {
-        this.mouseWheelListeners.push(func);
     }
 }
 const cursor = new Cursor();

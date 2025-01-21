@@ -1,5 +1,5 @@
 import CURSOR from "./cursor.js";
-import { Label } from "./label.js";
+import Label from "./label.js";
 
 
 class Render {
@@ -58,11 +58,11 @@ class Render {
     this.context.fillRect(x, y, w, h);
   }
   
-  drawLine(x1: number, y1: number, x2: number, y2: number, strokeColor: string): void {
-    this.context.strokeStyle = strokeColor;
-    this.context.moveTo(x1, y1);
-    this.context.lineTo(x2, y2);
-  }
+  // drawLine(x1: number, y1: number, x2: number, y2: number, strokeColor: string): void {
+  //   this.context.strokeStyle = strokeColor;
+  //   this.context.moveTo(x1, y1);
+  //   this.context.lineTo(x2, y2);
+  // }
   
   drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label: Label): void {
     this.drawRect(x, y, w, h, bg, bg); //-- background fill
@@ -83,6 +83,46 @@ class Render {
     //   drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color); //-- shadow
     //   drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
     // }
+  }
+
+  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, size: number, border: boolean, rounded: boolean): void {
+    // if border then rectb(x,y,cols*size+1,rows*size+1,fg) end
+    // this.drawRect(x, y, cols * size, rows * size, bg, bg);
+    
+    for (let X = 0; X < cols + 1; X++) {
+      this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
+    }
+
+    for (let Y = 0; Y < rows + 1; Y++) {
+      this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
+    }
+    
+    // Dont work
+    // if (rounded) {
+    //   for (let i = 0; i < rows; i ++) {
+    //     for (let j = 0; j < cols; j++) {
+    //       const xx = x + ( j * size);
+    //       const yy = y +( i * size);
+
+    //       this.drawRect(xx, yy, 1, 1, fg, fg);
+    //       this.drawRect(xx + size - 2, yy, 1, 1, fg, fg);
+    //       this.drawRect(xx + size - 2, yy + size - 2, 1, 1, fg, fg);
+    //       this.drawRect(xx, yy + size - 2, 1, 1, fg, fg);
+    //     }
+    //   }
+    // }
+  }
+
+  drawItemStack(x: number, y: number, quant: number, showQuant: boolean): void {
+    // show_cnt = show_tile_widget or show_cnt or show_count
+    
+    // sspr(ITEMS[stack.id].sprite_id, x, y, ITEMS[stack.id].color_key)
+    
+    if (showQuant) {
+      // local count = stack.count < 100 and stack.count or floor(stack.count/100) .. 'H'
+      // local sx, sy = x + 9 - text_width(count), y + 4
+      // prints(count, sx, sy)
+    }
   }
 
   drawText(text: string, x: number, y: number, fontSize: number, color: string, baseLine: "top" | "bottom" | "middle", textAling: "left" | "center" | "right"): void {

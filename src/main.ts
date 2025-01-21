@@ -3,6 +3,7 @@ import ui from "./classes/ui.js";
 import keyboard from "./classes/keyboard.js";
 import cursor from "./classes/cursor.js";
 import player from "./classes/player.js";
+import inv from "./classes/inventory.js"
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
@@ -56,7 +57,7 @@ let showMiniMap: boolean = false;
 let showTileWidget: boolean = false;
 let altMode: boolean = false;
 
-cursor.addMouseDownListener(() => {
+window.addEventListener("mousedown", () => {
   const pos = screenToWorld(cursor.x, cursor.y, true);
   
   if (cursor.l) {
@@ -69,6 +70,12 @@ cursor.addMouseDownListener(() => {
   }
   else if (cursor.r) {
     removeEnt(pos);
+  }
+});
+
+window.addEventListener("keydown", (ev) => {
+  if (ev.key === "i" || ev.key === "Tab") {
+    inv.visible = !inv.visible;
   }
 });
 
@@ -155,6 +162,14 @@ function removeEnt(globalPos: {x: number, y: number}): boolean {
   
   return false;
 }
+function drawEnts(): void {
+  ents.wood_chest.forEach((chest) => {
+    chest.draw();
+  });
+  ents.assembly_machine.forEach((machine) => {
+    machine.draw();
+  });
+}
 
 function startMenuLoop(): void {
   state = ui.drawStartMenu() as stateType;
@@ -214,17 +229,13 @@ function gameLoop(): void {
   }
 
   // updateEnts();
-  // drawEnts();
-  ents.wood_chest.forEach((chest) => {
-    chest.draw();
-  });
-  ents.assembly_machine.forEach((machine) => {
-    machine.draw();
-  });
+  drawEnts();
   player.draw();
 
+  inv.draw();
+
   render.drawText(
-    `machine quant: ${ents.assembly_machine.size}`, 50, 50, 30, "white", "top", "left"
+    `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"
   );
 }
 

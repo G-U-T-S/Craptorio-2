@@ -41,14 +41,21 @@ class Render {
         this.context.fillStyle = fillColor;
         this.context.fillRect(x, y, w, h);
     }
-    drawLine(x1, y1, x2, y2, strokeColor) {
-        this.context.strokeStyle = strokeColor;
-        this.context.moveTo(x1, y1);
-        this.context.lineTo(x2, y2);
-    }
     drawPanel(x, y, w, h, bg, fg, shadowColor, label) {
         this.drawRect(x, y, w, h, bg, bg);
         this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
+    }
+    drawGrid(x, y, rows, cols, bg, fg, size, border, rounded) {
+        for (let X = 0; X < cols + 1; X++) {
+            this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
+        }
+        for (let Y = 0; Y < rows + 1; Y++) {
+            this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
+        }
+    }
+    drawItemStack(x, y, quant, showQuant) {
+        if (showQuant) {
+        }
     }
     drawText(text, x, y, fontSize, color, baseLine, textAling) {
         this.context.textBaseline = baseLine;

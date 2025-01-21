@@ -4,10 +4,9 @@ class Keyboard {
   public m = false; public r = false;
   public q = false; public i = false;
   public h = false; public c = false;
-  public t = false;
+  public tab = false; public t = false;
   public y = false; public shift = false;
   public alt = false; public ctrl = false;
-  public tab = false;
 
   constructor() {
     window.addEventListener("keydown", (ev) => {

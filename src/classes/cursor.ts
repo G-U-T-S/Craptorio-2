@@ -14,14 +14,11 @@ import render from "./render.js";
 // };
 class Cursor {
   public x = 0; public y = 0;
-  public itemStack = {id: 0, count: 0};
+  public itemStack = {id: -1, count: -1, slot: -1};
   public l = false; public m = false; public r = false;
   // public heldLeft = false; public heldRight = false;
   public holdTime = 0; public type: "pointer" | "item" = "pointer";
   public prog = false; public drag = false; public rot = 0;
-  public mouseDownListeners: Array<CallableFunction> = [];
-  public mouseUpListeners: Array<CallableFunction> = [];
-  public mouseWheelListeners: Array<CallableFunction> = []
 
   constructor() {
     window.addEventListener("mousemove", (ev) => {
@@ -39,10 +36,6 @@ class Cursor {
       if (ev.button === 2) {
         this.r = true;
       }
-
-      this.mouseDownListeners.forEach((func) => {
-        func(ev);
-      });
     });
     window.addEventListener("mouseup", (ev) => {
       if (ev.button === 0) {
@@ -54,17 +47,6 @@ class Cursor {
       if (ev.button === 2) {
         this.r = false;
       }
-
-      this.mouseUpListeners.forEach((func) => {
-        func(ev);
-      });
-    });
-    window.addEventListener("wheel", (ev) => {
-      // ev.preventDefault();
-
-      this.mouseWheelListeners.forEach((func) => {
-        func(ev.deltaY);
-      });
     });
   }
 
@@ -142,16 +124,6 @@ class Cursor {
     }
 
     // if cursor.type == 'item' then sound('rotate_' + dir) end
-  }
-
-  addMouseDownListener(func: CallableFunction): void {
-    this.mouseDownListeners.push(func);
-  }
-  addMouseUpListener(func: CallableFunction): void {
-    this.mouseUpListeners.push(func);
-  }
-  addMouseWheelListener(func: CallableFunction): void {
-    this.mouseWheelListeners.push(func);
   }
 }
 
