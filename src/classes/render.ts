@@ -1,5 +1,6 @@
 import CURSOR from "./cursor.js";
 import Label from "./label.js";
+import { items } from "./definitions.js";
 
 
 class Render {
@@ -88,7 +89,7 @@ class Render {
   drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, size: number, border: boolean, rounded: boolean): void {
     // if border then rectb(x,y,cols*size+1,rows*size+1,fg) end
     // this.drawRect(x, y, cols * size, rows * size, bg, bg);
-    
+
     for (let X = 0; X < cols + 1; X++) {
       this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
     }
@@ -97,7 +98,7 @@ class Render {
       this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
     }
     
-    // Dont work
+    //! Dont work
     // if (rounded) {
     //   for (let i = 0; i < rows; i ++) {
     //     for (let j = 0; j < cols; j++) {
@@ -113,10 +114,11 @@ class Render {
     // }
   }
 
-  drawItemStack(x: number, y: number, quant: number, showQuant: boolean): void {
-    // show_cnt = show_tile_widget or show_cnt or show_count
-    
-    // sspr(ITEMS[stack.id].sprite_id, x, y, ITEMS[stack.id].color_key)
+  drawItemStack(itemName:string, x: number, y: number, quant: number, showQuant: boolean): void {
+    this.drawSprite(
+      "staticSprite", 4, x, y,
+      items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y
+    );
     
     if (showQuant) {
       // local count = stack.count < 100 and stack.count or floor(stack.count/100) .. 'H'

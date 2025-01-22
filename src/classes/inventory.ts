@@ -4,7 +4,8 @@ import Label from "./label.js";
 
 
 class Inventory {
-  readonly slotSize = 8 * 4;
+  readonly offSet = 5;
+  readonly slotSize = (8 * 4) + this.offSet;
   readonly rows = 8; readonly colomns = 8;
   readonly w = this.slotSize * this.colomns;
   readonly h = this.slotSize * this.rows;
@@ -18,7 +19,7 @@ class Inventory {
     for (let x = 0; x < this.colomns; x++) {
       for (let y = 0; y < this.rows; y++) {
         this.slots.set(
-          quant, {x: this.x + (x * this.slotSize),y: this.y + (y * this.slotSize), itemName: "", quant: -1}
+          quant, {x: this.x + (x * this.slotSize),y: this.y + (y * this.slotSize), itemName: ["copper_plate", "iron_plate", "stone_furnace", "", ""][Math.round(Math.random() * 4)], quant: -1}
         );
         
         quant++;
@@ -35,28 +36,9 @@ class Inventory {
     
       this.slots.forEach((slot) => {
         if (slot.itemName !== "") {
-          render.drawItemStack(slot.x, slot.y, slot.quant, true);
+          render.drawItemStack(slot.itemName, slot.x + this.offSet - 1, slot.y + this.offSet - 1, slot.quant, true);
         }
       });
-      // for (let i = 0; i < this.rows; i++) {
-        // for (let j = 0; j < this.colomns; j++) {
-          // const index = ((i-1) * this.colomns) + j;
-          // local x, y = self.x + self.grid_x + ((j - 1) * (INVENTORY_SLOT_SIZE + 1)), self.y + self.grid_y + ((i-1) * (INVENTORY_SLOT_SIZE + 1))
-          
-          // if self.slots[index] and self.slots[index].id ~= 0 then
-          //   local item = ITEMS[self.slots[index].id]
-          //   draw_item_stack(x, y, {id = self.slots[index].id, count = self.slots[index].count})
-          // end
-          
-          // if index-56 == self.active_slot then
-          //   ui.highlight(x-1, y-1, INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE, true, 3, 4)
-          // end
-      //   }
-      // }
-    
-    //   if slot then
-    //     ui.highlight(slot.x - 1, slot.y - 1, INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE, false, 3, 4)
-    //   end
     
     //   local x, y = hx + ((self.active_slot - 1) * (INVENTORY_SLOT_SIZE+1)), hy + offset - 1
     //    ui.highlight(x, y, INVENTORY_SLOT_SIZE, INVENTORY_SLOT_SIZE, true, 3, 4)

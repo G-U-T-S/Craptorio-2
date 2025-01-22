@@ -1,4 +1,5 @@
 import CURSOR from "./cursor.js";
+import { items } from "./definitions.js";
 class Render {
     canvas;
     context;
@@ -53,7 +54,8 @@ class Render {
             this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
         }
     }
-    drawItemStack(x, y, quant, showQuant) {
+    drawItemStack(itemName, x, y, quant, showQuant) {
+        this.drawSprite("staticSprite", 4, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
         if (showQuant) {
         }
     }

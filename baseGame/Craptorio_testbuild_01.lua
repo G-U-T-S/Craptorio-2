@@ -2583,7 +2583,7 @@ function draw_recipe_widget(x, y, id)
   current_recipe = {x = x, y = y, id = id}
 end
 
-function draw_item_stack(x, y, stack, show_cnt)
+function ui(x, y, stack, show_cnt)
   show_cnt = show_tile_widget or show_cnt or show_count
   sspr(ITEMS[stack.id].sprite_id, x, y, ITEMS[stack.id].color_key)
   if show_cnt then
