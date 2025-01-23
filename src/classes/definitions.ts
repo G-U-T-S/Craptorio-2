@@ -246,4 +246,4 @@ export const items: { [index: string]: Iitem } = {
 
 export const crafties = {};
 
-export const entityes = {};
+export const entities = {};

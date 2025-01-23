@@ -2,12 +2,12 @@ import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    itemStack = { id: -1, count: -1, slot: -1 };
+    itemStack = { name: "copper_plate", quant: 50 };
     l = false;
     m = false;
     r = false;
     holdTime = 0;
-    type = "pointer";
+    type = "item";
     prog = false;
     drag = false;
     rot = 0;
@@ -53,6 +53,18 @@ class Cursor {
             if (this.rot < 0) {
                 this.rot = 3;
             }
+        }
+    }
+    setItem(stack) {
+        if (stack === undefined) {
+            cursor.type = "pointer";
+            cursor.itemStack.name = "";
+            cursor.itemStack.quant = 0;
+        }
+        else {
+            cursor.type = "item";
+            cursor.itemStack.name = stack.name;
+            cursor.itemStack.quant = stack.quant;
         }
     }
 }

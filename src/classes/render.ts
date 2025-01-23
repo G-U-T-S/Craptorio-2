@@ -8,7 +8,7 @@ class Render {
   public context: CanvasRenderingContext2D;
   public topLeft: {x: number, y: number};
   public size: {w: number, h: number};
-  public centerCanvas: {x: number, y: number};
+  public center: {x: number, y: number};
   public integerScale: boolean;
   private staticSpritesAtlas: HTMLImageElement;
   private rotatableSpritesAtlas: HTMLImageElement;
@@ -19,7 +19,7 @@ class Render {
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.topLeft = {x: 0, y: 0};
     this.size = {w: 0, h: 0};
-    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
+    this.center = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.staticSpritesAtlas = new Image();
     this.staticSpritesAtlas.src = "./assets/staticSprites.png";
     this.rotatableSpritesAtlas = new Image();
@@ -65,13 +65,16 @@ class Render {
   //   this.context.lineTo(x2, y2);
   // }
   
-  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label: Label): void {
+  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label?: Label): void {
     this.drawRect(x, y, w, h, bg, bg); //-- background fill
     // drawRect(x, y + 6, w, 3, fg); //-- header lower-fill
     // drawRect(x + 2, y + h - 3, w - 4, 1, fg); //-- bottom footer fill
     // drawRect(x + (w / 2), y - 15, 50, 4, fg); //--header fill
     
-    this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+
+    if (label) {
+      this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+    }
     //TODO drawText(label.text, x + (w / 2), (y - 15) + 2, 20, label.fg, "middle", "center");
   
     //TODO drawRect(x + 6, y, w - 12, 2, fg); //-- top border
@@ -86,7 +89,7 @@ class Render {
     // }
   }
 
-  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, size: number, border: boolean, rounded: boolean): void {
+  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, size: number, border = false, rounded = false): void {
     // if border then rectb(x,y,cols*size+1,rows*size+1,fg) end
     // this.drawRect(x, y, cols * size, rows * size, bg, bg);
 
@@ -114,16 +117,17 @@ class Render {
     // }
   }
 
-  drawItemStack(itemName:string, x: number, y: number, quant: number, showQuant: boolean): void {
+  drawItemStack(itemName:string, scale: number, x: number, y: number, quant: number, showQuant: boolean): void {
     this.drawSprite(
-      "staticSprite", 4, x, y,
+      "staticSprite", scale, x, y,
       items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y
     );
     
     if (showQuant) {
-      // local count = stack.count < 100 and stack.count or floor(stack.count/100) .. 'H'
-      // local sx, sy = x + 9 - text_width(count), y + 4
-      // prints(count, sx, sy)
+      const text = `${quant}`;
+      this.drawText(
+        text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right"
+      );
     }
   }
 
@@ -200,7 +204,7 @@ class Render {
     }
   
     this.size = {w: this.canvas.width, h: this.canvas.height};
-    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
+    this.center = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;
     this.drawBg("black");
   }

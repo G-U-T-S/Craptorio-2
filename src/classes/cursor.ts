@@ -14,10 +14,10 @@ import render from "./render.js";
 // };
 class Cursor {
   public x = 0; public y = 0;
-  public itemStack = {id: -1, count: -1, slot: -1};
+  public itemStack = {name: "copper_plate", quant: 50};
   public l = false; public m = false; public r = false;
   // public heldLeft = false; public heldRight = false;
-  public holdTime = 0; public type: "pointer" | "item" = "pointer";
+  public holdTime = 0; public type: "pointer" | "item" = "item";
   public prog = false; public drag = false; public rot = 0;
 
   constructor() {
@@ -124,6 +124,33 @@ class Cursor {
     }
 
     // if cursor.type == 'item' then sound('rotate_' + dir) end
+  }
+
+  setItem(stack?: {name: string, quant: number}): void {
+    if (stack === undefined) {
+      cursor.type = "pointer";
+      cursor.itemStack.name = "";
+      cursor.itemStack.quant = 0;
+    }
+    else {
+      cursor.type = "item";
+      cursor.itemStack.name = stack.name;
+      cursor.itemStack.quant = stack.quant;
+    }
+    
+    // if not stack then
+    //   cursor.item = false
+    //   cursor.item_stack.id = 0
+    //   cursor.item_stack.count = 0
+    //   cursor.item_stack.slot = cursor.item_stack.slot or false
+    //   cursor.type = 'pointer'
+    // else
+    //   cursor.type = 'item'
+    //   cursor.item_stack.id = stack.id
+    //   cursor.item_stack.count = stack.count
+    //   cursor.item_stack.slot = slot
+    //   cursor.item = ITEMS[stack.id].type == 'placeable' and ITEMS[stack.id].name or false
+    // en
   }
 }
 

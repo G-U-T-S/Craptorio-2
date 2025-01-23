@@ -139,7 +139,7 @@ class Player {
 
   public draw() {
     RENDER.drawSprite(
-      "rotatableSprite", 4, RENDER.centerCanvas.x - ((8 * 4) / 2), RENDER.centerCanvas.y  - ((8 * 4) / 2) + this.animFrame,
+      "rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y  - ((8 * 4) / 2) + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }

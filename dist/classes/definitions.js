@@ -25,4 +25,4 @@ export const items = {
     },
 };
 export const crafties = {};
-export const entityes = {};
+export const entities = {};

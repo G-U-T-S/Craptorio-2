@@ -58,18 +58,25 @@ let showTileWidget: boolean = false;
 let altMode: boolean = false;
 
 window.addEventListener("mousedown", () => {
-  const pos = screenToWorld(cursor.x, cursor.y, true);
+  const globalPos = screenToWorld(cursor.x, cursor.y, true);
+
+  if (inv.isHovered(cursor.x, cursor.y)) {
+    if (cursor.l || cursor.r) {
+      inv.click(cursor.x, cursor.y);
+    }
+    return;
+  }
   
   if (cursor.l) {
     if (Math.round(Math.random()) > 0) {
-      placeEnt("assembly_machine", pos);
+      placeEnt("assembly_machine", globalPos);
     }
     else {
-      placeEnt("wood_chest", pos);
+      placeEnt("wood_chest", globalPos);
     }
   }
   else if (cursor.r) {
-    removeEnt(pos);
+    removeEnt(globalPos);
   }
 });
 
@@ -143,7 +150,6 @@ function removeEnt(globalPos: {x: number, y: number}): boolean {
 
       case "assembly_machine": {
         //TODO não foi feito da maneira ideal;
-        console.log(mouseTile)
         const machine = ents.assembly_machine.get(mouseTile[1]) as AssemblyMachine;
         ents.assembly_machine.delete(mouseTile[1]);
         for (let x = 0; x < 3; x++) {
@@ -233,6 +239,11 @@ function gameLoop(): void {
   player.draw();
 
   inv.draw();
+  if (cursor.type === "item") {
+    render.drawItemStack(
+      cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false
+    );
+  }
 
   render.drawText(
     `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"

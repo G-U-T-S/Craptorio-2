@@ -5,7 +5,7 @@ class Render {
     context;
     topLeft;
     size;
-    centerCanvas;
+    center;
     integerScale;
     staticSpritesAtlas;
     rotatableSpritesAtlas;
@@ -15,7 +15,7 @@ class Render {
         this.context = this.canvas.getContext("2d");
         this.topLeft = { x: 0, y: 0 };
         this.size = { w: 0, h: 0 };
-        this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+        this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.staticSpritesAtlas = new Image();
         this.staticSpritesAtlas.src = "./assets/staticSprites.png";
         this.rotatableSpritesAtlas = new Image();
@@ -44,9 +44,11 @@ class Render {
     }
     drawPanel(x, y, w, h, bg, fg, shadowColor, label) {
         this.drawRect(x, y, w, h, bg, bg);
-        this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
+        if (label) {
+            this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
+        }
     }
-    drawGrid(x, y, rows, cols, bg, fg, size, border, rounded) {
+    drawGrid(x, y, rows, cols, bg, fg, size, border = false, rounded = false) {
         for (let X = 0; X < cols + 1; X++) {
             this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
         }
@@ -54,9 +56,11 @@ class Render {
             this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
         }
     }
-    drawItemStack(itemName, x, y, quant, showQuant) {
-        this.drawSprite("staticSprite", 4, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
+    drawItemStack(itemName, scale, x, y, quant, showQuant) {
+        this.drawSprite("staticSprite", scale, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
         if (showQuant) {
+            const text = `${quant}`;
+            this.drawText(text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right");
         }
     }
     drawText(text, x, y, fontSize, color, baseLine, textAling) {
@@ -102,7 +106,7 @@ class Render {
             this.canvas.height = Math.floor(this.canvas.height);
         }
         this.size = { w: this.canvas.width, h: this.canvas.height };
-        this.centerCanvas = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
+        this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");
     }
