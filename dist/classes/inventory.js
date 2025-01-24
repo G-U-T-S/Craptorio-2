@@ -1,6 +1,7 @@
 import render from "./render.js";
 import cursor from "./cursor.js";
 import Label from "./label.js";
+import { items } from "./definitions.js";
 class Inventory {
     offSet = 8;
     slotSize = (8 * 6) + this.offSet;
@@ -18,7 +19,7 @@ class Inventory {
         let index = 0;
         for (let x = 0; x < this.colomns; x++) {
             for (let y = 0; y < this.rows; y++) {
-                this.slots.set(index, { x: this.x + (x * this.slotSize), y: this.y + (y * this.slotSize), itemName: "", quant: -1 });
+                this.slots.set(index, { x: this.x + (x * this.slotSize), y: this.y + (y * this.slotSize), itemName: "", quant: 0 });
                 index++;
             }
         }
@@ -26,7 +27,7 @@ class Inventory {
         const hx = render.center.x - (this.w / 2);
         const hy = render.size.h - (this.slotSize + 4);
         for (let x = 0; x < this.colomns; x++) {
-            this.hotbarSlots.set(index, { x: hx + (x * this.slotSize), y: hy, itemName: "", quant: -1 });
+            this.hotbarSlots.set(index, { x: hx + (x * this.slotSize), y: hy, itemName: "", quant: 0 });
             index++;
         }
     }
@@ -67,10 +68,21 @@ class Inventory {
         });
         return result;
     }
+    isHovered(x, y) {
+        if (this.visible && x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
+            return true;
+        }
+        const hx = render.center.x - (this.w / 2);
+        const hy = render.size.h - (this.slotSize + 4);
+        if (x >= hx && x <= hx + this.w && y >= hy && y <= hy + this.slotSize + 4) {
+            return true;
+        }
+        return false;
+    }
     click(x, y) {
-        const result = this.getHoveredSlot(x, y);
-        if (result !== undefined) {
-            this.slotClick(result.index, result.target);
+        const slot = this.getHoveredSlot(x, y);
+        if (slot !== undefined) {
+            this.slotClick(slot.index, slot.target);
             return true;
         }
         return false;
@@ -87,20 +99,68 @@ class Inventory {
             if (slot?.itemName === "") {
                 slot.itemName = cursor.itemStack.name;
                 if (cursor.r) {
-                    slot.quant = 1;
+                    slot.quant += 1;
                     cursor.itemStack.quant = cursor.itemStack.quant - 1;
                     if (cursor.itemStack.quant < 1) {
                         cursor.setItem();
                     }
                 }
-                else {
+                else if (cursor.l) {
                     slot.quant = cursor.itemStack.quant;
                     cursor.setItem();
                 }
             }
+            else if (slot?.itemName == cursor.itemStack.name) {
+                if (cursor.r) {
+                    if (slot.quant < items[slot.itemName].stackSize) {
+                        slot.quant += 1;
+                        cursor.itemStack.quant = cursor.itemStack.quant - 1;
+                        if (cursor.itemStack.quant < 1) {
+                            cursor.setItem();
+                        }
+                        return;
+                    }
+                }
+                else if (cursor.l) {
+                    if (slot.quant == items[slot.itemName].stackSize) {
+                        const stack = { name: slot.itemName, quant: slot.quant };
+                        slot.quant = cursor.itemStack.quant;
+                        cursor.itemStack.name = stack.name;
+                        cursor.itemStack.quant = stack.quant;
+                    }
+                    else if (slot.quant + cursor.itemStack.quant <= items[slot.itemName].stackSize) {
+                        slot.quant += cursor.itemStack.quant;
+                        cursor.itemStack.quant = 0;
+                    }
+                    else if (slot.quant < items[slot.itemName].stackSize) {
+                        const diff = items[slot.itemName].stackSize - slot.quant;
+                        cursor.itemStack.quant = cursor.itemStack.quant - diff;
+                        slot.quant = items[slot.itemName].stackSize;
+                    }
+                    if (cursor.itemStack.quant < 1) {
+                        cursor.setItem();
+                    }
+                    return;
+                }
+            }
+            else if (slot !== undefined) {
+                const invStack = { itemName: slot.itemName, quant: slot.quant };
+                slot.itemName = cursor.itemStack.name;
+                slot.quant = cursor.itemStack.quant;
+                cursor.itemStack.name = invStack.itemName;
+                cursor.itemStack.quant = invStack.quant;
+                cursor.type = 'item';
+            }
         }
         else if (cursor.type === 'pointer') {
             if (slot !== undefined && slot.itemName !== "") {
+                if (cursor.r && slot.quant > 1) {
+                    const half = Math.floor(slot.quant / 2);
+                    const remainder = slot.quant - half;
+                    cursor.setItem({ name: slot.itemName, quant: remainder });
+                    slot.quant = half;
+                    return;
+                }
                 cursor.itemStack.name = slot.itemName;
                 cursor.itemStack.quant = slot.quant;
                 cursor.type = 'item';
@@ -108,17 +168,6 @@ class Inventory {
                 slot.quant = 0;
             }
         }
-    }
-    isHovered(x, y) {
-        if (this.visible && x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
-            return true;
-        }
-        const hx = render.center.x - (this.w / 2);
-        const hy = render.size.h - (this.slotSize + 4);
-        if (x >= hx && x <= hx + this.w && y >= hy && y <= hy + this.slotSize + 4) {
-            return true;
-        }
-        return false;
     }
 }
 const inv = new Inventory();

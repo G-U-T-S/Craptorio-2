@@ -46,17 +46,6 @@ window.addEventListener("mousedown", () => {
         }
         return;
     }
-    if (cursor.l) {
-        if (Math.round(Math.random()) > 0) {
-            placeEnt("assembly_machine", globalPos);
-        }
-        else {
-            placeEnt("wood_chest", globalPos);
-        }
-    }
-    else if (cursor.r) {
-        removeEnt(globalPos);
-    }
 });
 window.addEventListener("keydown", (ev) => {
     if (ev.key === "i" || ev.key === "Tab") {
@@ -132,6 +121,11 @@ function removeEnt(globalPos) {
     }
     return false;
 }
+function updateEnts() {
+    ents.assembly_machine.forEach((machine) => {
+        machine.update();
+    });
+}
 function drawEnts() {
     ents.wood_chest.forEach((chest) => {
         chest.draw();
@@ -187,6 +181,7 @@ function gameLoop() {
             crafterAnimDir = 1;
         }
     }
+    updateEnts();
     drawEnts();
     player.draw();
     inv.draw();

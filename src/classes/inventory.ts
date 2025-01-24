@@ -1,6 +1,7 @@
 import render from "./render.js";
 import cursor from "./cursor.js";
 import Label from "./label.js";
+import { items } from "./definitions.js";
 
 
 class Inventory {
@@ -21,7 +22,7 @@ class Inventory {
     for (let x = 0; x < this.colomns; x++) {
       for (let y = 0; y < this.rows; y++) {
         this.slots.set(
-          index, {x: this.x + (x * this.slotSize),y: this.y + (y * this.slotSize), itemName: "", quant: -1}
+          index, {x: this.x + (x * this.slotSize),y: this.y + (y * this.slotSize), itemName: "", quant: 0}
         );
         
         index++;
@@ -33,7 +34,7 @@ class Inventory {
     const hy = render.size.h - (this.slotSize + 4);
     for (let x = 0; x < this.colomns; x++) {
       this.hotbarSlots.set(
-        index, {x: hx + (x * this.slotSize),y: hy, itemName: "", quant: -1}
+        index, {x: hx + (x * this.slotSize),y: hy, itemName: "", quant: 0}
       );
       
       index++;
@@ -103,44 +104,59 @@ class Inventory {
     return result;
   }
 
-  click(x: number, y: number): boolean {
-    const result = this.getHoveredSlot(x, y);
-    if (result !== undefined) {
-    //   if key(64) then
-    //     local ent = ui.active_window and ENTS[ui.active_window.ent_key] or false
-    //     if result and ent and self.slots[result.index].id ~= 0 and ui.active_window and ent.deposit_stack then
-    //       local old_stack = {id = self.slots[result.index].id, count = self.slots[result.index].count}
-    //       local deposited, stack = ent:deposit_stack(old_stack, false)
-    //       if deposited then
-    //         ui.new_alert(cursor.x, cursor.y, '-' .. self.slots[result.index].count - stack.count .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 2)
-    //         self.slots[result.index].id = stack.id
-    //         self.slots[result.index].count = stack.count
-    //         sound('deposit')
-    //         return true
-    //       end
-    //     end
+  isHovered(x: number, y: number): boolean {
+    if (this.visible && x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
+      return true;
+    }
 
-    //     if result.index >= 57 and self.slots[result.index].id > 0 then
-    //       local stack = {id = self.slots[result.index].id, count = self.slots[result.index].count}
-    //       self.slots[result.index].id = 0
-    //       self.slots[result.index].count = 0
-    //       local res, stack = self:add_item(stack, 0)
-    //       if stack then
-    //         self.slots[result.index].id = stack.id
-    //         self.slots[result.index].count = stack.count
-    //       end
-    //     end
-    //   end
-
-      this.slotClick(result.index, result.target);
-      
-      return true
+    const hx = render.center.x - (this.w / 2);
+    const hy = render.size.h - (this.slotSize + 4);
+    if (x >= hx && x <= hx + this.w && y >= hy && y <= hy + this.slotSize + 4) {
+      return true;
     }
     
     return false;
   }
 
-  private slotClick(index: number, target: "hotbar" | "inventory") {
+  click(x: number, y: number): boolean {
+    const slot = this.getHoveredSlot(x, y);
+    
+    if (slot !== undefined) {
+    //   if key(64) then
+    //     local ent = ui.active_window and ENTS[ui.active_window.ent_key] or false
+    //     if slot and ent and self.slots[slot.index].id ~= 0 and ui.active_window and ent.deposit_stack then
+    //       local old_stack = {id = self.slots[slot.index].id, count = self.slots[slot.index].count}
+    //       local deposited, stack = ent:deposit_stack(old_stack, false)
+    //       if deposited then
+    //         ui.new_alert(cursor.x, cursor.y, '-' .. self.slots[slot.index].count - stack.count .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 2)
+    //         self.slots[slot.index].id = stack.id
+    //         self.slots[slot.index].count = stack.count
+    //         sound('deposit')
+    //         return true
+    //       end
+    //     end
+
+    //     if slot.index >= 57 and self.slots[slot.index].id > 0 then
+    //       local stack = {id = self.slots[slot.index].id, count = self.slots[slot.index].count}
+    //       self.slots[slot.index].id = 0
+    //       self.slots[slot.index].count = 0
+    //       local res, stack = self:add_item(stack, 0)
+    //       if stack then
+    //         self.slots[slot.index].id = stack.id
+    //         self.slots[slot.index].count = stack.count
+    //       end
+    //     end
+    //   end
+
+      this.slotClick(slot.index, slot.target);
+      
+      return true;
+    }
+    
+    return false;
+  }
+
+  private slotClick(index: number, target: "hotbar" | "inventory"): void {
     let slot: {x: number; y: number; itemName: string; quant: number;} | undefined;
       
     if (target === "inventory") {
@@ -153,15 +169,15 @@ class Inventory {
     
     // if index == cursor.item_stack.slot then return end
     
-    // if cursor.type == 'item' and cursor.item_stack.slot and index ~= cursor.item_stack.slot then
-    //   local old_item = self.slots[index]
+    // if (cursor.type === 'item' && index !== cursor.itemStack.index) {
+    //   const old_item = this.slots.get(index);
     //   self.slots[cursor.item_stack.slot].id = self.slots[index].id
     //   self.slots[cursor.item_stack.slot].count = self.slots[index].count
     //   self.slots[index].id = cursor.item_stack.id
     //   self.slots[index].count = cursor.item_stack.count
-    //   set_cursor_item()
-    //   return
-    // end
+    //   cursor.setItem();
+    //   return;
+    // }
 
     if (cursor.type === 'item') {
       if (slot?.itemName === "") {
@@ -169,14 +185,14 @@ class Inventory {
         slot.itemName = cursor.itemStack.name;
 
         if (cursor.r) {
-          slot.quant = 1;
+          slot.quant += 1;
           cursor.itemStack.quant = cursor.itemStack.quant - 1;
           
           if (cursor.itemStack.quant < 1) {
             cursor.setItem();
           }
         }
-        else {
+        else if (cursor.l) {
           slot.quant = cursor.itemStack.quant;
           
           // if (cursor.item_stack.slot and cursor.item_stack.slot ~= index) {
@@ -187,55 +203,66 @@ class Inventory {
           cursor.setItem();
         }
       }
+      else if (slot?.itemName == cursor.itemStack.name) {
+        if (cursor.r) {
+          if (slot.quant < items[slot.itemName].stackSize) {
+            slot.quant += 1;
+            cursor.itemStack.quant = cursor.itemStack.quant - 1;
+            
+            if (cursor.itemStack.quant < 1) {
+              cursor.setItem();
+            }
+            
+            return;
+          }
+        }
+        else if (cursor.l) {
+          //--swap held partial stack with full stack
+          if (slot.quant == items[slot.itemName].stackSize) {
+            const stack = {name: slot.itemName, quant: slot.quant};
+            slot.quant = cursor.itemStack.quant;
+            cursor.itemStack.name = stack.name;
+            cursor.itemStack.quant = stack.quant;
+          }
+          else if (slot.quant + cursor.itemStack.quant <= items[slot.itemName].stackSize) {
+            slot.quant += cursor.itemStack.quant
+            cursor.itemStack.quant = 0;
+          }
+          else if (slot.quant < items[slot.itemName].stackSize) {
+            const diff = items[slot.itemName].stackSize - slot.quant;
+            cursor.itemStack.quant = cursor.itemStack.quant - diff;
+            slot.quant = items[slot.itemName].stackSize;
+          }
+
+          if (cursor.itemStack.quant < 1) {
+            cursor.setItem();
+          }
+
+          return;
+        }
+      }
+      else if (slot !== undefined) {
+        // --swap stacks
+        const invStack = {itemName: slot.itemName, quant: slot.quant};
+        slot.itemName = cursor.itemStack.name;
+        slot.quant = cursor.itemStack.quant;
+        cursor.itemStack.name = invStack.itemName;
+        cursor.itemStack.quant = invStack.quant;
+        cursor.type = 'item';
+        // cursor.item = ITEMS[inv_item.id].name
+      }
     }
-
-    //   elseif self.slots[index].id == cursor.item_stack.id then
-    //     if cursor.r then
-    //       if self.slots[index].count < ITEMS[self.slots[index].id].stack_size then
-    //         self.slots[index].count = self.slots[index].count + 1
-    //         cursor.item_stack.count = cursor.item_stack.count - 1
-    //         if cursor.item_stack.count < 1 then
-    //           set_cursor_item()
-    //         end
-    //         return true
-    //       end
-    //     end
-
-    //     local item = ITEMS[self.slots[index].id]
-    //     --swap held partial stack with full stack
-    //     if self.slots[index].count == item.stack_size then
-    //       local stack = {id = self.slots[index].id, count = self.slots[index].count}
-    //       self.slots[index].count = cursor.item_stack.count
-    //       cursor.item_stack = stack
-    //     elseif self.slots[index].count + cursor.item_stack.count <= item.stack_size then
-    //       self.slots[index].count = self.slots[index].count + cursor.item_stack.count
-    //       cursor.item_stack.count = 0
-    //     elseif self.slots[index].count < item.stack_size then
-    //       local diff = item.stack_size - self.slots[index].count
-    //       cursor.item_stack.count = cursor.item_stack.count - diff
-    //       self.slots[index].count = item.stack_size
-    //     end
-
-    //     if cursor.item_stack.count <= 0 then
-    //       cursor.item_stack = {id = 0, count = 0}
-    //       cursor.type = 'pointer'
-    //     end
-    //   else
-    //     --swap stacks
-    //     local inv_item = {id = self.slots[index].id, count = self.slots[index].count}
-    //     self.slots[index].id = cursor.item_stack.id
-    //     self.slots[index].count = cursor.item_stack.count
-    //     cursor.item_stack = {id = inv_item.id, count = inv_item.count, slot = false}
-    //     cursor.type = 'item'
-    //     cursor.item = ITEMS[inv_item.id].name
-    //   end
     else if (cursor.type === 'pointer') {
       if (slot !== undefined && slot.itemName !== "") {
-      //   if cursor.r and not cursor.lr then
-      //     set_cursor_item({id = id, count = math.ceil(count/2)}, false)
-      //     self.slots[index].count = math.floor(count/2)
-      //     return true
-      //   end
+        if (cursor.r && slot.quant > 1) {
+          const half = Math.floor(slot.quant / 2);
+          const remainder = slot.quant - half;
+
+          cursor.setItem({name: slot.itemName, quant: remainder});
+          slot.quant = half;
+          
+          return;
+        }
       //   --try to move to hotbar first
       //   if index < 57 and key(64) then
       //     local stack = {id = id, count = count}
@@ -258,20 +285,6 @@ class Inventory {
         slot.quant = 0;
       }
     }
-  }
-
-  isHovered(x: number, y: number): boolean {
-    if (this.visible && x >= this.x && x <= this.x + this.w && y >= this.y && y <= this.y + this.h) {
-      return true;
-    }
-
-    const hx = render.center.x - (this.w / 2);
-    const hy = render.size.h - (this.slotSize + 4);
-    if (x >= hx && x <= hx + this.w && y >= hy && y <= hy + this.slotSize + 4) {
-      return true;
-    }
-    
-    return false;
   }
 }
 

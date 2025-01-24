@@ -12,6 +12,10 @@ import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
 
 
+//! coisas na tela nao alteram de posiçao se
+//! se a tela muda de tamanho apos o primeiro load
+
+
 window.addEventListener("contextmenu", (ev) => {
   ev.preventDefault();
 });
@@ -66,18 +70,97 @@ window.addEventListener("mousedown", () => {
     }
     return;
   }
-  
-  if (cursor.l) {
-    if (Math.round(Math.random()) > 0) {
-      placeEnt("assembly_machine", globalPos);
-    }
-    else {
-      placeEnt("wood_chest", globalPos);
-    }
-  }
-  else if (cursor.r) {
-    removeEnt(globalPos);
-  }
+
+  // if cursor.type == 'item' and cursor.item_stack.id ~= 0 then
+  //   --check other visible widgets
+  //   local item = ITEMS[cursor.item_stack.id]
+  //   local count = cursor.item_stack.count
+  //   --check for ents to deposit item stack
+  //   if key(63) and ENTS[k] and ENTS[k].deposit_stack then --TODO
+  //     if cursor.r and not cursor.lr then
+  //       local result, stack = ENTS[k]:deposit_stack({id = cursor.item_stack.id, count = 1})
+  //       if result then
+  //         cursor.item_stack.count = cursor.item_stack.count - 1
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = inv.slots[cursor.item_stack.slot].count - 1
+  //           if inv.slots[cursor.item_stack.slot].count < 1 then
+  //             inv.slots[cursor.item_stack.slot].count = 0
+  //             inv.slots[cursor.item_stack.slot].id = 0
+  //           end
+  //         end
+  //         ui.new_alert(cursor.x, cursor.y, '-1 ' .. ITEMS[cursor.item_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         if cursor.item_stack.count < 1 then
+  //           set_cursor_item()
+  //         end
+  //       end
+  //     elseif cursor.l and not cursor.ll then
+  //       local result, stack = ENTS[k]:deposit_stack(cursor.item_stack)
+  //       local old_stack = {id = cursor.item_stack.id, count = cursor.item_stack.count}
+  //       if stack.count == 0 then
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = 0
+  //           inv.slots[cursor.item_stack.slot].id = 0
+  //         end
+  //         ui.new_alert(cursor.x, cursor.y, -old_stack.count .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         set_cursor_item()
+  //       else
+  //         ui.new_alert(cursor.x, cursor.y, '- ' .. (old_stack.count - stack.count) .. ' ' .. ITEMS[old_stack.id].fancy_name, 1000, 0, 6)
+  //         sound('deposit')
+  //         cursor.item_stack.count = stack.count
+  //         if cursor.item_stack.slot then
+  //           inv.slots[cursor.item_stack.slot].count = stack.count
+  //         end
+  //       end
+  //     end
+  //     return
+  //     --if item is placeable, run callback for item type
+  //     --checking transport_belt's first (for drag-placement), then other items
+  //   else
+  //     if cursor.l and cursor.item == 'transport_belt' and (cursor.tx ~= cursor.ltx or cursor.ty ~= cursor.lty)  then
+  //       --trace('placing belt')
+  //       local slot = cursor.item_stack.slot
+  //       local item_consumed = callbacks[cursor.item].place_item(cursor.x, cursor.y)
+  //       if slot and item_consumed then
+  //         inv.slots[slot].count = inv.slots[slot].count - 1
+  //         cursor.item_stack.count = inv.slots[slot].count
+  //       elseif item_consumed ~= false then
+  //         cursor.item_stack.count = cursor.item_stack.count - 1
+  //         if cursor.item_stack.count < 1 then
+  //           set_cursor_item()
+  //         end
+  //       end
+  //       if slot and inv.slots[slot].count < 1 then
+  //         inv.slots[slot].id = 0
+  //         inv.slots[slot].count = 0
+  //         set_cursor_item()
+  //       end
+  //       return
+  //     elseif cursor.l and not cursor.ll and ITEMS[cursor.item_stack.id].type == 'placeable' then
+  //       if callbacks[cursor.item] then
+  //         local item_consumed = callbacks[cursor.item].place_item(cursor.x, cursor.y)
+  //         if item_consumed ~= false then
+  //           cursor.item_stack.count = cursor.item_stack.count - 1
+  //           if cursor.item_stack.count < 1 then
+  //             set_cursor_item()
+  //           end
+  //           if cursor.item_stack.slot then
+  //             inv.slots[cursor.item_stack.slot].count = inv.slots[cursor.item_stack.slot].count - 1
+  //             if inv.slots[cursor.item_stack.slot].count < 1 then
+  //               inv.slots[cursor.item_stack.slot].id = 0
+  //               inv.slots[cursor.item_stack.slot].count = 0
+  //               set_cursor_item()
+  //             end
+  //           end
+  //         end
+  //       end
+  //       return
+  //     elseif cursor.r then
+  //       --remove_tile(cursor.x, cursor.y)
+  //       return
+  //     end
+  //   end
 });
 
 window.addEventListener("keydown", (ev) => {
@@ -168,6 +251,11 @@ function removeEnt(globalPos: {x: number, y: number}): boolean {
   
   return false;
 }
+function updateEnts(): void {
+  ents.assembly_machine.forEach((machine) => {
+    machine.update();
+  });
+}
 function drawEnts(): void {
   ents.wood_chest.forEach((chest) => {
     chest.draw();
@@ -234,7 +322,7 @@ function gameLoop(): void {
     }
   }
 
-  // updateEnts();
+  updateEnts();
   drawEnts();
   player.draw();
 
