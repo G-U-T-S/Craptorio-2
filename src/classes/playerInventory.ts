@@ -26,7 +26,7 @@ class Inventory {
         );
         
         index++;
-      } 
+      }
     }
 
     index = 0;

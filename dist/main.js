@@ -3,12 +3,12 @@ import ui from "./classes/ui.js";
 import keyboard from "./classes/keyboard.js";
 import cursor from "./classes/cursor.js";
 import player from "./classes/player.js";
-import inv from "./classes/inventory.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
+import BaseInventory from "./classes/baseInventory.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -25,31 +25,18 @@ let drillTick = 0;
 let drillBitTick = 0;
 let drillBitDir = 1;
 let drillAnimTick = 0;
-let furnaceTick = 0;
 let furnaceAnimTick = 0;
-let crafterTick = 0;
 let crafterAnimTick = 0;
 let crafterAnimDir = 1;
 let delta = 0;
 let lastTime = 0;
 let state = "game";
-let showTech = false;
-let showHelp = false;
-let showMiniMap = false;
-let showTileWidget = false;
-let altMode = false;
 window.addEventListener("mousedown", () => {
     const globalPos = screenToWorld(cursor.x, cursor.y, true);
-    if (inv.isHovered(cursor.x, cursor.y)) {
-        if (cursor.l || cursor.r) {
-            inv.click(cursor.x, cursor.y);
-        }
-        return;
-    }
+    debugInv.depositItems("copper_plate", 30, 0, true);
 });
 window.addEventListener("keydown", (ev) => {
     if (ev.key === "i" || ev.key === "Tab") {
-        inv.visible = !inv.visible;
     }
 });
 function screenToWorld(x, y, snapToGrid) {
@@ -90,7 +77,6 @@ function placeEnt(type, globalPos) {
                 }
             }
             return true;
-            break;
         }
     }
     return false;
@@ -120,6 +106,11 @@ function removeEnt(globalPos) {
         return true;
     }
     return false;
+}
+function getEntData(globalPos) {
+    const mouseKey = `${globalPos.x}-${globalPos.y}`;
+    const mouseTile = gridData.get(mouseKey);
+    return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts() {
     ents.assembly_machine.forEach((machine) => {
@@ -184,12 +175,19 @@ function gameLoop() {
     updateEnts();
     drawEnts();
     player.draw();
-    inv.draw();
     if (cursor.type === "item") {
         render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);
     }
     render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
 }
+const cols = 5;
+const rows = 5;
+const slotSize = 8 * 6;
+const w = slotSize * cols;
+const h = slotSize * rows;
+const x = (render.size.w / 2) - (w / 2);
+const y = (render.size.h / 2) - (h / 2);
+const debugInv = new BaseInventory(x, y, rows, cols, slotSize, w, h);
 function BOOT() {
     TIC(1);
 }
@@ -212,6 +210,7 @@ function TIC(currentTime) {
             break;
         }
     }
+    debugInv.draw();
     tick = tick + 1;
     requestAnimationFrame(TIC);
 }

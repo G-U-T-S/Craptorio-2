@@ -2,12 +2,12 @@ import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    itemStack = { name: "copper_plate", quant: 50 };
+    itemStack = { name: "", quant: 0 };
     l = false;
     m = false;
     r = false;
     holdTime = 0;
-    type = "item";
+    type = "pointer";
     prog = false;
     drag = false;
     rot = 0;
