@@ -63,9 +63,11 @@ let state: stateType = "game";
 window.addEventListener("mousedown", () => {
   // const globalPos = screenToWorld(cursor.x, cursor.y, true);
 
-  if (cursor.l)  debugInv.depositStack("copper_plate", 30, 5, true);
+  if (cursor.l) {
+    debugInv.depositStack("copper_plate", 30, 5, true);
+  }
   else {
-    debugInv.removeStack(0);
+    debugInv.removeStack(0, "full");
   }
 
   // if (inv.isHovered(cursor.x, cursor.y)) {
@@ -268,12 +270,12 @@ function gameLoop(): void {
   drawEnts();
 
   // inv.draw();
-  const slot = cursor.inv.getSlot(0)
-  if (cursor.type === "item" && slot !== undefined) {
-    render.drawItemStack(
-      slot.itemName, 3, cursor.x, cursor.y, slot.quant, false
-    );
-  }
+  // const slot = cursor.inv.getSlot(0)
+  // if (cursor.type === "item" && slot !== undefined) {
+  //   render.drawItemStack(
+  //     slot.itemName, 3, cursor.x, cursor.y, slot.quant, false
+  //   );
+  // }
 
   render.drawText(
     `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"

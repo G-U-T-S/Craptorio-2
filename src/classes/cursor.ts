@@ -15,7 +15,6 @@ import render from "./render.js";
 // };
 class Cursor {
   public x = 0; public y = 0;
-  public inv = new Inventory(0, 0, 1, 1, 8 * 6, 8 * 6, 8 * 6);
   public l = false; public m = false; public r = false;
   // public heldLeft = false; public heldRight = false;
   public holdTime = 0; public type: "pointer" | "item" = "pointer";

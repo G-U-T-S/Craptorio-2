@@ -34,8 +34,14 @@ export default class Inventory {
 
   draw(): void {
     render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue");
-    render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
-  
+    
+    if (this.rows + this.cols > 2) {
+      render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
+    }
+    else {
+      render.drawRect(this.pos.x, this.pos.y, this.slotSize, this.slotSize, "white", "white");
+    }
+    
     this.slots.forEach((slot) => {
       if (slot.itemName !== "") {
         render.drawItemStack(
@@ -119,21 +125,47 @@ export default class Inventory {
     return returnData;
   }
 
-  removeStack(index: number): undefined | {itemName: string, quant: number} {
+  removeStack(index: number, quantity: "full" | "half"): undefined | {itemName: string, quant: number} {
     const slot = this.getSlot(index);
 
     if (slot !== undefined) {
-      const name = slot.itemName;
-      slot.itemName = "";
+      let name = slot.itemName;
+      let quant = 0;
 
-      const quant = slot.quant;
-      slot.quant = 0;
+      if (quantity === "full" || slot.quant <= 1) {
+        slot.itemName = "";
+
+        quant = slot.quant;
+        slot.quant = 0;
+      }
+      else if (quantity === "half") {
+        const half = Math.floor(slot.quant / 2);
+        const remainder = slot.quant - half;
+
+        slot.quant = half;
+        quant = remainder;
+      }
 
       return {itemName: name, quant: quant};
     }
 
     return undefined;
   }
+
+  swapStacks(index: number, itemName: string, quant: number): {itemName: string, quant: number} {
+    const returnData = {itemName: itemName, quant: quant};
+    const slot = this.getSlot(index);
+
+    if (slot !== undefined) {
+      returnData.itemName = slot.itemName;
+      returnData.quant = slot.quant;
+
+      slot.itemName = itemName;
+      slot.quant = quant;
+    }
+
+    return returnData;
+  } 
 
   moveTo(x: number, y: number): void {
     this.pos.x = x; this.pos.y = y;
@@ -152,6 +184,4 @@ export default class Inventory {
       } 
     }
   }
-
-  //removeHalfStack()??
 }
