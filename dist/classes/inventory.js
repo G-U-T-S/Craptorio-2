@@ -1,7 +1,6 @@
 import render from "./render.js";
-import cursor from "./cursor.js";
 import { items } from "./definitions.js";
-export default class BaseInventory {
+export default class Inventory {
     slots = new Map();
     slotSize;
     pos;
@@ -28,9 +27,12 @@ export default class BaseInventory {
         render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
         this.slots.forEach((slot) => {
             if (slot.itemName !== "") {
-                render.drawItemStack(slot.itemName, 4, slot.x, slot.y, slot.quant, true);
+                render.drawItemStack(slot.itemName, 4, slot.x + (this.slotSize / 5), slot.y + (this.slotSize / 5), slot.quant, true);
             }
         });
+    }
+    getSlot(index) {
+        return this.slots.get(index);
     }
     getHoveredSlot(x, y) {
         let result;
@@ -52,31 +54,61 @@ export default class BaseInventory {
         }
         return false;
     }
-    depositItems(itemName, quant, slotIndex, force) {
+    depositStack(itemName, quant, slotIndex, force) {
         const slot = this.slots.get(slotIndex);
+        let returnData = { itemName: itemName, quant: quant };
         if (slot !== undefined) {
-            if ((slot.itemName === "" || slot.itemName === itemName) && slot.quant + quant <= items[itemName].stackSize) {
+            if (slot.itemName === "" || slot.itemName === itemName) {
                 slot.itemName = itemName;
-                slot.quant += quant;
-                cursor.itemStack.name = "";
-                cursor.itemStack.quant = 0;
-                return;
+                const availableSpace = items[itemName].stackSize - slot.quant;
+                const toAdd = Math.min(returnData.quant, availableSpace);
+                slot.quant += toAdd;
+                returnData.quant -= toAdd;
             }
         }
-        if (force) {
-            let remaining = quant;
+        if (force && returnData.quant > 0) {
             this.slots.forEach((slot) => {
-                if ((slot.itemName === "" || slot.itemName === itemName) && slot.quant + remaining <= items[itemName].stackSize) {
+                if ((slot.itemName === "" || slot.itemName === itemName) && returnData.quant > 0) {
                     slot.itemName = itemName;
-                    slot.quant += remaining;
-                    cursor.itemStack.quant -= remaining;
+                    const availableSpace = items[itemName].stackSize - slot.quant;
+                    const toAdd = Math.min(returnData.quant, availableSpace);
+                    slot.quant += toAdd;
+                    returnData.quant -= toAdd;
                 }
-                if (remaining <= 0) {
-                    cursor.itemStack.name = "";
-                    cursor.itemStack.quant = 0;
+                else {
                     return;
                 }
             });
+        }
+        if (returnData.quant <= 0) {
+            returnData.itemName = "";
+        }
+        return returnData;
+    }
+    removeStack(index) {
+        const slot = this.getSlot(index);
+        if (slot !== undefined) {
+            const name = slot.itemName;
+            slot.itemName = "";
+            const quant = slot.quant;
+            slot.quant = 0;
+            return { itemName: name, quant: quant };
+        }
+        return undefined;
+    }
+    moveTo(x, y) {
+        this.pos.x = x;
+        this.pos.y = y;
+        let index = 0;
+        for (let x = 0; x < this.rows; x++) {
+            for (let y = 0; y < this.cols; y++) {
+                const slot = this.getSlot(index);
+                if (slot !== undefined) {
+                    slot.x = this.pos.x + (x * this.slotSize);
+                    slot.y = this.pos.y + (y * this.slotSize);
+                }
+                index++;
+            }
         }
     }
 }

@@ -145,5 +145,5 @@ class Player {
   }
 }
 
-const player = new Player();
-export default player;
+// const player = new Player();
+// export default player;

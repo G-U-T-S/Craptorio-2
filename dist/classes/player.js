@@ -112,5 +112,3 @@ class Player {
         RENDER.drawSprite("rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y - ((8 * 4) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
-const player = new Player();
-export default player;

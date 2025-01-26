@@ -1,3 +1,5 @@
+/*
+
 import render from "./render.js";
 import cursor from "./cursor.js";
 import Label from "./label.js";
@@ -291,3 +293,5 @@ class Inventory {
 
 const inv = new Inventory();
 export default inv;
+
+*/

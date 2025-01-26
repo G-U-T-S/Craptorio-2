@@ -1,8 +1,9 @@
+import Inventory from "./inventory.js";
 import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    itemStack = { name: "", quant: 0 };
+    inv = new Inventory(0, 0, 1, 1, 8 * 6, 8 * 6, 8 * 6);
     l = false;
     m = false;
     r = false;
@@ -53,18 +54,6 @@ class Cursor {
             if (this.rot < 0) {
                 this.rot = 3;
             }
-        }
-    }
-    setItem(stack) {
-        if (stack === undefined) {
-            cursor.type = "pointer";
-            cursor.itemStack.name = "";
-            cursor.itemStack.quant = 0;
-        }
-        else {
-            cursor.type = "item";
-            cursor.itemStack.name = stack.name;
-            cursor.itemStack.quant = stack.quant;
         }
     }
 }

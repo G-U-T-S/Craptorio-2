@@ -10,6 +10,7 @@ class Render {
     staticSpritesAtlas;
     rotatableSpritesAtlas;
     tilesAtlas;
+    resizeCallbacks = [];
     constructor() {
         this.canvas = document.getElementsByTagName("Canvas")[0];
         this.context = this.canvas.getContext("2d");
@@ -109,6 +110,7 @@ class Render {
         this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
         this.context.imageSmoothingEnabled = false;
         this.drawBg("black");
+        this.resizeCallbacks.forEach((func) => { func(); });
     }
     isHovered(mouse, box) {
         return (mouse.x >= box.x &&
@@ -121,6 +123,9 @@ class Render {
             return true;
         }
         return false;
+    }
+    addResizeListener(callback) {
+        this.resizeCallbacks.push(callback);
     }
 }
 const render = new Render();

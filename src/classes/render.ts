@@ -13,6 +13,7 @@ class Render {
   private staticSpritesAtlas: HTMLImageElement;
   private rotatableSpritesAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
+  private resizeCallbacks: Array<CallableFunction> = []
   
   constructor() {
     this.canvas = document.getElementsByTagName("Canvas")[0] as HTMLCanvasElement;
@@ -207,6 +208,8 @@ class Render {
     this.center = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;
     this.drawBg("black");
+
+    this.resizeCallbacks.forEach((func) => { func() });
   }
 
   isHovered(mouse: {x: number, y: number}, box: {x: number, y: number, w: number, h: number}): boolean {
@@ -224,6 +227,10 @@ class Render {
     }
 
     return false;
+  }
+
+  addResizeListener(callback: CallableFunction): void {
+    this.resizeCallbacks.push(callback);
   }
 }
 

@@ -1,14 +1,12 @@
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
-import keyboard from "./classes/keyboard.js";
 import cursor from "./classes/cursor.js";
-import player from "./classes/player.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
-import BaseInventory from "./classes/baseInventory.js";
+import Inventory from "./classes/inventory.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -28,12 +26,13 @@ let drillAnimTick = 0;
 let furnaceAnimTick = 0;
 let crafterAnimTick = 0;
 let crafterAnimDir = 1;
-let delta = 0;
-let lastTime = 0;
 let state = "game";
 window.addEventListener("mousedown", () => {
-    const globalPos = screenToWorld(cursor.x, cursor.y, true);
-    debugInv.depositItems("copper_plate", 30, 0, true);
+    if (cursor.l)
+        debugInv.depositStack("copper_plate", 30, 5, true);
+    else {
+        debugInv.removeStack(0);
+    }
 });
 window.addEventListener("keydown", (ev) => {
     if (ev.key === "i" || ev.key === "Tab") {
@@ -132,7 +131,6 @@ function helpMenuLoop() {
     state = ui.drawHelpMenu();
 }
 function gameLoop() {
-    player.update(delta, tick, { w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d }, cursor.prog);
     if (tick % UndergroundBelt.tickRate === 0) {
         beltTick += 1;
         if (beltTick > UndergroundBelt.maxTick) {
@@ -174,9 +172,9 @@ function gameLoop() {
     }
     updateEnts();
     drawEnts();
-    player.draw();
-    if (cursor.type === "item") {
-        render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);
+    const slot = cursor.inv.getSlot(0);
+    if (cursor.type === "item" && slot !== undefined) {
+        render.drawItemStack(slot.itemName, 3, cursor.x, cursor.y, slot.quant, false);
     }
     render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
 }
@@ -187,13 +185,14 @@ const w = slotSize * cols;
 const h = slotSize * rows;
 const x = (render.size.w / 2) - (w / 2);
 const y = (render.size.h / 2) - (h / 2);
-const debugInv = new BaseInventory(x, y, rows, cols, slotSize, w, h);
+const debugInv = new Inventory(x, y, rows, cols, slotSize, w, h);
+render.addResizeListener(() => {
+    debugInv.moveTo((render.size.w / 2) - (w / 2), (render.size.h / 2) - (h / 2));
+});
 function BOOT() {
     TIC(1);
 }
 function TIC(currentTime) {
-    delta = (currentTime - lastTime) / 100;
-    lastTime = currentTime;
     render.drawBg("black");
     cursor.update();
     switch (state) {

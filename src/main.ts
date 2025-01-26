@@ -1,15 +1,14 @@
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
-import keyboard from "./classes/keyboard.js";
+// import keyboard from "./classes/keyboard.js";
 import cursor from "./classes/cursor.js";
-import player from "./classes/player.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
 // import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
-import BaseInventory from "./classes/baseInventory.js";
+import Inventory from "./classes/inventory.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -50,8 +49,8 @@ let furnaceAnimTick: number = 0;
 let crafterAnimTick: number = 0;
 let crafterAnimDir: number = 1;
 
-let delta: number = 0;
-let lastTime: number = 0;
+// let delta: number = 0;
+// let lastTime: number = 0;
 
 type stateType = "start" | "game" | "help" | "firstLaunch";
 let state: stateType = "game";
@@ -62,9 +61,12 @@ let state: stateType = "game";
 // let altMode: boolean = false;
 
 window.addEventListener("mousedown", () => {
-  const globalPos = screenToWorld(cursor.x, cursor.y, true);
+  // const globalPos = screenToWorld(cursor.x, cursor.y, true);
 
-  debugInv.depositStack("copper_plate", 30, 0, true);
+  if (cursor.l)  debugInv.depositStack("copper_plate", 30, 5, true);
+  else {
+    debugInv.removeStack(0);
+  }
 
   // if (inv.isHovered(cursor.x, cursor.y)) {
   //   if (cursor.l || cursor.r) {
@@ -215,7 +217,6 @@ function helpMenuLoop(): void {
 function gameLoop(): void {
   // getVisibleEnts();
 
-  player.update(delta, tick, {w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d}, cursor.prog);
   // dispatchInput();
 
   if (tick % UndergroundBelt.tickRate === 0) {
@@ -265,12 +266,12 @@ function gameLoop(): void {
 
   updateEnts();
   drawEnts();
-  player.draw();
 
   // inv.draw();
-  if (cursor.type === "item") {
+  const slot = cursor.inv.getSlot(0)
+  if (cursor.type === "item" && slot !== undefined) {
     render.drawItemStack(
-      cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false
+      slot.itemName, 3, cursor.x, cursor.y, slot.quant, false
     );
   }
 
@@ -287,17 +288,23 @@ const w = slotSize * cols;
 const h = slotSize * rows;
 const x = (render.size.w / 2) - (w / 2);
 const y = (render.size.h / 2) - (h / 2);
-const debugInv = new BaseInventory(
+const debugInv = new Inventory(
   x, y, rows, cols, slotSize, w, h
 )
+render.addResizeListener(() => {
+  debugInv.moveTo(
+    (render.size.w / 2) - (w / 2),
+    (render.size.h / 2) - (h / 2)
+  );
+});
 
 
 function BOOT(): void {
   TIC(1);
 }
 function TIC(currentTime: number) {
-  delta = (currentTime - lastTime) / 100;
-  lastTime = currentTime;
+  // delta = (currentTime - lastTime) / 100;
+  // lastTime = currentTime;
 
   render.drawBg("black");
   cursor.update();
