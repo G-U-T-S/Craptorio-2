@@ -10,6 +10,7 @@ import MiningDrill from "./classes/entities/mining_drill.js";
 // import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
+import { items } from "./classes/definitions.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -73,12 +74,16 @@ window.addEventListener("mousedown", () => {
   //   debugInv.removeStack(0, "full");
   // }
 
-  // if (inv.isHovered(cursor.x, cursor.y)) {
-  //   if (cursor.l || cursor.r) {
-  //     inv.click(cursor.x, cursor.y);
-  //   }
-  //   return;
-  // }
+  if (playerInv.visible) {
+    if (playerInv.isHovered(cursor.x, cursor.y)) {
+      playerInv.handleClick(cursor.x, cursor.y);
+      return;
+    }
+    else if (craftMenu.isHovered(cursor.x, cursor.y)) {
+      craftMenu.handleClick(cursor.x, cursor.y);
+      return;
+    }
+  }
 
   /*
   // const entData = getEntData({ ...screenToWorld(cursor.x, cursor.y, true) });
@@ -295,12 +300,11 @@ function gameLoop(): void {
     }
   }
 
-  // const slot = cursor.inv.getSlot(0)
-  // if (cursor.type === "item" && slot !== undefined) {
-  //   render.drawItemStack(
-  //     slot.itemName, 3, cursor.x, cursor.y, slot.quant, false
-  //   );
-  // }
+  if (cursor.type === "item") {
+    render.drawItemStack(
+      cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false
+    );
+  }
 
   render.drawText(
     `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"

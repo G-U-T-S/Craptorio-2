@@ -31,6 +31,16 @@ let crafterAnimDir = 1;
 let state = "game";
 let secodWindowMode = "craft";
 window.addEventListener("mousedown", () => {
+    if (playerInv.visible) {
+        if (playerInv.isHovered(cursor.x, cursor.y)) {
+            playerInv.handleClick(cursor.x, cursor.y);
+            return;
+        }
+        else if (craftMenu.isHovered(cursor.x, cursor.y)) {
+            craftMenu.handleClick(cursor.x, cursor.y);
+            return;
+        }
+    }
 });
 window.addEventListener("keydown", (ev) => {
     if (ev.key === "i" || ev.key === "Tab") {
@@ -183,6 +193,9 @@ function gameLoop() {
         else if (secodWindowMode === "ent") {
             return;
         }
+    }
+    if (cursor.type === "item") {
+        render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);
     }
     render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
 }

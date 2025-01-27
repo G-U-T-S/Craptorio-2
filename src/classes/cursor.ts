@@ -15,8 +15,9 @@ import render from "./render.js";
 // };
 class Cursor {
   public x = 0; public y = 0;
+  public itemStack = {name: "iron_plate", quant: 10};
   public l = false; public m = false; public r = false;
-  public holdTime = 0; public type: "pointer" | "item" = "pointer";
+  public holdTime = 0; public type: "pointer" | "item" = "item";
   public drag = false; public rot = 0;
 
   constructor() {
@@ -50,7 +51,7 @@ class Cursor {
   }
 
   update(): void {
-    const l = this.l; const r = this.r;
+    // const l = this.l; const r = this.r;
     // const sx = this.sx; const sy = this.sy;
   
     // // const { wx, wy } = get_world_cell(this.x, this.y);
@@ -123,6 +124,19 @@ class Cursor {
     }
 
     // if cursor.type == 'item' then sound('rotate_' + dir) end
+  }
+
+  setItem(stack?: {name: string, quant: number}): void {
+    if (stack !== undefined) {
+      this.itemStack.name = stack.name;
+      this.itemStack.quant = stack.quant;
+      this.type = "item";
+    }
+    else {
+      this.itemStack.name = "";
+      this.itemStack.quant = 0;
+      this.type = "pointer";
+    }
   }
 }
 
