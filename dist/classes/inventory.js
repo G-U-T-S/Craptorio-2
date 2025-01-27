@@ -28,7 +28,7 @@ export default class Inventory {
     draw() {
         render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", { x: 1, y: 1 }));
         if (this.rows + this.cols > 2) {
-            render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
+            render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, this.slotSize, false, false);
         }
         else {
             render.drawRect(this.pos.x, this.pos.y, this.slotSize, this.slotSize, "white", "white");

@@ -1,5 +1,7 @@
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
+import playerInv from "./classes/playerInv.js";
+import craftMenu from "./classes/craftMenu.js";
 // import keyboard from "./classes/keyboard.js";
 import cursor from "./classes/cursor.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
@@ -8,7 +10,6 @@ import MiningDrill from "./classes/entities/mining_drill.js";
 // import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
-import Inventory from "./classes/inventory.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -55,6 +56,7 @@ let crafterAnimDir: number = 1;
 
 type stateType = "start" | "game" | "help" | "firstLaunch";
 let state: stateType = "game";
+let secodWindowMode: "craft" | "ent" = "craft";
 // let showTech: boolean = false;
 // let showHelp: boolean = false;
 // let showMiniMap: boolean = false;
@@ -64,12 +66,12 @@ let state: stateType = "game";
 window.addEventListener("mousedown", () => {
   // const globalPos = screenToWorld(cursor.x, cursor.y, true);
 
-  if (cursor.l) {
-    debugInv.depositStack("copper_plate", 30, 5, true);
-  }
-  else {
-    debugInv.removeStack(0, "full");
-  }
+  // if (cursor.l) {
+  //   debugInv.depositStack("copper_plate", 30, 5, true);
+  // }
+  // else {
+  //   debugInv.removeStack(0, "full");
+  // }
 
   // if (inv.isHovered(cursor.x, cursor.y)) {
   //   if (cursor.l || cursor.r) {
@@ -106,7 +108,7 @@ window.addEventListener("mousedown", () => {
 
 window.addEventListener("keydown", (ev) => {
   if (ev.key === "i" || ev.key === "Tab") {
-    // inv.visible = !inv.visible;
+    playerInv.visible = !playerInv.visible;
   }
 });
 
@@ -282,7 +284,17 @@ function gameLoop(): void {
   updateEnts();
   drawEnts();
 
-  // inv.draw();
+  if (playerInv.visible) {
+    playerInv.draw();
+
+    if (secodWindowMode === "craft") {
+      craftMenu.draw();
+    }
+    else if (secodWindowMode === "ent") {
+      return;
+    }
+  }
+
   // const slot = cursor.inv.getSlot(0)
   // if (cursor.type === "item" && slot !== undefined) {
   //   render.drawItemStack(
@@ -294,24 +306,6 @@ function gameLoop(): void {
     `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"
   );
 }
-
-
-const cols = 5;
-const rows = 5;
-const slotSize = 8 * 6;
-const w = slotSize * cols;
-const h = slotSize * rows;
-const x = (render.size.w / 2) - (w / 2);
-const y = (render.size.h / 2) - (h / 2);
-const debugInv = new Inventory(
-  "Inventory", x, y, rows, cols, slotSize, w, h
-)
-render.addResizeListener(() => {
-  debugInv.moveTo(
-    (render.size.w / 2) - (w / 2),
-    (render.size.h / 2) - (h / 2)
-  );
-});
 
 
 function BOOT(): void {
@@ -338,8 +332,6 @@ function TIC(currentTime: number) {
       break;
     }
   }
-
-  debugInv.draw();
 
   tick = tick + 1;
   requestAnimationFrame(TIC);

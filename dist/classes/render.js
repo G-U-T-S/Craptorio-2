@@ -49,12 +49,12 @@ class Render {
             this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
         }
     }
-    drawGrid(x, y, rows, cols, bg, fg, size, border = false, rounded = false) {
+    drawGrid(x, y, rows, cols, bg, fg, sizeX, sizeY, border = false, rounded = false) {
         for (let X = 0; X < cols + 1; X++) {
-            this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
+            this.drawRect(x + (X * sizeX), y, 2, rows * sizeY, fg, fg);
         }
         for (let Y = 0; Y < rows + 1; Y++) {
-            this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
+            this.drawRect(x, y + (Y * sizeY), cols * sizeX, 2, fg, fg);
         }
     }
     drawItemStack(itemName, scale, x, y, quant, showQuant) {

@@ -90,16 +90,16 @@ class Render {
     // }
   }
 
-  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, size: number, border = false, rounded = false): void {
+  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, sizeX: number,sizeY: number, border = false, rounded = false): void {
     // if border then rectb(x,y,cols*size+1,rows*size+1,fg) end
     // this.drawRect(x, y, cols * size, rows * size, bg, bg);
 
     for (let X = 0; X < cols + 1; X++) {
-      this.drawRect(x + (X * size), y, 2, rows * size, fg, fg);
+      this.drawRect(x + (X * sizeX), y, 2, rows * sizeY, fg, fg);
     }
 
     for (let Y = 0; Y < rows + 1; Y++) {
-      this.drawRect(x, y + (Y * size), cols * size, 2, fg, fg);
+      this.drawRect(x, y + (Y * sizeY), cols * sizeX, 2, fg, fg);
     }
     
     //! Dont work
