@@ -1,15 +1,12 @@
-import Inventory from "./inventory.js";
 import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
-    inv = new Inventory(0, 0, 1, 1, 8 * 6, 8 * 6, 8 * 6);
     l = false;
     m = false;
     r = false;
     holdTime = 0;
     type = "pointer";
-    prog = false;
     drag = false;
     rot = 0;
     constructor() {

@@ -62,12 +62,6 @@ class Player {
         if (keys.d) {
             xDir = 1;
         }
-        if (!cursorProg) {
-            if (xDir !== 0 || yDir !== 0) {
-                RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
-                RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
-            }
-        }
         this.lastDir = `${xDir},${yDir}`;
         switch (this.lastDir) {
             case "-1,0": {

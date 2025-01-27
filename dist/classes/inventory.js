@@ -1,4 +1,5 @@
 import render from "./render.js";
+import Label from "./label.js";
 import { items } from "./definitions.js";
 export default class Inventory {
     slots = new Map();
@@ -7,8 +8,10 @@ export default class Inventory {
     size;
     rows;
     cols;
+    panelText;
     visible = false;
-    constructor(x, y, rows, cols, slotSize, width, height) {
+    constructor(panelText, x, y, rows, cols, slotSize, width, height) {
+        this.panelText = panelText;
         this.pos = { x: x, y: y };
         this.size = { w: width, h: height };
         this.rows = rows;
@@ -23,8 +26,13 @@ export default class Inventory {
         }
     }
     draw() {
-        render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue");
-        render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
+        render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", { x: 1, y: 1 }));
+        if (this.rows + this.cols > 2) {
+            render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, false, false);
+        }
+        else {
+            render.drawRect(this.pos.x, this.pos.y, this.slotSize, this.slotSize, "white", "white");
+        }
         this.slots.forEach((slot) => {
             if (slot.itemName !== "") {
                 render.drawItemStack(slot.itemName, 4, slot.x + (this.slotSize / 5), slot.y + (this.slotSize / 5), slot.quant, true);
@@ -85,16 +93,36 @@ export default class Inventory {
         }
         return returnData;
     }
-    removeStack(index) {
+    removeStack(index, quantity) {
         const slot = this.getSlot(index);
         if (slot !== undefined) {
-            const name = slot.itemName;
-            slot.itemName = "";
-            const quant = slot.quant;
-            slot.quant = 0;
+            let name = slot.itemName;
+            let quant = 0;
+            if (quantity === "full" || slot.quant <= 1) {
+                slot.itemName = "";
+                quant = slot.quant;
+                slot.quant = 0;
+            }
+            else if (quantity === "half") {
+                const half = Math.floor(slot.quant / 2);
+                const remainder = slot.quant - half;
+                slot.quant = half;
+                quant = remainder;
+            }
             return { itemName: name, quant: quant };
         }
         return undefined;
+    }
+    swapStacks(index, itemName, quant) {
+        const returnData = { itemName: itemName, quant: quant };
+        const slot = this.getSlot(index);
+        if (slot !== undefined) {
+            returnData.itemName = slot.itemName;
+            returnData.quant = slot.quant;
+            slot.itemName = itemName;
+            slot.quant = quant;
+        }
+        return returnData;
     }
     moveTo(x, y) {
         this.pos.x = x;

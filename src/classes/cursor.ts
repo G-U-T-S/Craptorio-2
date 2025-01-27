@@ -16,9 +16,8 @@ import render from "./render.js";
 class Cursor {
   public x = 0; public y = 0;
   public l = false; public m = false; public r = false;
-  // public heldLeft = false; public heldRight = false;
   public holdTime = 0; public type: "pointer" | "item" = "pointer";
-  public prog = false; public drag = false; public rot = 0;
+  public drag = false; public rot = 0;
 
   constructor() {
     window.addEventListener("mousemove", (ev) => {

@@ -47,7 +47,7 @@ class Inventory {
     const slot = this.getHoveredSlot(cursor.x, cursor.y);
     
     if (this.visible) {
-      render.drawPanel(this.x, this.y, this.w, this.h, "blue", "blue", "drakBlue", new Label("Inventory", "black", "white", {x: 1, y: 1}));
+      render.drawPanel(this.x, this.y, this.w, this.h, "blue", "blue", "drakBlue", );
       render.drawGrid(this.x, this.y, this.rows, this.colomns, "white", "white", this.slotSize, false, false);
     
       this.slots.forEach((slot) => {

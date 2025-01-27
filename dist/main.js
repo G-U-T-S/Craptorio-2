@@ -13,6 +13,7 @@ window.addEventListener("contextmenu", (ev) => {
 let tileSize = 8 * 4;
 const ents = {
     assembly_machine: new Map(),
+    stone_furnace: new Map(),
     wood_chest: new Map(),
 };
 const gridData = new Map();
@@ -28,10 +29,11 @@ let crafterAnimTick = 0;
 let crafterAnimDir = 1;
 let state = "game";
 window.addEventListener("mousedown", () => {
-    if (cursor.l)
+    if (cursor.l) {
         debugInv.depositStack("copper_plate", 30, 5, true);
+    }
     else {
-        debugInv.removeStack(0);
+        debugInv.removeStack(0, "full");
     }
 });
 window.addEventListener("keydown", (ev) => {
@@ -112,16 +114,20 @@ function getEntData(globalPos) {
     return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts() {
-    ents.assembly_machine.forEach((machine) => {
-        machine.update();
+    Object.entries(ents).forEach((value) => {
+        value[1].forEach((ent) => {
+            if (ent instanceof WoodChest) {
+                return;
+            }
+            ent.update();
+        });
     });
 }
 function drawEnts() {
-    ents.wood_chest.forEach((chest) => {
-        chest.draw();
-    });
-    ents.assembly_machine.forEach((machine) => {
-        machine.draw();
+    Object.entries(ents).forEach((value) => {
+        value[1].forEach((ent) => {
+            ent.draw();
+        });
     });
 }
 function startMenuLoop() {
@@ -172,10 +178,6 @@ function gameLoop() {
     }
     updateEnts();
     drawEnts();
-    const slot = cursor.inv.getSlot(0);
-    if (cursor.type === "item" && slot !== undefined) {
-        render.drawItemStack(slot.itemName, 3, cursor.x, cursor.y, slot.quant, false);
-    }
     render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
 }
 const cols = 5;
@@ -185,7 +187,7 @@ const w = slotSize * cols;
 const h = slotSize * rows;
 const x = (render.size.w / 2) - (w / 2);
 const y = (render.size.h / 2) - (h / 2);
-const debugInv = new Inventory(x, y, rows, cols, slotSize, w, h);
+const debugInv = new Inventory("Inventory", x, y, rows, cols, slotSize, w, h);
 render.addResizeListener(() => {
     debugInv.moveTo((render.size.w / 2) - (w / 2), (render.size.h / 2) - (h / 2));
 });

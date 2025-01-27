@@ -23,6 +23,7 @@ window.addEventListener("contextmenu", (ev) => {
 let tileSize = 8 * 4;
 const ents = {
   assembly_machine: new Map<string, AssemblyMachine>(),
+  stone_furnace: new Map<string, StoneFurnace>(),
   wood_chest: new Map<string, WoodChest>(),
 };
 //! key == a posição, value == [entType, entKey];
@@ -76,7 +77,7 @@ window.addEventListener("mousedown", () => {
   //   }
   //   return;
   // }
-  
+
   /*
   // const entData = getEntData({ ...screenToWorld(cursor.x, cursor.y, true) });
   // if (cursor.type === 'item' && cursor.itemStack.name !== "") {
@@ -100,7 +101,7 @@ window.addEventListener("mousedown", () => {
   // }
   */
 
-  
+
 });
 
 window.addEventListener("keydown", (ev) => {
@@ -110,19 +111,19 @@ window.addEventListener("keydown", (ev) => {
 });
 
 
-function screenToWorld(x: number, y: number, snapToGrid: boolean): {x: number, y: number} {
-  const worldPos = {x: x + render.topLeft.x, y: y + render.topLeft.y};
-  
+function screenToWorld(x: number, y: number, snapToGrid: boolean): { x: number, y: number } {
+  const worldPos = { x: x + render.topLeft.x, y: y + render.topLeft.y };
+
   if (snapToGrid) {
     return {
       x: Math.floor(worldPos.x / tileSize) * tileSize,
       y: Math.floor(worldPos.y / tileSize) * tileSize
     };
   }
-  
+
   return { ...worldPos };
 }
-function placeEnt(type: "assembly_machine" | "wood_chest", globalPos: {x: number, y: number}): boolean {
+function placeEnt(type: "assembly_machine" | "wood_chest", globalPos: { x: number, y: number }): boolean {
   switch (type) {
     case "wood_chest": {
       const key = `${globalPos.x}-${globalPos.y}`;
@@ -158,7 +159,7 @@ function placeEnt(type: "assembly_machine" | "wood_chest", globalPos: {x: number
 
   return false;
 }
-function removeEnt(globalPos: {x: number, y: number}): boolean {
+function removeEnt(globalPos: { x: number, y: number }): boolean {
   const mouseKey = `${globalPos.x}-${globalPos.y}`;
 
   if (gridData.has(mouseKey)) {
@@ -184,30 +185,42 @@ function removeEnt(globalPos: {x: number, y: number}): boolean {
         break;
       }
     }
-    
+
     return true;
   }
-  
+
   return false;
 }
-function getEntData(globalPos: {x: number, y: number}): undefined | {entKey: string, entName: string} {
+function getEntData(globalPos: { x: number, y: number }): undefined | { entKey: string, entName: string } {
   const mouseKey = `${globalPos.x}-${globalPos.y}`;
   const mouseTile = gridData.get(mouseKey)
 
-  return mouseTile !== undefined ? {entName: mouseTile[0], entKey: mouseTile[1]} : undefined;
+  return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts(): void {
-  ents.assembly_machine.forEach((machine) => {
-    machine.update();
+  Object.entries(ents).forEach((value) => {
+    value[1].forEach((ent) => {
+      if (ent instanceof WoodChest) {
+        return;
+      }
+
+      ent.update();
+    });
   });
 }
 function drawEnts(): void {
-  ents.wood_chest.forEach((chest) => {
-    chest.draw();
+  Object.entries(ents).forEach((value) => {
+    value[1].forEach((ent) => {
+      ent.draw();
+    });
   });
-  ents.assembly_machine.forEach((machine) => {
-    machine.draw();
-  });
+
+  // ents.wood_chest.forEach((chest) => {
+  //   chest.draw();
+  // });
+  // ents.assembly_machine.forEach((machine) => {
+  //   machine.draw();
+  // });
 }
 
 function startMenuLoop(): void {
@@ -236,7 +249,7 @@ function gameLoop(): void {
     if (drillBitTick > 7 && drillBitTick < 0) {
       drillBitDir = drillBitDir * -1;
     }
-    
+
     drillAnimTick += 1;
     if (drillAnimTick > 2) {
       drillAnimTick = 0;
@@ -249,7 +262,7 @@ function gameLoop(): void {
       // set_sprite_pixel(490, 0, y, floor(math.random(2, 4)))
       // set_sprite_pixel(490, 1, y, floor(math.random(2, 4)))
     }
-    
+
     if (furnaceAnimTick > StoneFurnace.animMaxTick) {
       furnaceAnimTick = 0;
     }
@@ -257,7 +270,7 @@ function gameLoop(): void {
 
   if (tick % AssemblyMachine.animTickRate === 0) {
     crafterAnimTick = crafterAnimTick + crafterAnimDir;
-    
+
     if (crafterAnimTick > 5) {
       crafterAnimDir = -1;
     }
@@ -291,7 +304,7 @@ const h = slotSize * rows;
 const x = (render.size.w / 2) - (w / 2);
 const y = (render.size.h / 2) - (h / 2);
 const debugInv = new Inventory(
-  x, y, rows, cols, slotSize, w, h
+  "Inventory", x, y, rows, cols, slotSize, w, h
 )
 render.addResizeListener(() => {
   debugInv.moveTo(
