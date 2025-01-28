@@ -62,12 +62,6 @@ class Player {
         if (keys.d) {
             xDir = 1;
         }
-        if (!cursorProg) {
-            if (xDir !== 0 || yDir !== 0) {
-                RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
-                RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
-            }
-        }
         this.lastDir = `${xDir},${yDir}`;
         switch (this.lastDir) {
             case "-1,0": {
@@ -109,8 +103,6 @@ class Player {
         }
     }
     draw() {
-        RENDER.drawSprite("rotatableSprite", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y - ((8 * 5) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
+        RENDER.drawSprite("rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y - ((8 * 4) / 2) + this.animFrame, this.atlasCoord.x, this.atlasCoord.y);
     }
 }
-const player = new Player();
-export default player;

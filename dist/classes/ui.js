@@ -1,5 +1,5 @@
 import render from "./render.js";
-import { Label } from "./label.js";
+import Label from "./label.js";
 class Ui {
     currentHelp;
     constructor() {

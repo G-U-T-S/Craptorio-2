@@ -5,6 +5,11 @@ export default class StoneFurnace {
     static animMaxTick = 2;
     type = "stone_furnace";
     globalPos;
+    atlasCoords = {
+        fullSize: { x: 72, y: 64 },
+        mediun: { x: 80, y: 16 },
+        small: { x: 80, y: 24 }
+    };
     updated = false;
     drawn = false;
     isHovered = false;
@@ -13,6 +18,6 @@ export default class StoneFurnace {
     }
     update() { }
     draw() {
-        RENDER.drawSprite("staticSprite", 5, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, 64, 64, 16, 16);
+        RENDER.drawSprite("staticSprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, this.atlasCoords.fullSize.x, this.atlasCoords.fullSize.y, 16, 16);
     }
 }

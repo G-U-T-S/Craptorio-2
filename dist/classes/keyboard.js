@@ -9,12 +9,12 @@ class Keyboard {
     i = false;
     h = false;
     c = false;
+    tab = false;
     t = false;
     y = false;
     shift = false;
     alt = false;
     ctrl = false;
-    tab = false;
     constructor() {
         window.addEventListener("keydown", (ev) => {
             switch (ev.key) {

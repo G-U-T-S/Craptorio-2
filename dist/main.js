@@ -1,34 +1,23 @@
 import render from "./classes/render.js";
 import ui from "./classes/ui.js";
-import keyboard from "./classes/keyboard.js";
+import playerInv from "./classes/playerInv.js";
+import craftMenu from "./classes/craftMenu.js";
 import cursor from "./classes/cursor.js";
-import player from "./classes/player.js";
 import StoneFurnace from "./classes/entities/stone_furnace.js";
 import UndergroundBelt from "./classes/entities/undergroundBelt.js";
 import MiningDrill from "./classes/entities/mining_drill.js";
-import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./classes/entities/assembly_machine.js";
 import WoodChest from "./classes/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
-const tileScale = 5;
-const tileSize = 8 * tileScale;
-const currentRecipe = { x: 0, y: 0, id: 0 };
-const ents = {};
-const visEnts = {
-    transport_belt: [],
-    inserter: [],
-    splitter: [],
-    mining_drill: [],
-    stone_furnace: [],
-    underground_belt: [],
-    assembly_machine: [],
-    research_lab: [],
-    wood_chest: [],
-    bio_refinary: [],
-    rocket_silo: []
+let tileSize = 8 * 4;
+const ents = {
+    assembly_machine: new Map(),
+    stone_furnace: new Map(),
+    wood_chest: new Map(),
 };
+const gridData = new Map();
 let tick = 0;
 let beltTick = 0;
 let uBeltTick = 0;
@@ -36,195 +25,125 @@ let drillTick = 0;
 let drillBitTick = 0;
 let drillBitDir = 1;
 let drillAnimTick = 0;
-let furnaceTick = 0;
 let furnaceAnimTick = 0;
-let crafterTick = 0;
 let crafterAnimTick = 0;
 let crafterAnimDir = 1;
-let delta = 0;
-let lastTime = 0;
-let state = "start";
-let showTech = false;
-let showHelp = false;
-let showMiniMap = false;
-let showTileWidget = false;
-let altMode = false;
-function screenToWorld(x, y) {
-    return { x: x + render.topLeft.x, y: y + render.topLeft.y };
-}
-function getVisibleEnts() {
-    Object.entries(visEnts).forEach((value) => {
-        const index = value[0];
-        visEnts[index] = [];
-    });
-    for (let worldX = render.topLeft.x - tileSize; worldX < render.topLeft.x + render.canvas.width; worldX++) {
-        if (worldX % tileSize !== 0) {
-            continue;
+let state = "game";
+let secodWindowMode = "craft";
+window.addEventListener("mousedown", () => {
+    if (playerInv.visible) {
+        if (playerInv.isHovered(cursor.x, cursor.y)) {
+            playerInv.handleClick(cursor.x, cursor.y);
+            return;
         }
-        for (let worldY = render.topLeft.y - tileSize; worldY < render.topLeft.y + render.canvas.height; worldY++) {
-            if (worldY % tileSize !== 0) {
-                continue;
-            }
-            const coord = worldX + '-' + worldY;
-            if (ents[coord] !== undefined && visEnts[ents[coord].type] !== undefined) {
-                const type = ents[coord].type;
-                visEnts[type].push(coord);
-            }
+        else if (craftMenu.isHovered(cursor.x, cursor.y)) {
+            craftMenu.handleClick(cursor.x, cursor.y);
+            return;
         }
     }
+});
+window.addEventListener("keydown", (ev) => {
+    if (ev.key === "i" || ev.key === "Tab") {
+        playerInv.visible = !playerInv.visible;
+    }
+});
+function screenToWorld(x, y, snapToGrid) {
+    const worldPos = { x: x + render.topLeft.x, y: y + render.topLeft.y };
+    if (snapToGrid) {
+        return {
+            x: Math.floor(worldPos.x / tileSize) * tileSize,
+            y: Math.floor(worldPos.y / tileSize) * tileSize
+        };
+    }
+    return { ...worldPos };
+}
+function placeEnt(type, globalPos) {
+    switch (type) {
+        case "wood_chest": {
+            const key = `${globalPos.x}-${globalPos.y}`;
+            if (!gridData.has(key)) {
+                gridData.set(key, ["wood_chest", key]);
+                ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
+                return true;
+            }
+            break;
+        }
+        case "assembly_machine": {
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+                    if (gridData.has(key)) {
+                        return false;
+                    }
+                }
+            }
+            ents.assembly_machine.set(`${globalPos.x}-${globalPos.y}`, new AssemblyMachine({ ...globalPos }));
+            for (let x = 0; x < 3; x++) {
+                for (let y = 0; y < 3; y++) {
+                    const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+                    gridData.set(key, ["assembly_machine", `${globalPos.x}-${globalPos.y}`]);
+                }
+            }
+            return true;
+        }
+    }
+    return false;
+}
+function removeEnt(globalPos) {
+    const mouseKey = `${globalPos.x}-${globalPos.y}`;
+    if (gridData.has(mouseKey)) {
+        const mouseTile = gridData.get(mouseKey);
+        switch (mouseTile[0]) {
+            case "wood_chest": {
+                ents.wood_chest.delete(mouseKey);
+                gridData.delete(mouseKey);
+                break;
+            }
+            case "assembly_machine": {
+                const machine = ents.assembly_machine.get(mouseTile[1]);
+                ents.assembly_machine.delete(mouseTile[1]);
+                for (let x = 0; x < 3; x++) {
+                    for (let y = 0; y < 3; y++) {
+                        const key = `${machine.globalPos.x + (x * tileSize)}-${machine.globalPos.y + (y * tileSize)}`;
+                        gridData.delete(key);
+                    }
+                }
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+function getEntData(globalPos) {
+    const mouseKey = `${globalPos.x}-${globalPos.y}`;
+    const mouseTile = gridData.get(mouseKey);
+    return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts() {
     Object.entries(ents).forEach((value) => {
-        const ent = value[1];
-        if (ent !== undefined && !(ent instanceof WoodChest)) {
+        value[1].forEach((ent) => {
+            if (ent instanceof WoodChest) {
+                return;
+            }
             ent.update();
-        }
+        });
     });
 }
 function drawEnts() {
-    if (showMiniMap || showHelp || state !== 'game') {
-        return;
-    }
-    visEnts.transport_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.transport_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            const belt = ents[coord];
-            belt.drawItems();
-        }
-    });
-    visEnts.underground_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.underground_belt.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            const uBelt = ents[coord];
-            uBelt.drawItems();
-        }
-    });
-    visEnts.stone_furnace.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.splitter.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.mining_drill.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.assembly_machine.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.research_lab.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.wood_chest.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.rocket_silo.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.bio_refinary.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
-    });
-    visEnts.inserter.forEach((coord) => {
-        if (ents[coord] !== undefined) {
-            ents[coord].draw();
-        }
+    Object.entries(ents).forEach((value) => {
+        value[1].forEach((ent) => {
+            ent.draw();
+        });
     });
 }
-function dispatchKeypress() {
-    if (keyboard.m) {
-        showMiniMap = !showMiniMap;
-    }
-    if (keyboard.r) {
-        if (keyboard.shift) {
-            cursor.rotate('l');
-        }
-        else {
-            cursor.rotate('r');
-        }
-    }
-    showTileWidget = keyboard.shift;
-    if (keyboard.alt) {
-        altMode = !altMode;
-    }
-    if (keyboard.t) {
-        showTech = !showTech;
-    }
+function startMenuLoop() {
+    state = ui.drawStartMenu();
 }
-function dispatchInput() {
-    cursor.update();
-    dispatchKeypress();
-    if (showTech) {
-        return;
-    }
-    const coord = screenToWorld(cursor.x, cursor.y);
-    const ent = ents[`${coord.x}-${coord.y}`];
-    if (ent !== undefined) {
-        ent.isHovered = true;
-    }
-    if (!cursor.l) {
-        cursor.panelDrag = false;
-        cursor.drag = false;
-    }
-    if (cursor.type === 'item' && cursor.itemStack.id !== 0) {
-    }
+function helpMenuLoop() {
+    state = ui.drawHelpMenu();
 }
-function BOOT() {
-    TIC(1);
-}
-function TIC(currentTime) {
-    delta = (currentTime - lastTime) / 100;
-    lastTime = currentTime;
-    currentRecipe.x = 0;
-    currentRecipe.y = 0;
-    currentRecipe.id = 0;
-    if (state === "start") {
-        cursor.update();
-        state = ui.drawStartMenu();
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    else if (state === "help") {
-        cursor.update();
-        state = ui.drawHelpMenu();
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    if (state === 'firstLaunch') {
-        cursor.update();
-        state = ui.drawEndgameWindow(tick);
-        tick += 1;
-        requestAnimationFrame(TIC);
-        return;
-    }
-    render.drawBg("black");
-    getVisibleEnts();
-    player.update(delta, tick, { w: keyboard.w, a: keyboard.a, s: keyboard.s, d: keyboard.d }, cursor.prog);
-    dispatchInput();
+function gameLoop() {
     if (tick % UndergroundBelt.tickRate === 0) {
         beltTick += 1;
         if (beltTick > UndergroundBelt.maxTick) {
@@ -266,34 +185,40 @@ function TIC(currentTime) {
     }
     updateEnts();
     drawEnts();
-    if (!showMiniMap) {
-    }
-    player.draw();
-    let col = 5;
-    if (cursor.r) {
-        col = 2;
-    }
-    if (!showMiniMap) {
-    }
-    let totalEnts = 0;
-    Object.entries(visEnts).forEach((value) => {
-        const arr = value[1];
-        totalEnts += arr.length;
-    });
-    Object.entries(ents).forEach((value) => {
-        const ent = value[1];
-        if (ent !== undefined) {
-            if (!(ent instanceof WoodChest)) {
-                ent.updated = false;
-            }
-            ent.drawn = false;
-            ent.isHovered = false;
-            if (ent instanceof TransportBelt) {
-                ent.beltDrawn = false;
-                ent.curveChecked = false;
-            }
+    if (playerInv.visible) {
+        playerInv.draw();
+        if (secodWindowMode === "craft") {
+            craftMenu.draw();
         }
-    });
+        else if (secodWindowMode === "ent") {
+            return;
+        }
+    }
+    if (cursor.type === "item") {
+        render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);
+    }
+    render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
+}
+function BOOT() {
+    TIC(1);
+}
+function TIC(currentTime) {
+    render.drawBg("black");
+    cursor.update();
+    switch (state) {
+        case "start": {
+            startMenuLoop();
+            break;
+        }
+        case "help": {
+            helpMenuLoop();
+            break;
+        }
+        case "game": {
+            gameLoop();
+            break;
+        }
+    }
     tick = tick + 1;
     requestAnimationFrame(TIC);
 }

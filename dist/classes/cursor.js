@@ -2,21 +2,14 @@ import render from "./render.js";
 class Cursor {
     x = 0;
     y = 0;
+    itemStack = { name: "iron_plate", quant: 10 };
     l = false;
-    ll = false;
-    itemStack = { id: 0, count: 0 };
     m = false;
     r = false;
-    panelDrag = false;
-    heldLeft = false;
-    heldRight = false;
     holdTime = 0;
-    type = "pointer";
-    prog = false;
+    type = "item";
     drag = false;
     rot = 0;
-    mouseDownListeners = [];
-    mouseUpListeners = [];
     constructor() {
         window.addEventListener("mousemove", (ev) => {
             const rect = render.canvas.getBoundingClientRect();
@@ -33,9 +26,6 @@ class Cursor {
             if (ev.button === 2) {
                 this.r = true;
             }
-            this.mouseDownListeners.forEach((func) => {
-                func();
-            });
         });
         window.addEventListener("mouseup", (ev) => {
             if (ev.button === 0) {
@@ -47,31 +37,9 @@ class Cursor {
             if (ev.button === 2) {
                 this.r = false;
             }
-            this.mouseUpListeners.forEach((func) => {
-                func();
-            });
         });
     }
     update() {
-        const l = this.l;
-        const r = this.r;
-        if (l && this.l && !this.heldLeft && !this.r) {
-            this.heldLeft = true;
-        }
-        if (r && this.r && !this.heldRight && !this.l) {
-            this.heldRight = true;
-        }
-        if (this.heldLeft || this.heldRight) {
-            this.holdTime = this.holdTime + 1;
-        }
-        if (!l && this.heldLeft) {
-            this.heldLeft = false;
-            this.holdTime = 0;
-        }
-        if (!r && this.heldRight) {
-            this.heldRight = false;
-            this.holdTime = 0;
-        }
     }
     rotate(dir) {
         if (cursor.drag) {
@@ -84,11 +52,17 @@ class Cursor {
             }
         }
     }
-    addMouseDownListener(func) {
-        this.mouseDownListeners.push(func);
-    }
-    addMouseUpListener(func) {
-        this.mouseUpListeners.push(func);
+    setItem(stack) {
+        if (stack !== undefined) {
+            this.itemStack.name = stack.name;
+            this.itemStack.quant = stack.quant;
+            this.type = "item";
+        }
+        else {
+            this.itemStack.name = "";
+            this.itemStack.quant = 0;
+            this.type = "pointer";
+        }
     }
 }
 const cursor = new Cursor();

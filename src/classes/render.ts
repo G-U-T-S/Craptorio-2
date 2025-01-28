@@ -1,5 +1,6 @@
 import CURSOR from "./cursor.js";
-import { Label } from "./label.js";
+import Label from "./label.js";
+import { items } from "./definitions.js";
 
 
 class Render {
@@ -7,18 +8,19 @@ class Render {
   public context: CanvasRenderingContext2D;
   public topLeft: {x: number, y: number};
   public size: {w: number, h: number};
-  public centerCanvas: {x: number, y: number};
+  public center: {x: number, y: number};
   public integerScale: boolean;
   private staticSpritesAtlas: HTMLImageElement;
   private rotatableSpritesAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
+  private resizeCallbacks: Array<CallableFunction> = []
   
   constructor() {
     this.canvas = document.getElementsByTagName("Canvas")[0] as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     this.topLeft = {x: 0, y: 0};
     this.size = {w: 0, h: 0};
-    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
+    this.center = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.staticSpritesAtlas = new Image();
     this.staticSpritesAtlas.src = "./assets/staticSprites.png";
     this.rotatableSpritesAtlas = new Image();
@@ -58,19 +60,22 @@ class Render {
     this.context.fillRect(x, y, w, h);
   }
   
-  drawLine(x1: number, y1: number, x2: number, y2: number, strokeColor: string): void {
-    this.context.strokeStyle = strokeColor;
-    this.context.moveTo(x1, y1);
-    this.context.lineTo(x2, y2);
-  }
+  // drawLine(x1: number, y1: number, x2: number, y2: number, strokeColor: string): void {
+  //   this.context.strokeStyle = strokeColor;
+  //   this.context.moveTo(x1, y1);
+  //   this.context.lineTo(x2, y2);
+  // }
   
-  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label: Label): void {
+  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label?: Label): void {
     this.drawRect(x, y, w, h, bg, bg); //-- background fill
     // drawRect(x, y + 6, w, 3, fg); //-- header lower-fill
     // drawRect(x + 2, y + h - 3, w - 4, 1, fg); //-- bottom footer fill
     // drawRect(x + (w / 2), y - 15, 50, 4, fg); //--header fill
     
-    this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+
+    if (label) {
+      this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+    }
     //TODO drawText(label.text, x + (w / 2), (y - 15) + 2, 20, label.fg, "middle", "center");
   
     //TODO drawRect(x + 6, y, w - 12, 2, fg); //-- top border
@@ -83,6 +88,48 @@ class Render {
     //   drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color); //-- shadow
     //   drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
     // }
+  }
+
+  drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, sizeX: number,sizeY: number, border = false, rounded = false): void {
+    // if border then rectb(x,y,cols*size+1,rows*size+1,fg) end
+    // this.drawRect(x, y, cols * size, rows * size, bg, bg);
+
+    for (let X = 0; X < cols + 1; X++) {
+      this.drawRect(x + (X * sizeX), y, 2, rows * sizeY, fg, fg);
+    }
+
+    for (let Y = 0; Y < rows + 1; Y++) {
+      this.drawRect(x, y + (Y * sizeY), cols * sizeX, 2, fg, fg);
+    }
+    
+    //! Dont work
+    // if (rounded) {
+    //   for (let i = 0; i < rows; i ++) {
+    //     for (let j = 0; j < cols; j++) {
+    //       const xx = x + ( j * size);
+    //       const yy = y +( i * size);
+
+    //       this.drawRect(xx, yy, 1, 1, fg, fg);
+    //       this.drawRect(xx + size - 2, yy, 1, 1, fg, fg);
+    //       this.drawRect(xx + size - 2, yy + size - 2, 1, 1, fg, fg);
+    //       this.drawRect(xx, yy + size - 2, 1, 1, fg, fg);
+    //     }
+    //   }
+    // }
+  }
+
+  drawItemStack(itemName:string, scale: number, x: number, y: number, quant: number, showQuant: boolean): void {
+    this.drawSprite(
+      "staticSprite", scale, x, y,
+      items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y
+    );
+    
+    if (showQuant) {
+      const text = `${quant}`;
+      this.drawText(
+        text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right"
+      );
+    }
   }
 
   drawText(text: string, x: number, y: number, fontSize: number, color: string, baseLine: "top" | "bottom" | "middle", textAling: "left" | "center" | "right"): void {
@@ -158,9 +205,11 @@ class Render {
     }
   
     this.size = {w: this.canvas.width, h: this.canvas.height};
-    this.centerCanvas = {x: this.canvas.width / 2, y: this.canvas.height / 2};
+    this.center = {x: this.canvas.width / 2, y: this.canvas.height / 2};
     this.context.imageSmoothingEnabled = false;
     this.drawBg("black");
+
+    this.resizeCallbacks.forEach((func) => { func() });
   }
 
   isHovered(mouse: {x: number, y: number}, box: {x: number, y: number, w: number, h: number}): boolean {
@@ -178,6 +227,10 @@ class Render {
     }
 
     return false;
+  }
+
+  addResizeListener(callback: CallableFunction): void {
+    this.resizeCallbacks.push(callback);
   }
 }
 

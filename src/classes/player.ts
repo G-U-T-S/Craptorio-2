@@ -67,28 +67,28 @@ class Player {
       xDir = 1;
     }
 
-    if (!cursorProg) {
-      // const dust_dir = this.directions[`${x_dir},${y_dir}`].dust;
+    // if (!cursorProg) {
+    //   // const dust_dir = this.directions[`${x_dir},${y_dir}`].dust;
 
-      // const dx: number = 240/2 - 4 + dust_dir.x;
-      // const dy: number = 136/2 - 4 + this.anim_frame + dust_dir.y;
+    //   // const dx: number = 240/2 - 4 + dust_dir.x;
+    //   // const dy: number = 136/2 - 4 + this.anim_frame + dust_dir.y;
       
-      //& Math.random() retornar entre 0 e 1;
-      // if (dust_dir && (x_dir !== 0 || y_dir !== 0)) {
-      //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
-      // }
-      // else if (tick % 24 == 0) {
-      //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
-      // }
+    //   //& Math.random() retornar entre 0 e 1;
+    //   // if (dust_dir && (x_dir !== 0 || y_dir !== 0)) {
+    //   //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
+    //   // }
+    //   // else if (tick % 24 == 0) {
+    //   //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
+    //   // }
       
-      if (xDir !== 0 || yDir !== 0) {
-        // sound('move');
-        //! removi o delta time
-        // this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
-        RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
-        RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
-      }
-    }
+    //   if (xDir !== 0 || yDir !== 0) {
+    //     // sound('move');
+    //     //! removi o delta time
+    //     // this.move(xDir * this.moveSpeed, yDir * this.moveSpeed);
+    //     RENDER.topLeft.x += (xDir * this.moveSpeed) * delta;
+    //     RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
+    //   }
+    // }
   
     this.lastDir = `${xDir},${yDir}`;
 
@@ -139,11 +139,11 @@ class Player {
 
   public draw() {
     RENDER.drawSprite(
-      "rotatableSprite", 5, RENDER.centerCanvas.x - ((8 * 5) / 2), RENDER.centerCanvas.y  - ((8 * 5) / 2) + this.animFrame,
+      "rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y  - ((8 * 4) / 2) + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }
 }
 
-const player = new Player();
-export default player;
+// const player = new Player();
+// export default player;
