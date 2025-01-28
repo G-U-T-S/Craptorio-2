@@ -1,5 +1,6 @@
 import cursor from "./cursor.js";
 import render from "./render.js";
+import { items } from "./definitions.js";
 class ItemButton {
     x;
     y;
@@ -20,11 +21,16 @@ class ItemButton {
         return false;
     }
     draw() {
+        render.drawRect(this.x, this.y, this.w, this.h, "blue", "darkBlues");
+        const x = this.x + (this.w / 2) - ((8 * 5) / 2);
+        const y = this.y + (this.h / 2) - ((8 * 5) / 2);
+        ;
+        render.drawSprite("staticSprite", 5, x, y, items[this.name].atlasCoord.normal.x, items[this.name].atlasCoord.normal.y);
     }
 }
 class CraftMenu {
-    cols = 7;
-    rows = 5;
+    cols = 1;
+    rows = 1;
     btnSize = 8 * 6;
     w = this.btnSize * this.cols;
     h = this.btnSize * this.rows;
@@ -36,7 +42,26 @@ class CraftMenu {
         render.addResizeListener(() => {
             this.x = (render.size.w / 2) + 5;
             this.y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
+            let index = 0;
+            for (let x = 0; x < this.rows; x++) {
+                for (let y = 0; y < this.cols; y++) {
+                    const btn = this.buttons[index];
+                    btn.x = this.x + (x * this.btnSize);
+                    btn.y = this.y + (y * this.btnSize);
+                }
+                index++;
+            }
         });
+        const namesArray = [
+            "green_circuit",
+        ];
+        let index = 0;
+        for (let x = 0; x < this.rows; x++) {
+            for (let y = 0; y < this.cols; y++) {
+                this.buttons.push(new ItemButton(namesArray[index], this.x + (x * this.btnSize), this.y + (y * this.btnSize), this.btnSize, this.btnSize));
+            }
+            index++;
+        }
     }
     draw() {
         render.drawSprite("staticSprite", 7, this.x + ((8 * 5) / 2), (this.y - 24 * 4) + ((8 * 5) / 2), 48, 40, 8, 8);
@@ -60,7 +85,9 @@ class CraftMenu {
             }
         });
     }
-    craft(itemName) { }
+    craft(itemName) {
+        console.log(itemName);
+    }
 }
 const craftMenu = new CraftMenu();
 export default craftMenu;

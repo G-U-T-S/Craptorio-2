@@ -17,6 +17,15 @@ export const items = {
             small: { x: 8, y: 8 }
         }
     },
+    "green_circuit": {
+        fancyName: "Green Circuit",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 64, y: 0 },
+            small: { x: 64, y: 8 }
+        }
+    },
     "stone_furnace": {
         fancyName: "Stone Furnace",
         info: "Used to smelt items",
