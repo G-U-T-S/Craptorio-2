@@ -216,6 +216,8 @@ function updateEnts(): void {
   });
 }
 function drawEnts(): void {
+  //TODO check inside screen
+  
   Object.entries(ents).forEach((value) => {
     value[1].forEach((ent) => {
       ent.draw();
@@ -306,9 +308,9 @@ function gameLoop(): void {
     );
   }
 
-  render.drawText(
-    `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"
-  );
+  // render.drawText(
+  //   `total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left"
+  // );
 }
 
 

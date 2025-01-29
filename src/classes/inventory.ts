@@ -129,6 +129,8 @@ export default class Inventory {
   }
 
   removeStack(index: number, quantity: "full" | "half"): undefined | {itemName: string, quant: number} {
+    //TODO need a rework for the "force" funcionality
+    
     const slot = this.getSlot(index);
 
     if (slot !== undefined) {

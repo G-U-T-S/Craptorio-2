@@ -197,7 +197,6 @@ function gameLoop() {
     if (cursor.type === "item") {
         render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);
     }
-    render.drawText(`total ents: ${ents.assembly_machine.size + ents.wood_chest.size}`, 50, 50, 30, "white", "top", "left");
 }
 function BOOT() {
     TIC(1);

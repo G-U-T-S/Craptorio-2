@@ -95,11 +95,11 @@ class Render {
     // this.drawRect(x, y, cols * size, rows * size, bg, bg);
 
     for (let X = 0; X < cols + 1; X++) {
-      this.drawRect(x + (X * sizeX), y, 2, rows * sizeY, fg, fg);
+      this.drawRect(x + (X * sizeX), y, 1, rows * sizeY, fg, fg);
     }
 
     for (let Y = 0; Y < rows + 1; Y++) {
-      this.drawRect(x, y + (Y * sizeY), cols * sizeX, 2, fg, fg);
+      this.drawRect(x, y + (Y * sizeY), cols * sizeX, 1, fg, fg);
     }
     
     //! Dont work

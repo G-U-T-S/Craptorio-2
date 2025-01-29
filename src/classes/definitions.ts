@@ -36,6 +36,15 @@ export const items: { [index: string]: Iitem } = {
       small: {x: 64, y: 8}
     }
   },
+  "inserter": {
+    fancyName: "Inserter",
+    info: "",
+    stackSize: 50,
+    atlasCoord: {
+      normal: {x: 48, y: 40},
+      small: {x: 0, y: 0}
+    }
+  },
   "stone_furnace": {
     fancyName: "Stone Furnace",
     info: "Used to smelt items",
@@ -43,6 +52,15 @@ export const items: { [index: string]: Iitem } = {
     atlasCoord: {
       normal: {x: 80, y: 16},
       small: {x: 80, y: 24}
+    }
+  },
+  "red_cience": {
+    fancyName: "Red Cience",
+    info: "",
+    stackSize: 100,
+    atlasCoord: {
+      normal: {x: 96, y: 0},
+      small: {x: 96, y: 8}
     }
   },
 };
