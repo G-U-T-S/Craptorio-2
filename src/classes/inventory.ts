@@ -8,43 +8,47 @@ interface Islot {
   itemName: string, quant: number
 }
 export default class Inventory {
-  private slots = new  Map<number, Islot>();
+  private slots = new Map<number, Islot>();
   public slotSize: number;
-  public pos: {x: number, y: number};
-  public size: {w: number, h: number};
+  public pos: { x: number, y: number };
+  public size: { w: number, h: number };
   public rows: number; public cols: number;
   public panelText: string;
   public visible = false;
 
   constructor(panelText: string, x: number, y: number, rows: number, cols: number, slotSize: number, width: number, height: number) {
     this.panelText = panelText;
-    this.pos = {x: x, y: y};
-    this.size = {w: width, h: height};
+    this.pos = { x: x, y: y };
+    this.size = { w: width, h: height };
     this.rows = rows; this.cols = cols;
     this.slotSize = slotSize;
-    
+
     let index = 0;
     for (let x = 0; x < rows; x++) {
       for (let y = 0; y < cols; y++) {
         this.slots.set(
-          index, {x: this.pos.x + (x * this.slotSize),y: this.pos.y + (y * this.slotSize), itemName: "", quant: 0}
+          index, { x: this.pos.x + (x * this.slotSize), y: this.pos.y + (y * this.slotSize), itemName: "", quant: 0 }
         );
-        
+
         index++;
-      } 
+      }
     }
+
+    //DEBUG
+    this.depositStack(0, "copper_plate", 50, true);
+    this.depositStack(0, "iron_plate", 50, true);
   }
 
   draw(): void {
-    render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", {x: 1, y: 1}));
-    
+    render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", { x: 1, y: 1 }));
+
     if (this.rows + this.cols > 2) {
       render.drawGrid(this.pos.x, this.pos.y, this.rows, this.cols, "white", "white", this.slotSize, this.slotSize, false, false);
     }
     else {
       render.drawRect(this.pos.x, this.pos.y, this.slotSize, this.slotSize, "white", "white");
     }
-    
+
     this.slots.forEach((slot) => {
       if (slot.itemName !== "") {
         render.drawItemStack(
@@ -62,7 +66,7 @@ export default class Inventory {
 
   getHoveredSlot(x: number, y: number): Islot | undefined {
     let result: Islot | undefined;
-    
+
     this.slots.forEach((slot) => {
       if (x >= slot.x && x <= (slot.x + this.slotSize) && y >= slot.y && y <= (slot.y + this.slotSize)) {
         result = slot;
@@ -82,22 +86,22 @@ export default class Inventory {
     if (x >= hx && x <= hx + this.size.w && y >= hy && y <= hy + this.slotSize + 4) {
       return true;
     }
-    
+
     return false;
   }
 
-  depositStack(itemName: string, quant: number, slotIndex: number, force: boolean): {itemName: string, quant: number} {
+  depositStack(slotIndex: number, itemName: string, quant: number, force: boolean): { itemName: string, quant: number } {
     const slot = this.slots.get(slotIndex);
-    let returnData = {itemName: itemName, quant: quant};
+    let returnData = { itemName: itemName, quant: quant };
 
     if (slot !== undefined) {
       if (slot.itemName === "" || slot.itemName === itemName) {
         slot.itemName = itemName;
-    
+
         //! o slot.quant nunca pode ser maior que a stack_size;
         const availableSpace = items[itemName].stackSize - slot.quant;
         const toAdd = Math.min(returnData.quant, availableSpace);
-        
+
         slot.quant += toAdd;
         returnData.quant -= toAdd;
       }
@@ -107,7 +111,7 @@ export default class Inventory {
       this.slots.forEach((slot) => {
         if ((slot.itemName === "" || slot.itemName === itemName) && returnData.quant > 0) {
           slot.itemName = itemName;
-      
+
           //! o slot.quant nunca pode ser maior que a stack_size;
           const availableSpace = items[itemName].stackSize - slot.quant;
           const toAdd = Math.min(returnData.quant, availableSpace);
@@ -128,37 +132,55 @@ export default class Inventory {
     return returnData;
   }
 
-  removeStack(index: number, quantity: "full" | "half"): undefined | {itemName: string, quant: number} {
-    //TODO need a rework for the "force" funcionality
-    
-    const slot = this.getSlot(index);
+  removeStack(index: number, itemName: string, quant: number, force: boolean) {
+    const slot = this.slots.get(index);
+    let remaining = quant;
 
-    if (slot !== undefined) {
-      let name = slot.itemName;
-      let quant = 0;
-
-      if (quantity === "full" || slot.quant <= 1) {
-        slot.itemName = "";
-
-        quant = slot.quant;
+    if (slot !== undefined && slot.itemName === itemName) {
+      if (slot.quant - remaining >= 0) {
+        slot.quant -= remaining;
+        remaining = 0;
+      }
+      else {
+        remaining -= slot.quant;
         slot.quant = 0;
       }
-      else if (quantity === "half") {
-        const half = Math.floor(slot.quant / 2);
-        const remainder = slot.quant - half;
-
-        slot.quant = half;
-        quant = remainder;
-      }
-
-      return {itemName: name, quant: quant};
     }
 
-    return undefined;
+    if (force && remaining > 0) {
+      this.slots.forEach((slot) => {
+        if (slot.itemName === itemName && remaining > 0) {
+          if (slot.quant - remaining >= 0) {
+            slot.quant -= remaining;
+            remaining = 0;
+          }
+          else {
+            remaining -= slot.quant;
+            slot.quant = 0;
+          }
+        }
+      });
+    }
   }
 
-  swapStacks(index: number, itemName: string, quant: number): {itemName: string, quant: number} {
-    const returnData = {itemName: itemName, quant: quant};
+  hasStack(itemName: string, quant: number): boolean {
+    let sum = 0;
+
+    this.slots.forEach((slot) => {
+      if (slot.itemName === itemName) {
+        sum += slot.quant;
+      }
+    });
+
+    if (sum >= quant) {
+      return true;
+    }
+
+    return false;
+  }
+
+  swapStacks(index: number, itemName: string, quant: number): { itemName: string, quant: number } {
+    const returnData = { itemName: itemName, quant: quant };
     const slot = this.getSlot(index);
 
     if (slot !== undefined) {
@@ -170,7 +192,7 @@ export default class Inventory {
     }
 
     return returnData;
-  } 
+  }
 
   moveTo(x: number, y: number): void {
     this.pos.x = x; this.pos.y = y;
@@ -184,9 +206,9 @@ export default class Inventory {
           slot.x = this.pos.x + (x * this.slotSize);
           slot.y = this.pos.y + (y * this.slotSize);
         }
-        
+
         index++;
-      } 
+      }
     }
   }
 }

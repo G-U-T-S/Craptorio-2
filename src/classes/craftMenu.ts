@@ -1,7 +1,7 @@
 import cursor from "./cursor.js";
 import render from "./render.js";
 import playerInv from "./playerInv.js";
-import { items } from "./definitions.js";
+import { items, recipes } from "./definitions.js";
 
 
 class ItemButton {
@@ -55,13 +55,21 @@ class CraftMenu {
       this.x = (render.size.w / 2) + 5;
       this.y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
 
+      // this.craftButtons.forEach((btnGrid) => {
+      //   btnGrid.forEach((btn) => {
+
+      //   });
+      // });
+
       let index = 0;
       for (let x = 0; x < this.rows; x++) {
         for (let y = 0; y < this.cols; y++) {
           const btn = this.craftButtons[0][index];
 
-          btn.x = this.x + (x * this.btnSize);
-          btn.y = this.y + (y * this.btnSize);
+          if (btn !== undefined) {
+            btn.x = this.x + (x * this.btnSize);
+            btn.y = this.y + (y * this.btnSize);
+          }
         }
 
         index++;
@@ -72,8 +80,10 @@ class CraftMenu {
         for (let y = 0; y < this.cols; y++) {
           const btn = this.craftButtons[1][index];
 
-          btn.x = this.x + (x * this.btnSize);
-          btn.y = this.y + (y * this.btnSize);
+          if (btn !== undefined) {
+            btn.x = this.x + (x * this.btnSize);
+            btn.y = this.y + (y * this.btnSize);
+          }
         }
 
         index++;
@@ -84,8 +94,10 @@ class CraftMenu {
         for (let y = 0; y < this.cols; y++) {
           const btn = this.craftButtons[2][index];
 
-          btn.x = this.x + (x * this.btnSize);
-          btn.y = this.y + (y * this.btnSize);
+          if (btn !== undefined) {
+            btn.x = this.x + (x * this.btnSize);
+            btn.y = this.y + (y * this.btnSize);
+          }
         }
 
         index++;
@@ -230,17 +242,61 @@ class CraftMenu {
     if (!consumed) {
       this.craftButtons[this.actualTab].forEach((btn) => {
         if (btn.isHovered(cursor.x, cursor.y)) {
-          this.craft(btn.name);
+          this.craft(btn.name, 1);
           return;
         }
       });
     }
   }
 
-  craft(itemName: string): void {
-    playerInv.depositStack(
-      itemName, 10, 0, true
-    );
+  craft(itemName: string, quant: number): void {
+    if (recipes[itemName] !== undefined) {
+      const toBeRemoved: { [index: string]: number } = {};
+      const stack: Array<{ name: string, quant: number }> = [];
+      let iterations = 0;
+
+      recipes[itemName].ingredients.forEach((ing) => {
+        stack.push({ name: ing.name, quant: ing.quant * quant });
+      });
+
+      while (stack.length > 0 && iterations <= 50) {
+        const topItem = stack[stack.length - 1];
+        const recipe = recipes[topItem.name];
+
+        if (recipe === undefined) {
+          if (toBeRemoved[topItem.name] === undefined) {
+            toBeRemoved[topItem.name] = topItem.quant;
+          }
+          else {
+            toBeRemoved[topItem.name] += topItem.quant;
+          }
+
+          stack.pop();
+        }
+        else {
+          stack.pop();
+
+          recipes[topItem.name].ingredients.forEach((ing) => {
+            stack.push({ name: ing.name, quant: ing.quant * quant });
+          });
+        }
+
+        iterations++;
+      }
+
+      for (let item in toBeRemoved) {
+        if (!playerInv.hasStack(item, toBeRemoved[item])) {
+          return;
+        }
+      }
+
+      for (let name in toBeRemoved) {
+        console.log(name)
+        playerInv.removeStack(0, name, toBeRemoved[name], true);
+      }
+
+      playerInv.depositStack(0, itemName, recipes[itemName].outputQuant * quant, true);
+    }
   }
 }
 

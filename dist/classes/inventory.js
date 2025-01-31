@@ -24,6 +24,8 @@ export default class Inventory {
                 index++;
             }
         }
+        this.depositStack(0, "copper_plate", 50, true);
+        this.depositStack(0, "iron_plate", 50, true);
     }
     draw() {
         render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", { x: 1, y: 1 }));
@@ -62,7 +64,7 @@ export default class Inventory {
         }
         return false;
     }
-    depositStack(itemName, quant, slotIndex, force) {
+    depositStack(slotIndex, itemName, quant, force) {
         const slot = this.slots.get(slotIndex);
         let returnData = { itemName: itemName, quant: quant };
         if (slot !== undefined) {
@@ -93,25 +95,45 @@ export default class Inventory {
         }
         return returnData;
     }
-    removeStack(index, quantity) {
-        const slot = this.getSlot(index);
-        if (slot !== undefined) {
-            let name = slot.itemName;
-            let quant = 0;
-            if (quantity === "full" || slot.quant <= 1) {
-                slot.itemName = "";
-                quant = slot.quant;
+    removeStack(index, itemName, quant, force) {
+        const slot = this.slots.get(index);
+        let remaining = quant;
+        if (slot !== undefined && slot.itemName === itemName) {
+            if (slot.quant - remaining >= 0) {
+                slot.quant -= remaining;
+                remaining = 0;
+            }
+            else {
+                remaining -= slot.quant;
                 slot.quant = 0;
             }
-            else if (quantity === "half") {
-                const half = Math.floor(slot.quant / 2);
-                const remainder = slot.quant - half;
-                slot.quant = half;
-                quant = remainder;
-            }
-            return { itemName: name, quant: quant };
         }
-        return undefined;
+        if (force && remaining > 0) {
+            this.slots.forEach((slot) => {
+                if (slot.itemName === itemName && remaining > 0) {
+                    if (slot.quant - remaining >= 0) {
+                        slot.quant -= remaining;
+                        remaining = 0;
+                    }
+                    else {
+                        remaining -= slot.quant;
+                        slot.quant = 0;
+                    }
+                }
+            });
+        }
+    }
+    hasStack(itemName, quant) {
+        let sum = 0;
+        this.slots.forEach((slot) => {
+            if (slot.itemName === itemName) {
+                sum += slot.quant;
+            }
+        });
+        if (sum >= quant) {
+            return true;
+        }
+        return false;
     }
     swapStacks(index, itemName, quant) {
         const returnData = { itemName: itemName, quant: quant };
