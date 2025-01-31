@@ -1,5 +1,5 @@
-import cursor from "./cursor.js";
-import render from "./render.js";
+import cursor from "../engine/cursor.js";
+import render from "../engine/render.js";
 import playerInv from "./playerInv.js";
 import { items, recipes } from "./definitions.js";
 

@@ -1,4 +1,4 @@
-import RENDER from "../render.js";
+import RENDER from "../../engine/render.js";
 
 
 export default class StoneFurnace {
@@ -6,21 +6,21 @@ export default class StoneFurnace {
   static readonly animTickRate = 9;
   static readonly animMaxTick = 2;
   public type = "stone_furnace";
-  public globalPos: {x: number, y: number};
+  public globalPos: { x: number, y: number };
   public atlasCoords = {
-    fullSize: {x: 72, y: 64},
-    mediun: {x: 80, y: 16},
-    small: {x: 80,y: 24}
+    fullSize: { x: 72, y: 64 },
+    mediun: { x: 80, y: 16 },
+    small: { x: 80, y: 24 }
   };
   public updated: boolean = false;
   public drawn: boolean = false;
   public isHovered: boolean = false;
 
-  constructor(globalPos: {x: number, y: number}) {
+  constructor(globalPos: { x: number, y: number }) {
     this.globalPos = { ...globalPos };
   }
-  
-  public update(): void {}
+
+  public update(): void { }
 
   public draw(): void {
     RENDER.drawSprite(

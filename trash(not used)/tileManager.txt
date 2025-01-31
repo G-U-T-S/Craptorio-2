@@ -1,5 +1,5 @@
-import RENDER from "./render.js";
-import { SimplexNoise2D } from "./noiseGenerator.js";
+import RENDER from "../src/engine/render.js";
+import { SimplexNoise2D } from "../src/engine/noiseGenerator.js";
 
 
 // const tile = {
@@ -19,12 +19,12 @@ function lerp(a: number, b: number, t: number): number {
   return a + t * (b - a);
 }
 class Tile {
-  readonly globalPos: {x: number, y: number}; public color: string;
+  readonly globalPos: { x: number, y: number }; public color: string;
   public visited: boolean; public isLand: boolean; public biome: number;
   public isBorder: boolean; public atlasCoord: { x: number, y: number }; public ore: number;
   public flip: number; public rot: number; public borderCol: string; public noise: number;
 
-  constructor(globalBos: {x: number, y: number}, noise: number, visited: boolean, isLand: boolean, biome: number, isBorder: boolean, atlasCoord: { x: number, y: number }, ore: number, flip: number, rot: number, borderCol: string) {
+  constructor(globalBos: { x: number, y: number }, noise: number, visited: boolean, isLand: boolean, biome: number, isBorder: boolean, atlasCoord: { x: number, y: number }, ore: number, flip: number, rot: number, borderCol: string) {
     this.globalPos = { ...globalBos }; this.color = "black";
     this.noise = noise; this.visited = visited; this.isLand = isLand; this.biome = biome; this.isBorder = isBorder;
     this.atlasCoord = { ...atlasCoord }; this.ore = ore; this.flip = flip; this.rot = rot; this.borderCol = borderCol;
@@ -35,7 +35,7 @@ export class Tilemanager {
 
   private tiles: { [index: string]: Tile };//! `x_y`
   private simplexNoise: SimplexNoise2D;
-  private autoMapValues: { [index: string]: {spriteCoord: {x: number, y: number}}};
+  private autoMapValues: { [index: string]: { spriteCoord: { x: number, y: number } } };
   private offset: number;
   private biomes: Array<{
     name: string, tileCoordOffset: { x: number, y: number }, min: number, max: number,
@@ -106,24 +106,24 @@ export class Tilemanager {
       // --N E S W
       // --tiles surrounding land
       // --0 is land, 1 is water or other biome
-    
-      '1000': {spriteCoord: {x: 0, y: 0}},
-      '0100': {spriteCoord: {x: 0, y: 0}},
-      '0010': {spriteCoord: {x: 0, y: 0}},
-      '0001': {spriteCoord: {x: 0, y: 0}},
-    
-      '1100': {spriteCoord: {x: 0, y: 0}},
-      '0110': {spriteCoord: {x: 0, y: 0}},
-      '0011': {spriteCoord: {x: 0, y: 0}},
-      '1001': {spriteCoord: {x: 0, y: 0}},
-    
-      '1101': {spriteCoord: {x: 0, y: 0}},
-      '1110': {spriteCoord: {x: 0, y: 0}},
-      '0111': {spriteCoord: {x: 0, y: 0}},
-      '1011': {spriteCoord: {x: 0, y: 0}},
-      '0101': {spriteCoord: {x: 0, y: 0}},
-      '1010': {spriteCoord: {x: 0, y: 0}},
-      '1111': {spriteCoord: {x: 0, y: 0}}
+
+      '1000': { spriteCoord: { x: 0, y: 0 } },
+      '0100': { spriteCoord: { x: 0, y: 0 } },
+      '0010': { spriteCoord: { x: 0, y: 0 } },
+      '0001': { spriteCoord: { x: 0, y: 0 } },
+
+      '1100': { spriteCoord: { x: 0, y: 0 } },
+      '0110': { spriteCoord: { x: 0, y: 0 } },
+      '0011': { spriteCoord: { x: 0, y: 0 } },
+      '1001': { spriteCoord: { x: 0, y: 0 } },
+
+      '1101': { spriteCoord: { x: 0, y: 0 } },
+      '1110': { spriteCoord: { x: 0, y: 0 } },
+      '0111': { spriteCoord: { x: 0, y: 0 } },
+      '1011': { spriteCoord: { x: 0, y: 0 } },
+      '0101': { spriteCoord: { x: 0, y: 0 } },
+      '1010': { spriteCoord: { x: 0, y: 0 } },
+      '1111': { spriteCoord: { x: 0, y: 0 } }
     };
   }
 
@@ -137,7 +137,7 @@ export class Tilemanager {
     );
 
     const tile = new Tile(
-      {x: x, y: y}, baseNoise, false, baseNoise >= 20, 0,
+      { x: x, y: y }, baseNoise, false, baseNoise >= 20, 0,
       false, { x: 0, y: 0 }, 0, 0, 0, "green"
     );
 
@@ -203,7 +203,7 @@ export class Tilemanager {
   drawTerrain(showMiniMap: boolean): void {
     for (let worldX = RENDER.topLeft.x - 40; worldX < RENDER.topLeft.x + RENDER.canvas.width; worldX++) {
       if (worldX % 40 !== 0) { continue; }
-      
+
       for (let worldY = RENDER.topLeft.y - 40; worldY < RENDER.topLeft.y + RENDER.canvas.height; worldY++) {
         if (worldY % 40 !== 0) { continue; }
 
@@ -216,7 +216,7 @@ export class Tilemanager {
         const tile = this.tiles[`${worldX}_${worldY}`];
         //!-------------------------------
 
-        if(tile === undefined) { return; }
+        if (tile === undefined) { return; }
 
         if (!showMiniMap) {
           if (!tile.visited) { this.autoMap(worldX, worldY); }
@@ -289,7 +289,7 @@ export class Tilemanager {
   private drawClutter(): void {
     for (let worldX = RENDER.topLeft.x - 40; worldX < RENDER.topLeft.x + RENDER.canvas.width; worldX++) {
       if (worldX % 40 !== 0) { continue; }
-      
+
       for (let worldY = RENDER.topLeft.y - 40; worldY < RENDER.topLeft.y + RENDER.canvas.height; worldY++) {
         if (worldY % 40 !== 0) { continue; }
 
@@ -308,7 +308,7 @@ export class Tilemanager {
 
   oreSample(x: number, y: number, tilebiome: number, tilenoise: number): number | undefined {
     //! TODO todos os minerios são o mesmo, o valor inicial
-    
+
     const tileBiome = tilebiome;
     const tileNoise = tilenoise;
     for (let i = 0; i < this.ores.length; i++) {
@@ -329,12 +329,12 @@ export class Tilemanager {
     tile.visited = true;
     // --Here, 'adj' is the north, east, south, and west 'neighboring' tiles (in local space)
     const adj = [
-      {x: 0, y: -1},
-      {x: 1, y: 0},
-      {x: 0, y: 1},
-      {x: -1, y: 0},
+      { x: 0, y: -1 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: -1, y: 0 },
     ]
-    
+
     let key = "";
     for (let i = 0; i < 4; i++) {
       // --Grab the neighbor tile

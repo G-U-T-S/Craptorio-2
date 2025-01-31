@@ -1,4 +1,4 @@
-import render from "./render.js";
+import render from "../engine/render.js";
 import Label from "./label.js";
 
 
@@ -16,12 +16,12 @@ class Ui {
     const middleScreen = {
       x: render.size.w / 2, y: render.size.h / 2
     };
-  
-    if (render.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", {x: 0, y: 2}), false)) {
+
+    if (render.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Start", "black", "white", { x: 0, y: 2 }), false)) {
       return "game";
     }
-    
-    if (render.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", {x: 0, y: 2}), false)) {
+
+    if (render.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Controls", "black", "white", { x: 0, y: 2 }), false)) {
       return 'help';
     }
 
@@ -52,13 +52,13 @@ class Ui {
       w: 500, h: 300
     };
 
-    render.drawPanel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "white", "blue", "black", new Label("Controls", "black", "black", {x: 0, y: 0}));
+    render.drawPanel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "white", "blue", "black", new Label("Controls", "black", "black", { x: 0, y: 0 }));
     for (let i = 0; i < info.length; i++) {
       render.drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
       render.drawText(info[i][0], panelCoords.x + panelCoords.w, panelCoords.y + (i * 20), 20, "black", "top", "right");
     }
 
-    if (render.drawTextButton(middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", {x: 0, y: 2}), false)) {
+    if (render.drawTextButton(middleScreen.x - (150 / 2), panelCoords.y + panelCoords.h, 150, 50, "red", "black", "darkRed", new Label("Back", "black", "white", { x: 0, y: 2 }), false)) {
       return "start";
     }
     return "help";
@@ -77,10 +77,10 @@ class Ui {
       // print('You\'ve won the game!', 10, 64, 4, false, 2, false)
     }
 
-    if (render.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Continue", "black", "white", {x: 0, y: 2}), false)) {
+    if (render.drawTextButton(middleScreen.x - 50, middleScreen.y - 25, 100, 50, "blue", "black", "darkBlue", new Label("Continue", "black", "white", { x: 0, y: 2 }), false)) {
       return "game";
     }
-    if (render.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Quit", "black", "white", {x: 0, y: 2}), false)) {
+    if (render.drawTextButton(middleScreen.x - 50, (middleScreen.y - 25) + 65, 100, 50, "blue", "black", "darkBlue", new Label("Quit", "black", "white", { x: 0, y: 2 }), false)) {
       // cls()
       // exit()
       // -- STATE = 'game'

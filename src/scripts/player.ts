@@ -1,4 +1,4 @@
-import RENDER from "./render.js";
+import RENDER from "../engine/render.js";
 
 
 class Player {
@@ -6,8 +6,8 @@ class Player {
   public lx: number; public ly: number;
   public animFrame: number; readonly animSpeed: 8; public animDir: number;
   readonly animMax: number; public lastDir: string; public moveSpeed: number;
-  readonly directions: { [index: string]: {id: number, flip: number, rot: number, dust: {x: number, y: number}} };
-  public atlasCoord: {x: number, y: number};
+  readonly directions: { [index: string]: { id: number, flip: number, rot: number, dust: { x: number, y: number } } };
+  public atlasCoord: { x: number, y: number };
 
   constructor() {
     // this.x = 0, this.y = 0;
@@ -15,24 +15,24 @@ class Player {
     this.animFrame = 0; this.animSpeed = 8; this.animDir = 0;
     this.animMax = 4; this.lastDir = "0,0"; this.moveSpeed = 50.0
     this.directions = {
-      '0,0':   {id: 362, flip: 0, rot: 0, dust: {x: 4, y: 11}},  //--straight
-      '0,-1':  {id: 365, flip: 0, rot: 0, dust: {x: 4, y: 11}},  //--up
-      '0,1':   {id: 365, flip: 2, rot: 0, dust: {x: 4, y: -2}},  //--down
-      '-1,0':  {id: 363, flip: 1, rot: 0, dust: {x: 11,y:  5}},  //--left
-      '1,0':   {id: 363, flip: 0, rot: 0, dust: {x: -2,y:  5}},  //--right
-      '1,-1':  {id: 364, flip: 0, rot: 0, dust: {x: -2,y: 10}},  //--up-right
-      '-1,-1': {id: 364, flip: 1, rot: 0, dust: {x: 10,y: 10}},  //--up-left
-      '-1,1':  {id: 364, flip: 3, rot: 0, dust: {x: 10,y: -2}},  //--down-left
-      '1,1':   {id: 364, flip: 2, rot: 0, dust: {x: -2,y: -2}}   //--down-right
+      '0,0': { id: 362, flip: 0, rot: 0, dust: { x: 4, y: 11 } },  //--straight
+      '0,-1': { id: 365, flip: 0, rot: 0, dust: { x: 4, y: 11 } },  //--up
+      '0,1': { id: 365, flip: 2, rot: 0, dust: { x: 4, y: -2 } },  //--down
+      '-1,0': { id: 363, flip: 1, rot: 0, dust: { x: 11, y: 5 } },  //--left
+      '1,0': { id: 363, flip: 0, rot: 0, dust: { x: -2, y: 5 } },  //--right
+      '1,-1': { id: 364, flip: 0, rot: 0, dust: { x: -2, y: 10 } },  //--up-right
+      '-1,-1': { id: 364, flip: 1, rot: 0, dust: { x: 10, y: 10 } },  //--up-left
+      '-1,1': { id: 364, flip: 3, rot: 0, dust: { x: 10, y: -2 } },  //--down-left
+      '1,1': { id: 364, flip: 2, rot: 0, dust: { x: -2, y: -2 } }   //--down-right
     }
-    this.atlasCoord = {x: 0, y: 0};
+    this.atlasCoord = { x: 0, y: 0 };
   }
 
-  public update(delta: number, tick: number, keys: {w: boolean, a: boolean, s: boolean, d: boolean}, cursorProg: boolean): void {
+  public update(delta: number, tick: number, keys: { w: boolean, a: boolean, s: boolean, d: boolean }, cursorProg: boolean): void {
     if (tick % this.animSpeed === 0) {
       if (this.animDir === 0) {
         this.animFrame = this.animFrame + 1
-        
+
         if (this.animFrame > this.animMax) {
           this.animDir = 1
           this.animFrame = this.animMax
@@ -53,7 +53,7 @@ class Player {
     // this.ly = this.y;
 
     let xDir = 0; let yDir = 0;
-    
+
     if (keys.w) {
       yDir = -1;
     }
@@ -72,7 +72,7 @@ class Player {
 
     //   // const dx: number = 240/2 - 4 + dust_dir.x;
     //   // const dy: number = 136/2 - 4 + this.anim_frame + dust_dir.y;
-      
+
     //   //& Math.random() retornar entre 0 e 1;
     //   // if (dust_dir && (x_dir !== 0 || y_dir !== 0)) {
     //   //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
@@ -80,7 +80,7 @@ class Player {
     //   // else if (tick % 24 == 0) {
     //   //   new_dust(dx, dy, 2, randRange(-1, 1) + (3*-x_dir), Math.random() + (3*-y_dir));
     //   // }
-      
+
     //   if (xDir !== 0 || yDir !== 0) {
     //     // sound('move');
     //     //! removi o delta time
@@ -89,7 +89,7 @@ class Player {
     //     RENDER.topLeft.y += (yDir * this.moveSpeed) * delta;
     //   }
     // }
-  
+
     this.lastDir = `${xDir},${yDir}`;
 
     switch (this.lastDir) {
@@ -139,7 +139,7 @@ class Player {
 
   public draw() {
     RENDER.drawSprite(
-      "rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y  - ((8 * 4) / 2) + this.animFrame,
+      "rotatableSprite", 4, RENDER.center.x - ((8 * 4) / 2), RENDER.center.y - ((8 * 4) / 2) + this.animFrame,
       this.atlasCoord.x, this.atlasCoord.y
     );
   }

@@ -1,4 +1,4 @@
-import RENDER from "../render.js";
+import RENDER from "../../engine/render.js";
 import { items } from "../definitions.js";
 export default class WoodChest {
     type = "assembly_machine";

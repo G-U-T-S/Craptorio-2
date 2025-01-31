@@ -1,4 +1,4 @@
-import render from "./render.js";
+import render from "../engine/render.js";
 import Label from "./label.js";
 class Ui {
     currentHelp;

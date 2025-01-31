@@ -1,4 +1,4 @@
-import render from "./render.js";
+import render from "../engine/render.js";
 import Label from "./label.js";
 import { items } from "./definitions.js";
 export default class Inventory {

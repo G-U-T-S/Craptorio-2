@@ -1,4 +1,4 @@
-import render from "../render.js";
+import render from "../../engine/render.js";
 export default class AssemblyMachine {
     static tickRate = 8;
     static animTickRate = 0;

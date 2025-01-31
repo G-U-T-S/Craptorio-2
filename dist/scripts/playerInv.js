@@ -1,5 +1,5 @@
-import render from "./render.js";
-import cursor from "./cursor.js";
+import render from "../engine/render.js";
+import cursor from "../engine/cursor.js";
 import Inventory from "./inventory.js";
 import { items } from "./definitions.js";
 const cols = 7;

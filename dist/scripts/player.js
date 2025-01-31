@@ -1,4 +1,4 @@
-import RENDER from "./render.js";
+import RENDER from "../engine/render.js";
 class Player {
     lx;
     ly;

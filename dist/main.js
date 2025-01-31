@@ -1,13 +1,13 @@
-import render from "./classes/render.js";
-import ui from "./classes/ui.js";
-import playerInv from "./classes/playerInv.js";
-import craftMenu from "./classes/craftMenu.js";
-import cursor from "./classes/cursor.js";
-import StoneFurnace from "./classes/entities/stone_furnace.js";
-import UndergroundBelt from "./classes/entities/undergroundBelt.js";
-import MiningDrill from "./classes/entities/mining_drill.js";
-import AssemblyMachine from "./classes/entities/assembly_machine.js";
-import WoodChest from "./classes/entities/wood_chest.js";
+import render from "./engine/render.js";
+import ui from "./scripts/ui.js";
+import playerInv from "./scripts/playerInv.js";
+import craftMenu from "./scripts/craftMenu.js";
+import cursor from "./engine/cursor.js";
+import StoneFurnace from "./scripts/entities/stone_furnace.js";
+import UndergroundBelt from "./scripts/entities/undergroundBelt.js";
+import MiningDrill from "./scripts/entities/mining_drill.js";
+import AssemblyMachine from "./scripts/entities/assembly_machine.js";
+import WoodChest from "./scripts/entities/wood_chest.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });

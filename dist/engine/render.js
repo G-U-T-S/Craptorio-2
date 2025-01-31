@@ -1,5 +1,5 @@
 import CURSOR from "./cursor.js";
-import { items } from "./definitions.js";
+import { items } from "../scripts/definitions.js";
 class Render {
     canvas;
     context;

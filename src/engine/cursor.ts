@@ -1,4 +1,4 @@
-import Inventory from "./inventory.js";
+import Inventory from "../scripts/inventory.js";
 import render from "./render.js";
 
 

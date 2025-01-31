@@ -1,4 +1,4 @@
-import RENDER from "../render.js";
+import RENDER from "../../engine/render.js";
 export default class StoneFurnace {
     static tickRate = 5;
     static animTickRate = 9;

@@ -1,6 +1,6 @@
 import CURSOR from "./cursor.js";
-import Label from "./label.js";
-import { items } from "./definitions.js";
+import Label from "../scripts/label.js";
+import { items } from "../scripts/definitions.js";
 
 
 class Render {
