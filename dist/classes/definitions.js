@@ -206,7 +206,7 @@ export const items = {
             small: { x: 104, y: 24 }
         }
     },
-    "conveyor_belt": {
+    "transport_belt": {
         fancyName: "Conveyor Belt",
         info: "",
         stackSize: 100,
@@ -258,7 +258,7 @@ export const recipes = {
     "iron_stick": { outputQuant: 2, ingredients: [{ name: "iron_plate", quant: 2 }] },
     "green_circuit": { outputQuant: 1, ingredients: [{ name: "copper_wire", quant: 2 }, { name: "iron_plate", quant: 1 }] },
     "red_circuit": { outputQuant: 1, ingredients: [{ name: "copper_wire", quant: 4 }, { name: "green_circuit", quant: 2 }, { name: "plastic_bar", quant: 2 }] },
-    "red_cience": { outputQuant: 1, ingredients: [{ name: "copper_plate", quant: 1 }, { name: "iron_gear", quant: 1 }] },
+    "red_cience": { outputQuant: 1, ingredients: [{ name: "copper_plate", quant: 1 }, { name: "gear", quant: 1 }] },
     "green_cience": { outputQuant: 1, ingredients: [{ name: "inserter", quant: 1 }, { name: "conveyor_belt", quant: 1 }] },
     "blue_cience": { outputQuant: 2, ingredients: [{ name: "red_circuit", quant: 3 }, { name: "engine_unit", quant: 2 }, { name: "sulfur", quant: 1 }] },
     "wood_chest": { outputQuant: 1, ingredients: [{ name: "wood", quant: 2 }] },
@@ -266,10 +266,10 @@ export const recipes = {
     "steel_furnace": { outputQuant: 1, ingredients: [{ name: "steel", quant: 6 }, { name: "stone_brick", quant: 10 }] },
     "assembly_machine": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 3 }, { name: "gear", quant: 5 }, { name: "iron_plate", quant: 9 }] },
     "research_lab": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 10 }, { name: "gear", quant: 10 }, { name: "conveyor_belt", quant: 4 }] },
-    "conveyor_belt": { outputQuant: 2, ingredients: [{ name: "iron_gear", quant: 2 }] },
+    "transport_belt": { outputQuant: 2, ingredients: [{ name: "gear", quant: 1 }, { name: "iron_plate", quant: 1 }] },
     "splitter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 5 }, { name: "iron_plate", quant: 5 }, { name: "conveyor_belt", quant: 4 }] },
-    "inserter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 1 }, { name: "iron_plate", quant: 1 }, { name: "iron_gear", quant: 1 }] },
-    "mining_drill": { outputQuant: 1, ingredients: [{ name: "iron_gear", quant: 3 }, { name: "iron_plate", quant: 3 }, { name: "stone_furnace", quant: 1 }] },
+    "inserter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 1 }, { name: "iron_plate", quant: 1 }, { name: "gear", quant: 1 }] },
+    "mining_drill": { outputQuant: 1, ingredients: [{ name: "gear", quant: 3 }, { name: "iron_plate", quant: 3 }, { name: "stone_furnace", quant: 1 }] },
     "underground_belt": { outputQuant: 1, ingredients: [{ name: "iron_plate", quant: 10 }, { name: "conveyor_belt", quant: 5 }] },
 };
 export const entities = {};

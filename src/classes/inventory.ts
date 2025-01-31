@@ -24,8 +24,8 @@ export default class Inventory {
     this.slotSize = slotSize;
 
     let index = 0;
-    for (let x = 0; x < rows; x++) {
-      for (let y = 0; y < cols; y++) {
+    for (let y = 0; y < cols; y++) {
+      for (let x = 0; x < rows; x++) {
         this.slots.set(
           index, { x: this.pos.x + (x * this.slotSize), y: this.pos.y + (y * this.slotSize), itemName: "", quant: 0 }
         );
@@ -37,6 +37,7 @@ export default class Inventory {
     //DEBUG
     this.depositStack(0, "copper_plate", 50, true);
     this.depositStack(0, "iron_plate", 50, true);
+    // this.depositStack(0, "copper_wire", 15, true);
   }
 
   draw(): void {
@@ -50,6 +51,10 @@ export default class Inventory {
     }
 
     this.slots.forEach((slot) => {
+      if (slot.itemName !== "" && slot.quant <= 0) {
+        slot.itemName = "";
+      }
+
       if (slot.itemName !== "") {
         render.drawItemStack(
           slot.itemName, 4,

@@ -39,9 +39,12 @@ class Render {
         }
     }
     drawRect(x, y, w, h, fillColor, strokeColor) {
-        this.context.strokeStyle = strokeColor;
         this.context.fillStyle = fillColor;
         this.context.fillRect(x, y, w, h);
+    }
+    drawEmptyRect(x, y, w, h, strokeColor) {
+        this.context.strokeStyle = strokeColor;
+        this.context.strokeRect(x, y, w, h);
     }
     drawPanel(x, y, w, h, bg, fg, shadowColor, label) {
         this.drawRect(x, y, w, h, bg, bg);
