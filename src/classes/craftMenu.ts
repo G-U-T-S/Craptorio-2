@@ -244,58 +244,51 @@ class CraftMenu {
     if (!consumed) {
       this.craftButtons[this.actualTab].forEach((btn) => {
         if (btn.isHovered(cursor.x, cursor.y)) {
-          this.craft(btn.name, 1);
+          this.craftToPlayerInv(btn.name, 1);
           return;
         }
       });
     }
   }
 
-  craft(itemName: string, quant: number): void {
-    if (recipes[itemName] !== undefined) {
-      const toBeRemoved: { [index: string]: number } = {};
+  craftToPlayerInv(itemName: string, quant: number): boolean {
+    //TODO create a version who can be used for every craft, not just for playerInv
 
-      //TODO const toBeAdded: { [index: string]: number } = {};
-      /*
-      quando um item é criado e sobra, ele é simplesmente
-      destruido, ao inves de ser adicionado ao inventario;
-     */
+    if (recipes[itemName] !== undefined) {
+      const toBeRemoved: { [item: string]: number } = {};
+      const toBeAdded: { [item: string]: number } = {};
 
       const stack: Array<{ name: string, quant: number }> = [];
-      let iterations = 0;
 
       recipes[itemName].ingredients.forEach((ing) => {
         stack.push({ name: ing.name, quant: ing.quant * quant });
       });
 
-      while (stack.length > 0 && iterations <= 50) {
-        const topItem = stack[stack.length - 1];
-        const recipe = recipes[topItem.name];
+      let iterations = 0;
+      const maxIterations = 100;
+
+      while (stack.length > 0 && iterations <= maxIterations) {
+        const current = stack.pop() as { name: string, quant: number };
+        const recipe = recipes[current.name];
 
         if (recipe === undefined) {
-          if (toBeRemoved[topItem.name] === undefined) {
-            toBeRemoved[topItem.name] = topItem.quant;
-          }
-          else {
-            toBeRemoved[topItem.name] += topItem.quant;
-          }
-
-          stack.pop();
+          toBeRemoved[current.name] = (toBeRemoved[current.name] || 0) + current.quant;
         }
         else {
-          stack.pop();
-
-          if (playerInv.hasStack(topItem.name, topItem.quant)) {
-            if (toBeRemoved[topItem.name] === undefined) {
-              toBeRemoved[topItem.name] = topItem.quant;
-            }
-            else {
-              toBeRemoved[topItem.name] += topItem.quant;
-            }
+          if (playerInv.hasStack(current.name, current.quant)) {
+            toBeRemoved[current.name] = (toBeRemoved[current.name] || 0) + current.quant;
           }
           else {
-            recipes[topItem.name].ingredients.forEach((ing) => {
-              stack.push({ name: ing.name, quant: ing.quant * quant });
+            const times = Math.ceil(current.quant / recipe.outputQuant);
+            const totalProduced = recipe.outputQuant * times;
+            const surplus = totalProduced - current.quant;
+
+            if (surplus > 0) {
+              toBeAdded[current.name] = (toBeAdded[current.name] || 0) + surplus;
+            }
+
+            recipe.ingredients.forEach((ing) => {
+              stack.push({ name: ing.name, quant: ing.quant * times });
             });
           }
         }
@@ -303,18 +296,33 @@ class CraftMenu {
         iterations++;
       }
 
-      for (let item in toBeRemoved) {
+      if (iterations >= maxIterations) {
+        console.error("Iterações máximas atingidas; algo pode estar errado com as receitas.");
+        return false;
+      }
+
+      for (const item in toBeRemoved) {
         if (!playerInv.hasStack(item, toBeRemoved[item])) {
-          return;
+          return false;
         }
       }
 
-      for (let name in toBeRemoved) {
-        playerInv.removeStack(0, name, toBeRemoved[name], true);
+      for (const item in toBeRemoved) {
+        playerInv.removeStack(0, item, toBeRemoved[item], true);
       }
 
+      //! Obs: Pode ser que o item principal também tenha sobras se produzido por receita,
+      // mas assumimos que a lógica acima já acumulou o excedente em toBeAdded.
       playerInv.depositStack(0, itemName, recipes[itemName].outputQuant * quant, true);
+
+      for (const item in toBeAdded) {
+        playerInv.depositStack(0, item, toBeAdded[item], true);
+      }
+
+      return true;
     }
+
+    return false;
   }
 }
 

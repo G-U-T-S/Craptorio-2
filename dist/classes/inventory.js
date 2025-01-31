@@ -24,8 +24,9 @@ export default class Inventory {
                 index++;
             }
         }
-        this.depositStack(0, "copper_plate", 50, true);
-        this.depositStack(0, "iron_plate", 50, true);
+        this.depositStack(0, "copper_plate", 100, true);
+        this.depositStack(0, "copper_wire", 3, true);
+        this.depositStack(0, "iron_plate", 100, true);
     }
     draw() {
         render.drawPanel(this.pos.x, this.pos.y, this.size.w, this.size.h, "blue", "blue", "drakBlue", new Label(this.panelText, "black", "white", { x: 1, y: 1 }));

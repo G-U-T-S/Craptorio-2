@@ -18,7 +18,9 @@ const ents = {
     wood_chest: new Map(),
 };
 const gridData = new Map();
+const tickRate = 1000 / 60;
 let tick = 0;
+let acumulator = 0;
 let beltTick = 0;
 let uBeltTick = 0;
 let drillTick = 0;
@@ -28,6 +30,8 @@ let drillAnimTick = 0;
 let furnaceAnimTick = 0;
 let crafterAnimTick = 0;
 let crafterAnimDir = 1;
+let delta = 0;
+let lastTime = 0;
 let state = "game";
 let secodWindowMode = "craft";
 window.addEventListener("mousedown", () => {
@@ -144,46 +148,55 @@ function helpMenuLoop() {
     state = ui.drawHelpMenu();
 }
 function gameLoop() {
-    if (tick % UndergroundBelt.tickRate === 0) {
-        beltTick += 1;
-        if (beltTick > UndergroundBelt.maxTick) {
-            beltTick = 0;
+    const now = performance.now();
+    delta = now - lastTime;
+    lastTime = now;
+    acumulator += delta;
+    render.drawText(`delta: ${Number(delta).toFixed(2)}`, 5, 5, 30, "white", "top", "left");
+    while (acumulator >= tickRate) {
+        if (tick % UndergroundBelt.tickRate === 0) {
+            beltTick += 1;
+            if (beltTick > UndergroundBelt.maxTick) {
+                beltTick = 0;
+            }
         }
+        if (tick % UndergroundBelt.tickRate === 0) {
+            uBeltTick += 1;
+            if (beltTick > UndergroundBelt.maxTick) {
+                uBeltTick = 0;
+            }
+        }
+        if (tick % MiningDrill.tickRate === 0) {
+            drillTick = drillTick + drillBitDir;
+            if (drillBitTick > 7 && drillBitTick < 0) {
+                drillBitDir = drillBitDir * -1;
+            }
+            drillAnimTick += 1;
+            if (drillAnimTick > 2) {
+                drillAnimTick = 0;
+            }
+        }
+        if (tick % StoneFurnace.animTickRate === 0) {
+            furnaceAnimTick += 1;
+            for (let y = 0; y < 3; y++) {
+            }
+            if (furnaceAnimTick > StoneFurnace.animMaxTick) {
+                furnaceAnimTick = 0;
+            }
+        }
+        if (tick % AssemblyMachine.animTickRate === 0) {
+            crafterAnimTick = crafterAnimTick + crafterAnimDir;
+            if (crafterAnimTick > 5) {
+                crafterAnimDir = -1;
+            }
+            else if (crafterAnimTick < 1) {
+                crafterAnimDir = 1;
+            }
+        }
+        updateEnts();
+        tick += 1;
+        acumulator -= tickRate;
     }
-    if (tick % UndergroundBelt.tickRate === 0) {
-        uBeltTick += 1;
-        if (beltTick > UndergroundBelt.maxTick) {
-            uBeltTick = 0;
-        }
-    }
-    if (tick % MiningDrill.tickRate === 0) {
-        drillTick = drillTick + drillBitDir;
-        if (drillBitTick > 7 && drillBitTick < 0) {
-            drillBitDir = drillBitDir * -1;
-        }
-        drillAnimTick += 1;
-        if (drillAnimTick > 2) {
-            drillAnimTick = 0;
-        }
-    }
-    if (tick % StoneFurnace.animTickRate === 0) {
-        furnaceAnimTick += 1;
-        for (let y = 0; y < 3; y++) {
-        }
-        if (furnaceAnimTick > StoneFurnace.animMaxTick) {
-            furnaceAnimTick = 0;
-        }
-    }
-    if (tick % AssemblyMachine.animTickRate === 0) {
-        crafterAnimTick = crafterAnimTick + crafterAnimDir;
-        if (crafterAnimTick > 5) {
-            crafterAnimDir = -1;
-        }
-        else if (crafterAnimTick < 1) {
-            crafterAnimDir = 1;
-        }
-    }
-    updateEnts();
     drawEnts();
     if (playerInv.visible) {
         playerInv.draw();
@@ -199,9 +212,9 @@ function gameLoop() {
     }
 }
 function BOOT() {
-    TIC(1);
+    TIC();
 }
-function TIC(currentTime) {
+function TIC() {
     render.drawBg("black");
     cursor.update();
     switch (state) {
@@ -218,7 +231,7 @@ function TIC(currentTime) {
             break;
         }
     }
-    tick = tick + 1;
+    tick += 1;
     requestAnimationFrame(TIC);
 }
 BOOT();

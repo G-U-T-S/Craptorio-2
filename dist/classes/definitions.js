@@ -1,4 +1,49 @@
 export const items = {
+    "copper_ore": {
+        fancyName: "Copper Ore",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 64, y: 40 },
+            small: { x: 64, y: 48 }
+        }
+    },
+    "iron_ore": {
+        fancyName: "Iron Ore",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 72, y: 40 },
+            small: { x: 72, y: 48 }
+        }
+    },
+    "stone_ore": {
+        fancyName: "Stone Ore",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 56, y: 40 },
+            small: { x: 56, y: 48 }
+        }
+    },
+    "coal_ore": {
+        fancyName: "Coal Ore",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 80, y: 40 },
+            small: { x: 80, y: 48 }
+        }
+    },
+    "uranium_ore": {
+        fancyName: "Uranium Ore",
+        info: "",
+        stackSize: 100,
+        atlasCoord: {
+            normal: { x: 88, y: 40 },
+            small: { x: 88, y: 48 }
+        }
+    },
     "copper_plate": {
         fancyName: "Copper Plate",
         info: "Made by smelting copper",
@@ -248,7 +293,7 @@ export const items = {
         stackSize: 100,
         atlasCoord: {
             normal: { x: 48, y: 40 },
-            small: { x: 40, y: 8 }
+            small: { x: 48, y: 48 }
         }
     },
 };
@@ -259,17 +304,17 @@ export const recipes = {
     "green_circuit": { outputQuant: 1, ingredients: [{ name: "copper_wire", quant: 2 }, { name: "iron_plate", quant: 1 }] },
     "red_circuit": { outputQuant: 1, ingredients: [{ name: "copper_wire", quant: 4 }, { name: "green_circuit", quant: 2 }, { name: "plastic_bar", quant: 2 }] },
     "red_cience": { outputQuant: 1, ingredients: [{ name: "copper_plate", quant: 1 }, { name: "gear", quant: 1 }] },
-    "green_cience": { outputQuant: 1, ingredients: [{ name: "inserter", quant: 1 }, { name: "conveyor_belt", quant: 1 }] },
+    "green_cience": { outputQuant: 1, ingredients: [{ name: "inserter", quant: 1 }, { name: "transport_belt", quant: 1 }] },
     "blue_cience": { outputQuant: 2, ingredients: [{ name: "red_circuit", quant: 3 }, { name: "engine_unit", quant: 2 }, { name: "sulfur", quant: 1 }] },
     "wood_chest": { outputQuant: 1, ingredients: [{ name: "wood", quant: 2 }] },
     "stone_furnace": { outputQuant: 1, ingredients: [{ name: "stone", quant: 5 }] },
     "steel_furnace": { outputQuant: 1, ingredients: [{ name: "steel", quant: 6 }, { name: "stone_brick", quant: 10 }] },
     "assembly_machine": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 3 }, { name: "gear", quant: 5 }, { name: "iron_plate", quant: 9 }] },
-    "research_lab": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 10 }, { name: "gear", quant: 10 }, { name: "conveyor_belt", quant: 4 }] },
+    "research_lab": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 10 }, { name: "gear", quant: 10 }, { name: "transport_belt", quant: 4 }] },
     "transport_belt": { outputQuant: 2, ingredients: [{ name: "gear", quant: 1 }, { name: "iron_plate", quant: 1 }] },
-    "splitter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 5 }, { name: "iron_plate", quant: 5 }, { name: "conveyor_belt", quant: 4 }] },
+    "splitter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 5 }, { name: "iron_plate", quant: 5 }, { name: "transport_belt", quant: 4 }] },
     "inserter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 1 }, { name: "iron_plate", quant: 1 }, { name: "gear", quant: 1 }] },
     "mining_drill": { outputQuant: 1, ingredients: [{ name: "gear", quant: 3 }, { name: "iron_plate", quant: 3 }, { name: "stone_furnace", quant: 1 }] },
-    "underground_belt": { outputQuant: 1, ingredients: [{ name: "iron_plate", quant: 10 }, { name: "conveyor_belt", quant: 5 }] },
+    "underground_belt": { outputQuant: 1, ingredients: [{ name: "iron_plate", quant: 10 }, { name: "transport_belt", quant: 5 }] },
 };
 export const entities = {};
