@@ -1,6 +1,8 @@
 # Craptorio-2
 A fan-made of a fan-made game
 
+(work in progress, not full release) 
+
 Welcome to Craptorio-2!
 This project is a fork of [Craptorio](https://github.com/archaicvirus/Craptorio).
 
