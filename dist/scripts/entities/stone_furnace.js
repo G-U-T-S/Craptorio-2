@@ -1,15 +1,12 @@
 import RENDER from "../../engine/render.js";
+import { entities } from "../definitions.js";
 export default class StoneFurnace {
     static tickRate = 5;
     static animTickRate = 9;
     static animMaxTick = 2;
     type = "stone_furnace";
     globalPos;
-    atlasCoords = {
-        fullSize: { x: 72, y: 64 },
-        mediun: { x: 80, y: 16 },
-        small: { x: 80, y: 24 }
-    };
+    atlasCoord = entities[this.type].atlasCoord;
     updated = false;
     drawn = false;
     isHovered = false;
@@ -18,6 +15,6 @@ export default class StoneFurnace {
     }
     update() { }
     draw() {
-        RENDER.drawSprite("staticSprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, this.atlasCoords.fullSize.x, this.atlasCoords.fullSize.y, 16, 16);
+        RENDER.drawSprite("staticSprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y, this.atlasCoord.x, this.atlasCoord.y, 16, 16);
     }
 }

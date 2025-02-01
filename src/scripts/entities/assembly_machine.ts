@@ -1,4 +1,5 @@
 import render from "../../engine/render.js";
+import { entities } from "../definitions.js";
 
 
 export default class AssemblyMachine {
@@ -6,11 +7,7 @@ export default class AssemblyMachine {
   static readonly animTickRate = 0;
   public type = "assembly_machine";
   public globalPos: { x: number, y: number };
-  public atlasCoords = {
-    fullSize: { x: 48, y: 64 },
-    mediun: { x: 96, y: 16 },
-    small: { x: 96, y: 24 }
-  };
+  public atlasCoord = entities[this.type].atlasCoord;
   public updated: boolean = false;
   public drawn: boolean = false;
   public isHovered: boolean = false;
@@ -25,7 +22,7 @@ export default class AssemblyMachine {
       "staticSprite", 4,
       (this.globalPos.x - render.topLeft.x),
       (this.globalPos.y - render.topLeft.y),
-      this.atlasCoords.fullSize.x, this.atlasCoords.fullSize.y, 24, 24
+      this.atlasCoord.x, this.atlasCoord.y, 24, 24
     );
   }
 }

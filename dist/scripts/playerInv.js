@@ -15,6 +15,9 @@ class PlayerInv extends Inventory {
         render.addResizeListener(() => {
             this.moveTo((render.size.w / 2) - w - 5, (render.size.h / 2) - (h / 2));
         });
+        this.depositStack(0, "copper_plate", 200, true);
+        this.depositStack(0, "iron_plate", 200, true);
+        this.depositStack(0, "stone_ore", 50, true);
     }
     handleClick(x, y) {
         const slot = this.getHoveredSlot(x, y);
@@ -26,12 +29,12 @@ class PlayerInv extends Inventory {
                         slot.quant += 1;
                         cursor.itemStack.quant = cursor.itemStack.quant - 1;
                         if (cursor.itemStack.quant < 1) {
-                            cursor.setItem();
+                            cursor.checkStack();
                         }
                     }
                     else if (cursor.l) {
                         slot.quant = cursor.itemStack.quant;
-                        cursor.setItem();
+                        cursor.setStack();
                     }
                 }
                 else if (slot.itemName == cursor.itemStack.name) {
@@ -40,7 +43,7 @@ class PlayerInv extends Inventory {
                             slot.quant += 1;
                             cursor.itemStack.quant = cursor.itemStack.quant - 1;
                             if (cursor.itemStack.quant < 1) {
-                                cursor.setItem();
+                                cursor.checkStack();
                             }
                             return;
                         }
@@ -62,7 +65,7 @@ class PlayerInv extends Inventory {
                             slot.quant = items[slot.itemName].stackSize;
                         }
                         if (cursor.itemStack.quant < 1) {
-                            cursor.setItem();
+                            cursor.checkStack();
                         }
                         return;
                     }
@@ -81,7 +84,7 @@ class PlayerInv extends Inventory {
                     if (cursor.r && slot.quant > 1) {
                         const half = Math.floor(slot.quant / 2);
                         const remainder = slot.quant - half;
-                        cursor.setItem({ name: slot.itemName, quant: remainder });
+                        cursor.setStack({ name: slot.itemName, quant: remainder });
                         slot.quant = half;
                         return;
                     }

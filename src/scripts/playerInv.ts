@@ -26,6 +26,15 @@ class PlayerInv extends Inventory {
         (render.size.h / 2) - (h / 2)
       );
     });
+
+    //DEBUG
+    this.depositStack(0, "copper_plate", 200, true);
+    this.depositStack(0, "iron_plate", 200, true);
+    this.depositStack(0, "stone_ore", 50, true);
+    // this.depositStack(0, "wood", 50, true);
+    // this.depositStack(0, "steel", 150, true);
+    // this.depositStack(0, "stone_brick", 50, true);
+    // this.depositStack(0, "stone_furnace", 15, true);
   }
 
   handleClick(x: number, y: number): void {
@@ -82,7 +91,7 @@ class PlayerInv extends Inventory {
             cursor.itemStack.quant = cursor.itemStack.quant - 1;
 
             if (cursor.itemStack.quant < 1) {
-              cursor.setItem();
+              cursor.checkStack();
             }
           }
           else if (cursor.l) {
@@ -93,7 +102,7 @@ class PlayerInv extends Inventory {
             //   self.slots[cursor.item_stack.slot].count = 0
             // }
 
-            cursor.setItem();
+            cursor.setStack();
           }
         }
         else if (slot.itemName == cursor.itemStack.name) {
@@ -103,7 +112,7 @@ class PlayerInv extends Inventory {
               cursor.itemStack.quant = cursor.itemStack.quant - 1;
 
               if (cursor.itemStack.quant < 1) {
-                cursor.setItem();
+                cursor.checkStack();
               }
 
               return;
@@ -128,7 +137,7 @@ class PlayerInv extends Inventory {
             }
 
             if (cursor.itemStack.quant < 1) {
-              cursor.setItem();
+              cursor.checkStack();
             }
 
             return;
@@ -151,7 +160,7 @@ class PlayerInv extends Inventory {
             const half = Math.floor(slot.quant / 2);
             const remainder = slot.quant - half;
 
-            cursor.setItem({ name: slot.itemName, quant: remainder });
+            cursor.setStack({ name: slot.itemName, quant: remainder });
             slot.quant = half;
 
             return;
@@ -169,7 +178,7 @@ class PlayerInv extends Inventory {
           //       self.slots[index].count = stk.count
           //     end
           //     return true
-          //   end
+          //   end  
 
           cursor.itemStack.name = slot.itemName;
           cursor.itemStack.quant = slot.quant;

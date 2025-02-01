@@ -52,13 +52,20 @@ class Cursor {
             }
         }
     }
-    setItem(stack) {
+    setStack(stack) {
         if (stack !== undefined) {
             this.itemStack.name = stack.name;
             this.itemStack.quant = stack.quant;
             this.type = "item";
         }
         else {
+            this.itemStack.name = "";
+            this.itemStack.quant = 0;
+            this.type = "pointer";
+        }
+    }
+    checkStack() {
+        if (this.itemStack.quant <= 0 || this.itemStack.name === "") {
             this.itemStack.name = "";
             this.itemStack.quant = 0;
             this.type = "pointer";

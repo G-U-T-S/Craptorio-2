@@ -1,6 +1,7 @@
 interface Iitem {
   fancyName: string;
   info: string;
+  type: "ingredient" | "placeable" | "ore"
   stackSize: number;
   atlasCoord: {
     normal: { x: number, y: number };
@@ -12,6 +13,7 @@ export const items: { [index: string]: Iitem } = {
   "copper_ore": {
     fancyName: "Copper Ore",
     info: "",
+    type: "ore",
     stackSize: 100,
     atlasCoord: {
       normal: { x: 64, y: 40 },
@@ -21,6 +23,7 @@ export const items: { [index: string]: Iitem } = {
   "iron_ore": {
     fancyName: "Iron Ore",
     info: "",
+    type: "ore",
     stackSize: 100,
     atlasCoord: {
       normal: { x: 72, y: 40 },
@@ -30,6 +33,7 @@ export const items: { [index: string]: Iitem } = {
   "stone_ore": {
     fancyName: "Stone Ore",
     info: "",
+    type: "ore",
     stackSize: 100,
     atlasCoord: {
       normal: { x: 56, y: 40 },
@@ -39,6 +43,7 @@ export const items: { [index: string]: Iitem } = {
   "coal_ore": {
     fancyName: "Coal Ore",
     info: "",
+    type: "ore",
     stackSize: 100,
     atlasCoord: {
       normal: { x: 80, y: 40 },
@@ -48,6 +53,7 @@ export const items: { [index: string]: Iitem } = {
   "uranium_ore": {
     fancyName: "Uranium Ore",
     info: "",
+    type: "ore",
     stackSize: 100,
     atlasCoord: {
       normal: { x: 88, y: 40 },
@@ -58,6 +64,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Copper Plate",
     info: "Made by smelting copper",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 0, y: 0 },
       small: { x: 0, y: 8 }
@@ -67,6 +74,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Iron Plate",
     info: "Made by smelting copper",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 8, y: 0 },
       small: { x: 8, y: 8 }
@@ -76,6 +84,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Stone Brick",
     info: "Made by smelting stone",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 16, y: 0 },
       small: { x: 16, y: 8 }
@@ -85,6 +94,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Stone Brick",
     info: "Get by choping wood",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 24, y: 0 },
       small: { x: 24, y: 8 }
@@ -94,6 +104,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Gear",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 32, y: 0 },
       small: { x: 32, y: 8 }
@@ -103,6 +114,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Copper Wire",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 40, y: 0 },
       small: { x: 40, y: 8 }
@@ -112,6 +124,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Iron Stick",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 48, y: 0 },
       small: { x: 48, y: 8 }
@@ -121,6 +134,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Plastic Bar",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 56, y: 0 },
       small: { x: 56, y: 8 }
@@ -130,6 +144,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Green Circuit",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 64, y: 0 },
       small: { x: 64, y: 8 }
@@ -139,6 +154,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Red Circuit",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 72, y: 0 },
       small: { x: 72, y: 8 }
@@ -148,6 +164,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Blue Circuit",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 80, y: 0 },
       small: { x: 80, y: 8 }
@@ -157,6 +174,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "White Circuit",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 80, y: 0 },
       small: { x: 80, y: 8 }
@@ -166,6 +184,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Red Cience",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 96, y: 0 },
       small: { x: 96, y: 8 }
@@ -175,6 +194,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Green Cience",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 104, y: 0 },
       small: { x: 104, y: 8 }
@@ -184,6 +204,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Blue Cience",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 112, y: 0 },
       small: { x: 112, y: 8 }
@@ -193,6 +214,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Black Cience",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 120, y: 0 },
       small: { x: 120, y: 8 }
@@ -202,6 +224,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "White Cience",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 0, y: 16 },
       small: { x: 0, y: 24 }
@@ -211,6 +234,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Steel",
     info: "",
     stackSize: 100,
+    type: "ingredient",
     atlasCoord: {
       normal: { x: 56, y: 16 },
       small: { x: 56, y: 24 }
@@ -220,6 +244,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Wood Box",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 64, y: 16 },
       small: { x: 64, y: 24 }
@@ -229,6 +254,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Stone Furnace",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 80, y: 16 },
       small: { x: 80, y: 24 }
@@ -238,6 +264,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Steel Furnace",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 88, y: 16 },
       small: { x: 88, y: 24 }
@@ -247,6 +274,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Assembly Machine",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 96, y: 16 },
       small: { x: 96, y: 24 }
@@ -256,6 +284,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Research Lab",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 104, y: 16 },
       small: { x: 104, y: 24 }
@@ -265,6 +294,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Conveyor Belt",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 0, y: 40 },
       small: { x: 0, y: 48 }
@@ -274,6 +304,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Splitter",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 8, y: 40 },
       small: { x: 8, y: 48 }
@@ -283,6 +314,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Underground Belt",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 16, y: 40 },
       small: { x: 16, y: 48 }
@@ -292,6 +324,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Mining Drill",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 40, y: 40 },
       small: { x: 40, y: 48 }
@@ -301,6 +334,7 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Inserter",
     info: "",
     stackSize: 100,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 48, y: 40 },
       small: { x: 48, y: 48 }
@@ -318,7 +352,7 @@ export const recipes: { [index: string]: { outputQuant: number, ingredients: Arr
   "green_cience": { outputQuant: 1, ingredients: [{ name: "inserter", quant: 1 }, { name: "transport_belt", quant: 1 }] },
   "blue_cience": { outputQuant: 2, ingredients: [{ name: "red_circuit", quant: 3 }, { name: "engine_unit", quant: 2 }, { name: "sulfur", quant: 1 }] },
   "wood_chest": { outputQuant: 1, ingredients: [{ name: "wood", quant: 2 }] },
-  "stone_furnace": { outputQuant: 1, ingredients: [{ name: "stone", quant: 5 }] },
+  "stone_furnace": { outputQuant: 1, ingredients: [{ name: "stone_ore", quant: 5 }] },
   "steel_furnace": { outputQuant: 1, ingredients: [{ name: "steel", quant: 6 }, { name: "stone_brick", quant: 10 }] },
   "assembly_machine": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 3 }, { name: "gear", quant: 5 }, { name: "iron_plate", quant: 9 }] },
   "research_lab": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 10 }, { name: "gear", quant: 10 }, { name: "transport_belt", quant: 4 }] },
@@ -329,4 +363,30 @@ export const recipes: { [index: string]: { outputQuant: number, ingredients: Arr
   "underground_belt": { outputQuant: 1, ingredients: [{ name: "iron_plate", quant: 10 }, { name: "transport_belt", quant: 5 }] },
 };
 
-export const entities = {};
+interface Ient {
+  atlasCoord: { x: number, y: number };
+  sizeInPixels: { w: number, h: number };
+  sizeInTiles: { w: number, h: number };
+}
+export const entities: { [index: string]: Ient } = {
+  "wood_chest": {
+    atlasCoord: { x: 64, y: 16 },
+    sizeInPixels: { w: 8, h: 8 },
+    sizeInTiles: { w: 1, h: 1 }
+  },
+  "stone_furnace": {
+    atlasCoord: { x: 72, y: 56 },
+    sizeInPixels: { w: 16, h: 16 },
+    sizeInTiles: { w: 2, h: 2 }
+  },
+  "steel_furnace": {
+    atlasCoord: { x: 88, y: 56 },
+    sizeInPixels: { w: 16, h: 16 },
+    sizeInTiles: { w: 2, h: 2 }
+  },
+  "assembly_machine": {
+    atlasCoord: { x: 48, y: 56 },
+    sizeInPixels: { w: 24, h: 24 },
+    sizeInTiles: { w: 3, h: 3 }
+  },
+};

@@ -33,15 +33,6 @@ export default class Inventory {
         index++;
       }
     }
-
-    //DEBUG
-    this.depositStack(0, "copper_plate", 100, true);
-    this.depositStack(0, "copper_wire", 3, true);
-    this.depositStack(0, "iron_plate", 100, true);
-    // this.depositStack(0, "wood", 50, true);
-    // this.depositStack(0, "steel", 150, true);
-    // this.depositStack(0, "stone_brick", 50, true);
-    // this.depositStack(0, "stone_furnace", 15, true);
   }
 
   draw(): void {

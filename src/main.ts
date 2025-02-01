@@ -10,7 +10,7 @@ import MiningDrill from "./scripts/entities/mining_drill.js";
 // import TransportBelt from "./classes/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
-// import { items } from "./classes/definitions.js";
+import { entities, items, recipes } from "./scripts/definitions.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -66,15 +66,8 @@ let secodWindowMode: "craft" | "ent" = "craft";
 // let showTileWidget: boolean = false;
 // let altMode: boolean = false;
 
-window.addEventListener("mousedown", () => {
-  // const globalPos = screenToWorld(cursor.x, cursor.y, true);
-
-  // if (cursor.l) {
-  //   debugInv.depositStack("copper_plate", 30, 5, true);
-  // }
-  // else {
-  //   debugInv.removeStack(0, "full");
-  // }
+window.addEventListener("mousedown", (ev) => {
+  const cursorGlobalPos = screenToWorld(cursor.x, cursor.y, true);
 
   if (playerInv.visible) {
     if (playerInv.isHovered(cursor.x, cursor.y)) {
@@ -87,30 +80,19 @@ window.addEventListener("mousedown", () => {
     }
   }
 
-  /*
-  // const entData = getEntData({ ...screenToWorld(cursor.x, cursor.y, true) });
-  // if (cursor.type === 'item' && cursor.itemStack.name !== "") {
-  //   if (keyboard.ctrl && entData !== undefined) {
-  //     let returnData = {success: false, itemName: "", quant: 0};
+  if (ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
+    cursor.itemStack.quant -= 1;
+    cursor.checkStack();
+  }
+});
+window.addEventListener("mouseup", (ev) => {
+  if (ev.button === 2) {
+    const name = removeEnt({ ...screenToWorld(cursor.x, cursor.y, true) });
 
-  //     if (cursor.r) {
-  //       switch (entData.entName) {
-  //         case "wood_chest": {
-  //           const chest = ents.wood_chest.get(entData.entKey) as WoodChest;
-  //           returnData = chest.depositStack({itemName: cursor.itemStack.name, quant: 1});
-  //           break;
-  //         }
-  //       }
-
-  //       if (returnData.success) {
-  //         cursor.itemStack.quant = cursor.itemStack.quant - 1;
-  //       }
-  //     }
-  //   }
-  // }
-  */
-
-
+    if (name !== undefined) {
+      playerInv.depositStack(0, name, 1, true);
+    }
+  }
 });
 
 window.addEventListener("keydown", (ev) => {
@@ -132,43 +114,54 @@ function screenToWorld(x: number, y: number, snapToGrid: boolean): { x: number, 
 
   return { ...worldPos };
 }
-function placeEnt(type: "assembly_machine" | "wood_chest", globalPos: { x: number, y: number }): boolean {
-  switch (type) {
-    case "wood_chest": {
-      const key = `${globalPos.x}-${globalPos.y}`;
-      if (!gridData.has(key)) {
-        gridData.set(key, ["wood_chest", key]);
-        ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
-        return true;
+function placeEnt(name: string, globalPos: { x: number, y: number }): boolean {
+  const ent = entities[name];
+
+  if (ent === undefined) {
+    return false;
+  }
+  // check if is a ent in there position
+  for (let x = 0; x < ent.sizeInTiles.w; x++) {
+    for (let y = 0; y < ent.sizeInTiles.h; y++) {
+      const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+
+      if (gridData.has(key)) {
+        return false;
       }
-      break;
+    }
+  }
+
+  //adds the positions for the other ents not be place above
+  for (let x = 0; x < ent.sizeInTiles.w; x++) {
+    for (let y = 0; y < ent.sizeInTiles.h; y++) {
+      const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+      gridData.set(key, [name, `${globalPos.x}-${globalPos.y}`]);
+    }
+  }
+
+  //finally place the ent
+  const key = `${globalPos.x}-${globalPos.y}`;
+  switch (name) {
+    case "wood_chest": {
+      ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
+      return true;
     }
 
     case "assembly_machine": {
-      for (let x = 0; x < 3; x++) {
-        for (let y = 0; y < 3; y++) {
-          const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
+      ents.assembly_machine.set(key, new AssemblyMachine({ ...globalPos }));
+      return true;
+    }
 
-          if (gridData.has(key)) {
-            return false;
-          }
-        }
-      }
-
-      ents.assembly_machine.set(`${globalPos.x}-${globalPos.y}`, new AssemblyMachine({ ...globalPos }));
-      for (let x = 0; x < 3; x++) {
-        for (let y = 0; y < 3; y++) {
-          const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
-          gridData.set(key, ["assembly_machine", `${globalPos.x}-${globalPos.y}`]);
-        }
-      }
+    case "stone_furnace": {
+      ents.stone_furnace.set(key, new StoneFurnace({ ...globalPos }));
       return true;
     }
   }
 
   return false;
 }
-function removeEnt(globalPos: { x: number, y: number }): boolean {
+function removeEnt(globalPos: { x: number, y: number }): undefined | string {
+  //TODO needs rework
   const mouseKey = `${globalPos.x}-${globalPos.y}`;
 
   if (gridData.has(mouseKey)) {
@@ -177,7 +170,8 @@ function removeEnt(globalPos: { x: number, y: number }): boolean {
       case "wood_chest": {
         ents.wood_chest.delete(mouseKey);
         gridData.delete(mouseKey);
-        break;
+
+        return "wood_chest";
       }
 
       case "assembly_machine": {
@@ -191,14 +185,12 @@ function removeEnt(globalPos: { x: number, y: number }): boolean {
           }
         }
 
-        break;
+        return "assembly_machine";
       }
     }
-
-    return true;
   }
 
-  return false;
+  return undefined;
 }
 function getEntData(globalPos: { x: number, y: number }): undefined | { entKey: string, entName: string } {
   const mouseKey = `${globalPos.x}-${globalPos.y}`;
@@ -247,7 +239,10 @@ function gameLoop(): void {
   acumulator += delta;
 
   render.drawText(
-    `delta: ${Number(delta).toFixed(2)}`, 5, 5, 30, "white", "top", "left"
+    `FPS: ${Number(1 / (delta / 1000)).toFixed(2)}`, 5, 5, 30, "white", "top", "left"
+  );
+  render.drawText(
+    `Cursor.Item: ${cursor.itemStack.name || "null"}, quant: ${cursor.itemStack.quant || "null"}`, 5, 35, 30, "white", "top", "left"
   );
 
   while (acumulator >= tickRate) {
@@ -320,9 +315,24 @@ function gameLoop(): void {
   }
 
   if (cursor.type === "item") {
-    render.drawItemStack(
-      cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false
-    );
+    if (entities[cursor.itemStack.name] !== undefined && !playerInv.visible) {
+      const ent = entities[cursor.itemStack.name];
+      const pos = screenToWorld(
+        cursor.x, cursor.y, true
+      );
+
+      render.drawSprite(
+        "staticSprite", 4, pos.x, pos.y,
+        ent.atlasCoord.x, ent.atlasCoord.y,
+        ent.sizeInPixels.w, ent.sizeInPixels.h
+      );
+    }
+
+    else if (items[cursor.itemStack.name] !== undefined) {
+      render.drawItemStack(
+        cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false
+      );
+    }
   }
 }
 

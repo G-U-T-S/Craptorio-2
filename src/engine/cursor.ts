@@ -126,13 +126,21 @@ class Cursor {
     // if cursor.type == 'item' then sound('rotate_' + dir) end
   }
 
-  setItem(stack?: { name: string, quant: number }): void {
+  setStack(stack?: { name: string, quant: number }): void {
     if (stack !== undefined) {
       this.itemStack.name = stack.name;
       this.itemStack.quant = stack.quant;
       this.type = "item";
     }
     else {
+      this.itemStack.name = "";
+      this.itemStack.quant = 0;
+      this.type = "pointer";
+    }
+  }
+
+  checkStack(): void {
+    if (this.itemStack.quant <= 0 || this.itemStack.name === "") {
       this.itemStack.name = "";
       this.itemStack.quant = 0;
       this.type = "pointer";
