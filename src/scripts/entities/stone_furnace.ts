@@ -21,7 +21,7 @@ export default class StoneFurnace {
 
   public draw(): void {
     RENDER.drawSprite(
-      "staticSprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
+      "sprite", 4, this.globalPos.x - RENDER.topLeft.x, this.globalPos.y - RENDER.topLeft.y,
       this.atlasCoord.x, this.atlasCoord.y, 16, 16
     );
   }

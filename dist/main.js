@@ -5,9 +5,10 @@ import craftMenu from "./scripts/craftMenu.js";
 import cursor from "./engine/cursor.js";
 import StoneFurnace from "./scripts/entities/stone_furnace.js";
 import UndergroundBelt from "./scripts/entities/undergroundBelt.js";
-import MiningDrill from "./scripts/entities/mining_drill.js";
+import BurnerMiningDrill from "./scripts/entities/burner_mining_drill.js";
 import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
+import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
 import { entities, items } from "./scripts/definitions.js";
 window.addEventListener("contextmenu", (ev) => {
@@ -18,6 +19,8 @@ const ents = {
     "wood_chest": new Map(),
     "stone_furnace": new Map(),
     "assembly_machine": new Map(),
+    "burner_mining_drill": new Map(),
+    "research_lab": new Map(),
 };
 const gridData = new Map();
 const tickRate = 1000 / 60;
@@ -107,6 +110,14 @@ function placeEnt(name, globalPos) {
             ents.stone_furnace.set(key, new StoneFurnace({ ...globalPos }));
             return true;
         }
+        case "burner_mining_drill": {
+            ents.burner_mining_drill.set(key, new BurnerMiningDrill({ ...globalPos }));
+            return true;
+        }
+        case "research_lab": {
+            ents.research_lab.set(key, new ResearchLab({ ...globalPos }));
+            return true;
+        }
     }
     return false;
 }
@@ -180,7 +191,7 @@ function gameLoop() {
                 uBeltTick = 0;
             }
         }
-        if (tick % MiningDrill.tickRate === 0) {
+        if (tick % BurnerMiningDrill.tickRate === 0) {
             drillTick = drillTick + drillBitDir;
             if (drillBitTick > 7 && drillBitTick < 0) {
                 drillBitDir = drillBitDir * -1;
@@ -225,7 +236,7 @@ function gameLoop() {
         if (entities[cursor.itemStack.name] !== undefined && !playerInv.visible) {
             const ent = entities[cursor.itemStack.name];
             const pos = screenToWorld(cursor.x, cursor.y, true);
-            render.drawSprite("staticSprite", 4, pos.x, pos.y, ent.atlasCoord.x, ent.atlasCoord.y, ent.sizeInPixels.w, ent.sizeInPixels.h);
+            render.drawSprite("sprite", 4, pos.x, pos.y, ent.atlasCoord.x, ent.atlasCoord.y, ent.sizeInPixels.w, ent.sizeInPixels.h);
         }
         else if (items[cursor.itemStack.name] !== undefined) {
             render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);

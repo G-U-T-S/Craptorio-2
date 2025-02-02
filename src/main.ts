@@ -2,13 +2,13 @@ import render from "./engine/render.js";
 import ui from "./scripts/ui.js";
 import playerInv from "./scripts/playerInv.js";
 import craftMenu from "./scripts/craftMenu.js";
-// import keyboard from "./classes/keyboard.js";
 import cursor from "./engine/cursor.js";
 import StoneFurnace from "./scripts/entities/stone_furnace.js";
 import UndergroundBelt from "./scripts/entities/undergroundBelt.js";
-import MiningDrill from "./scripts/entities/mining_drill.js";
+import BurnerMiningDrill from "./scripts/entities/burner_mining_drill.js";
 import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
+import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
 import { entities, items } from "./scripts/definitions.js";
 
@@ -23,10 +23,12 @@ window.addEventListener("contextmenu", (ev) => {
 
 
 let tileSize = 8 * 4;
-const ents: { [index: string]: Map<string, AssemblyMachine | StoneFurnace | WoodChest> } = {
+const ents: { [index: string]: Map<string, AssemblyMachine | StoneFurnace | WoodChest | BurnerMiningDrill | ResearchLab> } = {
   "wood_chest": new Map<string, WoodChest>(),
   "stone_furnace": new Map<string, StoneFurnace>(),
   "assembly_machine": new Map<string, AssemblyMachine>(),
+  "burner_mining_drill": new Map<string, BurnerMiningDrill>(),
+  "research_lab": new Map<string, ResearchLab>(),
 }
 //! key == a posição, value == [entType, entKey];
 //! TODO o problema é que esse map fica gigantesco muito rápido
@@ -144,14 +146,20 @@ function placeEnt(name: string, globalPos: { x: number, y: number }): boolean {
       ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
       return true;
     }
-
     case "assembly_machine": {
       ents.assembly_machine.set(key, new AssemblyMachine({ ...globalPos }));
       return true;
     }
-
     case "stone_furnace": {
       ents.stone_furnace.set(key, new StoneFurnace({ ...globalPos }));
+      return true;
+    }
+    case "burner_mining_drill": {
+      ents.burner_mining_drill.set(key, new BurnerMiningDrill({ ...globalPos }));
+      return true;
+    }
+    case "research_lab": {
+      ents.research_lab.set(key, new ResearchLab({ ...globalPos }));
       return true;
     }
   }
@@ -206,13 +214,6 @@ function drawEnts(): void {
       ent.draw();
     });
   });
-
-  // ents.wood_chest.forEach((chest) => {
-  //   chest.draw();
-  // });
-  // ents.assembly_machine.forEach((machine) => {
-  //   machine.draw();
-  // });
 }
 
 function startMenuLoop(): void {
@@ -263,7 +264,7 @@ function gameLoop(): void {
       if (beltTick > UndergroundBelt.maxTick) { uBeltTick = 0; }
     }
 
-    if (tick % MiningDrill.tickRate === 0) {
+    if (tick % BurnerMiningDrill.tickRate === 0) {
       drillTick = drillTick + drillBitDir;
       if (drillBitTick > 7 && drillBitTick < 0) {
         drillBitDir = drillBitDir * -1;
@@ -325,7 +326,7 @@ function gameLoop(): void {
       );
 
       render.drawSprite(
-        "staticSprite", 4, pos.x, pos.y,
+        "sprite", 4, pos.x, pos.y,
         ent.atlasCoord.x, ent.atlasCoord.y,
         ent.sizeInPixels.w, ent.sizeInPixels.h
       );

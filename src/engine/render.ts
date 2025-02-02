@@ -10,8 +10,7 @@ class Render {
   public size: { w: number, h: number };
   public center: { x: number, y: number };
   public integerScale: boolean;
-  private staticSpritesAtlas: HTMLImageElement;
-  private rotatableSpritesAtlas: HTMLImageElement;
+  private spriteAtlas: HTMLImageElement;
   private tilesAtlas: HTMLImageElement;
   private resizeCallbacks: Array<CallableFunction> = []
 
@@ -21,10 +20,8 @@ class Render {
     this.topLeft = { x: 0, y: 0 };
     this.size = { w: 0, h: 0 };
     this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
-    this.staticSpritesAtlas = new Image();
-    this.staticSpritesAtlas.src = "./assets/staticSprites.png";
-    this.rotatableSpritesAtlas = new Image();
-    this.rotatableSpritesAtlas.src = "./assets/rotatableSprites.png";
+    this.spriteAtlas = new Image();
+    this.spriteAtlas.src = "./assets/sprites.png";
     this.tilesAtlas = new Image();
     this.tilesAtlas.src = "./assets/tiles.png";
     this.integerScale = true;
@@ -33,20 +30,14 @@ class Render {
     this.resizeCanvas();
   }
 
-  drawSprite(src: "staticSprite" | "rotatableSprite" | "tiles", scale: number, x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
-    if (src === "staticSprite") {
+  drawSprite(src: "sprite" | "tile", scale: number, x: number, y: number, coordX: number, coordY: number, sizeX: number = 8, sizeY: number = 8): void {
+    if (src === "sprite") {
       this.context.drawImage(
-        this.staticSpritesAtlas, coordX, coordY,
+        this.spriteAtlas, coordX, coordY,
         sizeX, sizeY, x, y, sizeX * scale, sizeY * scale
       )
     }
-    else if (src === "rotatableSprite") {
-      this.context.drawImage(
-        this.rotatableSpritesAtlas, coordX, coordY,
-        sizeX, sizeY, x, y, sizeX * scale, sizeY * scale
-      )
-    }
-    else if (src === "tiles") {
+    else if (src === "tile") {
       this.context.drawImage(
         this.tilesAtlas, coordX, coordY,
         sizeX, sizeY, x, y, sizeX * scale, sizeY * scale
@@ -125,7 +116,7 @@ class Render {
 
   drawItemStack(itemName: string, scale: number, x: number, y: number, quant: number, showQuant: boolean): void {
     this.drawSprite(
-      "staticSprite", scale, x, y,
+      "sprite", scale, x, y,
       items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y
     );
 

@@ -2,10 +2,10 @@ import render from "../../engine/render.js";
 import { entities } from "../definitions.js";
 
 
-export default class AssemblyMachine {
+export default class ResearchLab {
   static readonly tickRate = 8;
   static readonly animTickRate = 0;
-  public type = "assembly_machine";
+  public type = "research_lab";
   public globalPos: { x: number, y: number };
   public atlasCoord = entities[this.type].atlasCoord;
   public updated: boolean = false;

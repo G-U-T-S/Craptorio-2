@@ -14,50 +14,50 @@ export const items: { [index: string]: Iitem } = {
     fancyName: "Copper Ore",
     info: "",
     type: "ore",
-    stackSize: 100,
+    stackSize: 50,
     atlasCoord: {
-      normal: { x: 64, y: 40 },
-      small: { x: 64, y: 48 }
+      normal: { x: 8, y: 32 },
+      small: { x: 8, y: 40 }
     }
   },
   "iron_ore": {
     fancyName: "Iron Ore",
     info: "",
     type: "ore",
-    stackSize: 100,
+    stackSize: 50,
     atlasCoord: {
-      normal: { x: 72, y: 40 },
-      small: { x: 72, y: 48 }
+      normal: { x: 16, y: 32 },
+      small: { x: 16, y: 40 }
     }
   },
   "stone_ore": {
     fancyName: "Stone Ore",
     info: "",
     type: "ore",
-    stackSize: 100,
+    stackSize: 50,
     atlasCoord: {
-      normal: { x: 56, y: 40 },
-      small: { x: 56, y: 48 }
+      normal: { x: 0, y: 32 },
+      small: { x: 0, y: 40 }
     }
   },
   "coal_ore": {
     fancyName: "Coal Ore",
     info: "",
     type: "ore",
-    stackSize: 100,
+    stackSize: 50,
     atlasCoord: {
-      normal: { x: 80, y: 40 },
-      small: { x: 80, y: 48 }
+      normal: { x: 24, y: 32 },
+      small: { x: 24, y: 40 }
     }
   },
   "uranium_ore": {
     fancyName: "Uranium Ore",
     info: "",
     type: "ore",
-    stackSize: 100,
+    stackSize: 50,
     atlasCoord: {
-      normal: { x: 88, y: 40 },
-      small: { x: 88, y: 48 }
+      normal: { x: 32, y: 32 },
+      small: { x: 32, y: 40 }
     }
   },
   "copper_plate": {
@@ -113,7 +113,7 @@ export const items: { [index: string]: Iitem } = {
   "copper_wire": {
     fancyName: "Copper Wire",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 40, y: 0 },
@@ -141,9 +141,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "green_circuit": {
-    fancyName: "Green Circuit",
+    fancyName: "Eletronic Circuit",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 64, y: 0 },
@@ -151,9 +151,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "red_circuit": {
-    fancyName: "Red Circuit",
+    fancyName: "Advanced Circuit",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 72, y: 0 },
@@ -161,7 +161,7 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "blue_circuit": {
-    fancyName: "Blue Circuit",
+    fancyName: "Processing Circuit",
     info: "",
     stackSize: 100,
     type: "ingredient",
@@ -181,9 +181,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "red_cience": {
-    fancyName: "Red Cience",
+    fancyName: "Automation Cience Pack",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 96, y: 0 },
@@ -191,9 +191,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "green_cience": {
-    fancyName: "Green Cience",
+    fancyName: "Logistic Cience Pack",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 104, y: 0 },
@@ -201,9 +201,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "blue_cience": {
-    fancyName: "Blue Cience",
+    fancyName: "Chemical Cience Pack",
     info: "",
-    stackSize: 100,
+    stackSize: 200,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 112, y: 0 },
@@ -211,7 +211,7 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "black_cience": {
-    fancyName: "Black Cience",
+    fancyName: "Military Cience Pack",
     info: "",
     stackSize: 100,
     type: "ingredient",
@@ -221,9 +221,9 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "white_cience": {
-    fancyName: "White Cience",
+    fancyName: "Space Cience Pack",
     info: "",
-    stackSize: 100,
+    stackSize: 2000,
     type: "ingredient",
     atlasCoord: {
       normal: { x: 0, y: 16 },
@@ -231,37 +231,67 @@ export const items: { [index: string]: Iitem } = {
     }
   },
   "steel": {
-    fancyName: "Steel",
+    fancyName: "Steel Plate",
     info: "",
     stackSize: 100,
     type: "ingredient",
+    atlasCoord: {
+      normal: { x: 16, y: 16 },
+      small: { x: 16, y: 24 }
+    }
+  },
+  "wood_chest": {
+    fancyName: "Wooden chest",
+    info: "",
+    stackSize: 50,
+    type: "placeable",
+    atlasCoord: {
+      normal: { x: 24, y: 16 },
+      small: { x: 24, y: 24 }
+    }
+  },
+  "stone_furnace": {
+    fancyName: "Stone Furnace",
+    info: "",
+    stackSize: 50,
+    type: "placeable",
     atlasCoord: {
       normal: { x: 56, y: 16 },
       small: { x: 56, y: 24 }
     }
   },
-  "wood_chest": {
-    fancyName: "Wood Box",
+  "steel_furnace": {
+    fancyName: "Steel Furnace",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
     type: "placeable",
     atlasCoord: {
       normal: { x: 64, y: 16 },
       small: { x: 64, y: 24 }
     }
   },
-  "stone_furnace": {
-    fancyName: "Stone Furnace",
+  "assembly_machine": {
+    fancyName: "Assembly Machine",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
+    type: "placeable",
+    atlasCoord: {
+      normal: { x: 72, y: 16 },
+      small: { x: 72, y: 24 }
+    }
+  },
+  "research_lab": {
+    fancyName: "Research Lab",
+    info: "",
+    stackSize: 10,
     type: "placeable",
     atlasCoord: {
       normal: { x: 80, y: 16 },
       small: { x: 80, y: 24 }
     }
   },
-  "steel_furnace": {
-    fancyName: "Steel Furnace",
+  "transport_belt": {
+    fancyName: "Transport Belt",
     info: "",
     stackSize: 100,
     type: "placeable",
@@ -270,74 +300,44 @@ export const items: { [index: string]: Iitem } = {
       small: { x: 88, y: 24 }
     }
   },
-  "assembly_machine": {
-    fancyName: "Assembly Machine",
+  "splitter": {
+    fancyName: "Splitter",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
     type: "placeable",
     atlasCoord: {
       normal: { x: 96, y: 16 },
       small: { x: 96, y: 24 }
     }
   },
-  "research_lab": {
-    fancyName: "Research Lab",
+  "undergroun_belt": {
+    fancyName: "Underground Belt",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
     type: "placeable",
     atlasCoord: {
       normal: { x: 104, y: 16 },
       small: { x: 104, y: 24 }
     }
   },
-  "transport_belt": {
-    fancyName: "Conveyor Belt",
+  "burner_mining_drill": {
+    fancyName: "Burner Mining Drill",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
     type: "placeable",
     atlasCoord: {
-      normal: { x: 0, y: 40 },
-      small: { x: 0, y: 48 }
-    }
-  },
-  "splitter": {
-    fancyName: "Splitter",
-    info: "",
-    stackSize: 100,
-    type: "placeable",
-    atlasCoord: {
-      normal: { x: 8, y: 40 },
-      small: { x: 8, y: 48 }
-    }
-  },
-  "undergroun_belt": {
-    fancyName: "Underground Belt",
-    info: "",
-    stackSize: 100,
-    type: "placeable",
-    atlasCoord: {
-      normal: { x: 16, y: 40 },
-      small: { x: 16, y: 48 }
-    }
-  },
-  "mining_drill": {
-    fancyName: "Mining Drill",
-    info: "",
-    stackSize: 100,
-    type: "placeable",
-    atlasCoord: {
-      normal: { x: 40, y: 40 },
-      small: { x: 40, y: 48 }
+      normal: { x: 112, y: 16 },
+      small: { x: 112, y: 16 }
     }
   },
   "inserter": {
     fancyName: "Inserter",
     info: "",
-    stackSize: 100,
+    stackSize: 50,
     type: "placeable",
     atlasCoord: {
-      normal: { x: 48, y: 40 },
-      small: { x: 48, y: 48 }
+      normal: { x: 120, y: 16 },
+      small: { x: 120, y: 24 }
     }
   },
 };
@@ -359,7 +359,7 @@ export const recipes: { [index: string]: { outputQuant: number, ingredients: Arr
   "transport_belt": { outputQuant: 2, ingredients: [{ name: "gear", quant: 1 }, { name: "iron_plate", quant: 1 }] },
   "splitter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 5 }, { name: "iron_plate", quant: 5 }, { name: "transport_belt", quant: 4 }] },
   "inserter": { outputQuant: 1, ingredients: [{ name: "green_circuit", quant: 1 }, { name: "iron_plate", quant: 1 }, { name: "gear", quant: 1 }] },
-  "mining_drill": { outputQuant: 1, ingredients: [{ name: "gear", quant: 3 }, { name: "iron_plate", quant: 3 }, { name: "stone_furnace", quant: 1 }] },
+  "burner_mining_drill": { outputQuant: 1, ingredients: [{ name: "gear", quant: 3 }, { name: "iron_plate", quant: 3 }, { name: "stone_furnace", quant: 1 }] },
   "underground_belt": { outputQuant: 1, ingredients: [{ name: "iron_plate", quant: 10 }, { name: "transport_belt", quant: 5 }] },
 };
 
@@ -370,27 +370,37 @@ interface Ient {
 }
 export const entities: { [index: string]: Ient } = {
   "wood_chest": {
-    atlasCoord: { x: 64, y: 16 },
+    atlasCoord: { x: 24, y: 16 },
     sizeInPixels: { w: 8, h: 8 },
     sizeInTiles: { w: 1, h: 1 }
   },
   // "inserter": {
   //   atlasCoord: { x: 72, y: 56 },
-  //   sizeInPixels: { w: 16, h: 16 },
-  //   sizeInTiles: { w: 2, h: 2 }
+  //   sizeInPixels: { w: 8, h: 8 },
+  //   sizeInTiles: { w: 1, h: 1 }
   // },
   "stone_furnace": {
-    atlasCoord: { x: 72, y: 56 },
+    atlasCoord: { x: 72, y: 112 },
     sizeInPixels: { w: 16, h: 16 },
     sizeInTiles: { w: 2, h: 2 }
   },
   "steel_furnace": {
-    atlasCoord: { x: 88, y: 56 },
+    atlasCoord: { x: 88, y: 112 },
     sizeInPixels: { w: 16, h: 16 },
     sizeInTiles: { w: 2, h: 2 }
   },
   "assembly_machine": {
-    atlasCoord: { x: 48, y: 56 },
+    atlasCoord: { x: 24, y: 104 },
+    sizeInPixels: { w: 24, h: 24 },
+    sizeInTiles: { w: 3, h: 3 }
+  },
+  "burner_mining_drill": {
+    atlasCoord: { x: 0, y: 88 },
+    sizeInPixels: { w: 16, h: 16 },
+    sizeInTiles: { w: 2, h: 2 }
+  },
+  "research_lab": {
+    atlasCoord: { x: 0, y: 104 },
     sizeInPixels: { w: 24, h: 24 },
     sizeInTiles: { w: 3, h: 3 }
   },

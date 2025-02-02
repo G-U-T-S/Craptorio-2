@@ -35,7 +35,7 @@ class ItemButton {
     const y = this.y + (this.h / 2) - ((8 * spriteScale) / 2) + 1;
 
     render.drawSprite(
-      "staticSprite", spriteScale, x, y,
+      "sprite", spriteScale, x, y,
       items[this.name].atlasCoord.normal.x, items[this.name].atlasCoord.normal.y
     );
   }
@@ -111,7 +111,7 @@ class CraftMenu {
       "wood_chest", "", "", "", "", "", "",
       "transport_belt", "underground_belt", "splitter", "", "", "", "",
       "inserter", "", "", "", "", "", "",
-      "stone_furnace", "steel_furnace", "mining_drill", "", "", "", "",
+      "stone_furnace", "steel_furnace", "burner_mining_drill", "", "", "", "",
       "assembly_machine", "", "", "", "", "", "",
     ];
 

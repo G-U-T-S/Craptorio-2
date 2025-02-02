@@ -1,9 +1,10 @@
+import render from "../../engine/render.js";
 import { entities } from "../definitions.js";
 
 
-export default class MiningDrill {
+export default class BurnerMiningDrill {
   static readonly tickRate = 8;
-  public type = "mining_drill";
+  public type = "burner_mining_drill";
   public globalPos: { x: number, y: number };
   public atlasCoord = entities[this.type].atlasCoord;
   public updated: boolean = false;
@@ -14,6 +15,12 @@ export default class MiningDrill {
     this.globalPos = { ...globalPos };
   }
 
-  update(): void { }
-  draw(): void { }
+  public update(): void { }
+
+  public draw(): void {
+    render.drawSprite(
+      "sprite", 4, this.globalPos.x - render.topLeft.x, this.globalPos.y - render.topLeft.y,
+      this.atlasCoord.x, this.atlasCoord.y, 16, 16
+    );
+  }
 }

@@ -7,8 +7,7 @@ class Render {
     size;
     center;
     integerScale;
-    staticSpritesAtlas;
-    rotatableSpritesAtlas;
+    spriteAtlas;
     tilesAtlas;
     resizeCallbacks = [];
     constructor() {
@@ -17,10 +16,8 @@ class Render {
         this.topLeft = { x: 0, y: 0 };
         this.size = { w: 0, h: 0 };
         this.center = { x: this.canvas.width / 2, y: this.canvas.height / 2 };
-        this.staticSpritesAtlas = new Image();
-        this.staticSpritesAtlas.src = "./assets/staticSprites.png";
-        this.rotatableSpritesAtlas = new Image();
-        this.rotatableSpritesAtlas.src = "./assets/rotatableSprites.png";
+        this.spriteAtlas = new Image();
+        this.spriteAtlas.src = "./assets/sprites.png";
         this.tilesAtlas = new Image();
         this.tilesAtlas.src = "./assets/tiles.png";
         this.integerScale = true;
@@ -28,13 +25,10 @@ class Render {
         this.resizeCanvas();
     }
     drawSprite(src, scale, x, y, coordX, coordY, sizeX = 8, sizeY = 8) {
-        if (src === "staticSprite") {
-            this.context.drawImage(this.staticSpritesAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
+        if (src === "sprite") {
+            this.context.drawImage(this.spriteAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
         }
-        else if (src === "rotatableSprite") {
-            this.context.drawImage(this.rotatableSpritesAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
-        }
-        else if (src === "tiles") {
+        else if (src === "tile") {
             this.context.drawImage(this.tilesAtlas, coordX, coordY, sizeX, sizeY, x, y, sizeX * scale, sizeY * scale);
         }
     }
@@ -61,7 +55,7 @@ class Render {
         }
     }
     drawItemStack(itemName, scale, x, y, quant, showQuant) {
-        this.drawSprite("staticSprite", scale, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
+        this.drawSprite("sprite", scale, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
         if (showQuant) {
             const text = `${quant}`;
             this.drawText(text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right");

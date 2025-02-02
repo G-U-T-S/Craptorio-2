@@ -19,6 +19,6 @@ export default class WoodChest {
         }
     }
     draw() {
-        RENDER.drawSprite("staticSprite", 4, (this.globalPos.x - RENDER.topLeft.x), (this.globalPos.y - RENDER.topLeft.y), this.atlasCoord.x, this.atlasCoord.y, 8, 8);
+        RENDER.drawSprite("sprite", 4, (this.globalPos.x - RENDER.topLeft.x), (this.globalPos.y - RENDER.topLeft.y), this.atlasCoord.x, this.atlasCoord.y, 8, 8);
     }
 }

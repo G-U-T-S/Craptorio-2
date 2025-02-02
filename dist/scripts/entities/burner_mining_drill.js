@@ -1,9 +1,8 @@
 import render from "../../engine/render.js";
 import { entities } from "../definitions.js";
-export default class AssemblyMachine {
+export default class BurnerMiningDrill {
     static tickRate = 8;
-    static animTickRate = 0;
-    type = "assembly_machine";
+    type = "burner_mining_drill";
     globalPos;
     atlasCoord = entities[this.type].atlasCoord;
     updated = false;
@@ -14,6 +13,6 @@ export default class AssemblyMachine {
     }
     update() { }
     draw() {
-        render.drawSprite("sprite", 4, (this.globalPos.x - render.topLeft.x), (this.globalPos.y - render.topLeft.y), this.atlasCoord.x, this.atlasCoord.y, 24, 24);
+        render.drawSprite("sprite", 4, this.globalPos.x - render.topLeft.x, this.globalPos.y - render.topLeft.y, this.atlasCoord.x, this.atlasCoord.y, 16, 16);
     }
 }

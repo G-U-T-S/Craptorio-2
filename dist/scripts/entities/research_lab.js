@@ -1,9 +1,9 @@
 import render from "../../engine/render.js";
 import { entities } from "../definitions.js";
-export default class AssemblyMachine {
+export default class ResearchLab {
     static tickRate = 8;
     static animTickRate = 0;
-    type = "assembly_machine";
+    type = "research_lab";
     globalPos;
     atlasCoord = entities[this.type].atlasCoord;
     updated = false;
