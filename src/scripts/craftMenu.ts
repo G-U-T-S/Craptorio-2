@@ -54,64 +54,64 @@ class CraftMenu {
   public actualTab = 0;
 
   constructor() {
-    render.addResizeListener(() => {
-      this.x = (render.size.w / 2) + 5;
-      this.y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
+    // render.addResizeListener(() => {
+    //   this.x = (render.size.w / 2) + 5;
+    //   this.y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
 
-      // this.craftButtons.forEach((btnGrid) => {
-      //   btnGrid.forEach((btn) => {
+    //   // this.craftButtons.forEach((btnGrid) => {
+    //   //   btnGrid.forEach((btn) => {
 
-      //   });
-      // });
+    //   //   });
+    //   // });
 
-      let index = 0;
-      for (let y = 0; y < this.cols; y++) {
-        for (let x = 0; x < this.rows; x++) {
-          const btn = this.craftButtons[0][index];
+    //   let index = 0;
+    //   for (let y = 0; y < this.cols; y++) {
+    //     for (let x = 0; x < this.rows; x++) {
+    //       const btn = this.craftButtons[0][index];
 
-          if (btn !== undefined) {
-            btn.x = this.x + (x * this.btnSize);
-            btn.y = this.y + (y * this.btnSize);
-          }
-        }
+    //       if (btn !== undefined) {
+    //         btn.x = this.x + (x * this.btnSize);
+    //         btn.y = this.y + (y * this.btnSize);
+    //       }
+    //     }
 
-        index++;
-      }
+    //     index++;
+    //   }
 
-      index = 0;
-      for (let y = 0; y < this.cols; y++) {
-        for (let x = 0; x < this.rows; x++) {
-          const btn = this.craftButtons[1][index];
+    //   index = 0;
+    //   for (let y = 0; y < this.cols; y++) {
+    //     for (let x = 0; x < this.rows; x++) {
+    //       const btn = this.craftButtons[1][index];
 
-          if (btn !== undefined) {
-            btn.x = this.x + (x * this.btnSize);
-            btn.y = this.y + (y * this.btnSize);
-          }
-        }
+    //       if (btn !== undefined) {
+    //         btn.x = this.x + (x * this.btnSize);
+    //         btn.y = this.y + (y * this.btnSize);
+    //       }
+    //     }
 
-        index++;
-      }
+    //     index++;
+    //   }
 
-      index = 0;
-      for (let y = 0; y < this.cols; y++) {
-        for (let x = 0; x < this.rows; x++) {
-          const btn = this.craftButtons[2][index];
+    //   index = 0;
+    //   for (let y = 0; y < this.cols; y++) {
+    //     for (let x = 0; x < this.rows; x++) {
+    //       const btn = this.craftButtons[2][index];
 
-          if (btn !== undefined) {
-            btn.x = this.x + (x * this.btnSize);
-            btn.y = this.y + (y * this.btnSize);
-          }
-        }
+    //       if (btn !== undefined) {
+    //         btn.x = this.x + (x * this.btnSize);
+    //         btn.y = this.y + (y * this.btnSize);
+    //       }
+    //     }
 
-        index++;
-      }
-    });
+    //     index++;
+    //   }
+    // });
 
     const namesArrayZero: Array<string> = [
       "wood_chest", "", "", "", "", "", "",
       "transport_belt", "underground_belt", "splitter", "", "", "", "",
       "inserter", "", "", "", "", "", "",
-      "stone_furnace", "mining_drill", "", "", "", "", "",
+      "stone_furnace", "steel_furnace", "mining_drill", "", "", "", "",
       "assembly_machine", "", "", "", "", "", "",
     ];
 

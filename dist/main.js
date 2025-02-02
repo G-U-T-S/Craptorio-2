@@ -6,6 +6,7 @@ import cursor from "./engine/cursor.js";
 import StoneFurnace from "./scripts/entities/stone_furnace.js";
 import UndergroundBelt from "./scripts/entities/undergroundBelt.js";
 import MiningDrill from "./scripts/entities/mining_drill.js";
+import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
 import { entities, items } from "./scripts/definitions.js";
@@ -14,9 +15,9 @@ window.addEventListener("contextmenu", (ev) => {
 });
 let tileSize = 8 * 4;
 const ents = {
-    assembly_machine: new Map(),
-    stone_furnace: new Map(),
-    wood_chest: new Map(),
+    "wood_chest": new Map(),
+    "stone_furnace": new Map(),
+    "assembly_machine": new Map(),
 };
 const gridData = new Map();
 const tickRate = 1000 / 60;
@@ -51,9 +52,7 @@ window.addEventListener("mousedown", (ev) => {
         cursor.itemStack.quant -= 1;
         cursor.checkStack();
     }
-});
-window.addEventListener("mouseup", (ev) => {
-    if (ev.button === 2) {
+    else if (ev.button === 2) {
         const name = removeEnt({ ...screenToWorld(cursor.x, cursor.y, true) });
         if (name !== undefined) {
             playerInv.depositStack(0, name, 1, true);
@@ -112,34 +111,23 @@ function placeEnt(name, globalPos) {
     return false;
 }
 function removeEnt(globalPos) {
-    const mouseKey = `${globalPos.x}-${globalPos.y}`;
-    if (gridData.has(mouseKey)) {
-        const mouseTile = gridData.get(mouseKey);
-        switch (mouseTile[0]) {
-            case "wood_chest": {
-                ents.wood_chest.delete(mouseKey);
-                gridData.delete(mouseKey);
-                return "wood_chest";
-            }
-            case "assembly_machine": {
-                const machine = ents.assembly_machine.get(mouseTile[1]);
-                ents.assembly_machine.delete(mouseTile[1]);
-                for (let x = 0; x < 3; x++) {
-                    for (let y = 0; y < 3; y++) {
-                        const key = `${machine.globalPos.x + (x * tileSize)}-${machine.globalPos.y + (y * tileSize)}`;
-                        gridData.delete(key);
-                    }
+    const posKey = `${globalPos.x}-${globalPos.y}`;
+    if (gridData.has(posKey)) {
+        const mouseTile = gridData.get(posKey);
+        const entData = entities[mouseTile[0]];
+        const ent = ents[mouseTile[0]].get(mouseTile[1]);
+        if (ent !== undefined && entData !== undefined) {
+            for (let x = 0; x < entData.sizeInTiles.w; x++) {
+                for (let y = 0; y < entData.sizeInTiles.h; y++) {
+                    const key = `${ent.globalPos.x + (x * tileSize)}-${ent.globalPos.y + (y * tileSize)}`;
+                    gridData.delete(key);
                 }
-                return "assembly_machine";
             }
+            ents[mouseTile[0]].delete(mouseTile[1]);
+            return mouseTile[0];
         }
     }
     return undefined;
-}
-function getEntData(globalPos) {
-    const mouseKey = `${globalPos.x}-${globalPos.y}`;
-    const mouseTile = gridData.get(mouseKey);
-    return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts() {
     Object.entries(ents).forEach((value) => {
@@ -170,9 +158,17 @@ function gameLoop() {
     lastTime = now;
     acumulator += delta;
     render.drawText(`FPS: ${Number(1 / (delta / 1000)).toFixed(2)}`, 5, 5, 30, "white", "top", "left");
-    render.drawText(`Cursor.Item: ${cursor.itemStack.name || "null"}, quant: ${cursor.itemStack.quant || "null"}`, 5, 35, 30, "white", "top", "left");
+    render.drawText(`Cursor.Item: ${cursor.itemStack.name || "null"}, quant: ${cursor.itemStack.quant}`, 5, 35, 30, "white", "top", "left");
+    let totalEnts = 0;
+    Object.entries(ents).forEach((value) => {
+        const map = value[1];
+        totalEnts += map.size;
+    });
+    render.drawText(`Total Ents: ${totalEnts}`, 5, 65, 30, "white", "top", "left");
+    const totalGridData = gridData.size;
+    render.drawText(`Total Grid Data: ${totalGridData}`, 5, 95, 30, "white", "top", "left");
     while (acumulator >= tickRate) {
-        if (tick % UndergroundBelt.tickRate === 0) {
+        if (tick % TransportBelt.tickRate === 0) {
             beltTick += 1;
             if (beltTick > UndergroundBelt.maxTick) {
                 beltTick = 0;
@@ -241,7 +237,6 @@ function BOOT() {
 }
 function TIC() {
     render.drawBg("black");
-    cursor.update();
     switch (state) {
         case "start": {
             startMenuLoop();

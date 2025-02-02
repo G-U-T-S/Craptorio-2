@@ -43,48 +43,11 @@ class CraftMenu {
     tabButtons = [];
     actualTab = 0;
     constructor() {
-        render.addResizeListener(() => {
-            this.x = (render.size.w / 2) + 5;
-            this.y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
-            let index = 0;
-            for (let y = 0; y < this.cols; y++) {
-                for (let x = 0; x < this.rows; x++) {
-                    const btn = this.craftButtons[0][index];
-                    if (btn !== undefined) {
-                        btn.x = this.x + (x * this.btnSize);
-                        btn.y = this.y + (y * this.btnSize);
-                    }
-                }
-                index++;
-            }
-            index = 0;
-            for (let y = 0; y < this.cols; y++) {
-                for (let x = 0; x < this.rows; x++) {
-                    const btn = this.craftButtons[1][index];
-                    if (btn !== undefined) {
-                        btn.x = this.x + (x * this.btnSize);
-                        btn.y = this.y + (y * this.btnSize);
-                    }
-                }
-                index++;
-            }
-            index = 0;
-            for (let y = 0; y < this.cols; y++) {
-                for (let x = 0; x < this.rows; x++) {
-                    const btn = this.craftButtons[2][index];
-                    if (btn !== undefined) {
-                        btn.x = this.x + (x * this.btnSize);
-                        btn.y = this.y + (y * this.btnSize);
-                    }
-                }
-                index++;
-            }
-        });
         const namesArrayZero = [
             "wood_chest", "", "", "", "", "", "",
             "transport_belt", "underground_belt", "splitter", "", "", "", "",
             "inserter", "", "", "", "", "", "",
-            "stone_furnace", "mining_drill", "", "", "", "", "",
+            "stone_furnace", "steel_furnace", "mining_drill", "", "", "", "",
             "assembly_machine", "", "", "", "", "", "",
         ];
         let index = 0;

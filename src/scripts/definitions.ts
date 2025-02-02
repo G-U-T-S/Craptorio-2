@@ -374,6 +374,11 @@ export const entities: { [index: string]: Ient } = {
     sizeInPixels: { w: 8, h: 8 },
     sizeInTiles: { w: 1, h: 1 }
   },
+  // "inserter": {
+  //   atlasCoord: { x: 72, y: 56 },
+  //   sizeInPixels: { w: 16, h: 16 },
+  //   sizeInTiles: { w: 2, h: 2 }
+  // },
   "stone_furnace": {
     atlasCoord: { x: 72, y: 56 },
     sizeInPixels: { w: 16, h: 16 },

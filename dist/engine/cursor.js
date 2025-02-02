@@ -6,9 +6,7 @@ class Cursor {
     l = false;
     m = false;
     r = false;
-    holdTime = 0;
     type = "pointer";
-    drag = false;
     rot = 0;
     constructor() {
         window.addEventListener("mousemove", (ev) => {
@@ -39,17 +37,13 @@ class Cursor {
             }
         });
     }
-    update() {
-    }
     rotate(dir) {
-        if (cursor.drag) {
-            this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
-            if (this.rot > 3) {
-                this.rot = 0;
-            }
-            if (this.rot < 0) {
-                this.rot = 3;
-            }
+        this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
+        if (this.rot > 3) {
+            this.rot = 0;
+        }
+        if (this.rot < 0) {
+            this.rot = 3;
         }
     }
     setStack(stack) {

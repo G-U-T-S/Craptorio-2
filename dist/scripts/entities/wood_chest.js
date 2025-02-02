@@ -1,7 +1,7 @@
 import RENDER from "../../engine/render.js";
 import { entities } from "../definitions.js";
 export default class WoodChest {
-    type = "assembly_machine";
+    type = "wood_chest";
     globalPos;
     atlasCoord = entities[this.type].atlasCoord;
     drawn = false;
