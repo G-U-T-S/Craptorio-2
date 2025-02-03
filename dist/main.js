@@ -22,6 +22,13 @@ const ents = {
     "burner_mining_drill": new Map(),
     "research_lab": new Map(),
 };
+const entConstructor = {
+    "wood_chest": (pos) => new WoodChest({ ...pos }),
+    "stone_furnace": (pos) => new StoneFurnace({ ...pos }),
+    "assembly_machine": (pos) => new AssemblyMachine({ ...pos }),
+    "burner_mining_drill": (pos) => new BurnerMiningDrill({ ...pos }),
+    "research_lab": (pos) => new ResearchLab({ ...pos }),
+};
 const gridData = new Map();
 const tickRate = 1000 / 60;
 let tick = 0;
@@ -97,29 +104,8 @@ function placeEnt(name, globalPos) {
         }
     }
     const key = `${globalPos.x}-${globalPos.y}`;
-    switch (name) {
-        case "wood_chest": {
-            ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
-            return true;
-        }
-        case "assembly_machine": {
-            ents.assembly_machine.set(key, new AssemblyMachine({ ...globalPos }));
-            return true;
-        }
-        case "stone_furnace": {
-            ents.stone_furnace.set(key, new StoneFurnace({ ...globalPos }));
-            return true;
-        }
-        case "burner_mining_drill": {
-            ents.burner_mining_drill.set(key, new BurnerMiningDrill({ ...globalPos }));
-            return true;
-        }
-        case "research_lab": {
-            ents.research_lab.set(key, new ResearchLab({ ...globalPos }));
-            return true;
-        }
-    }
-    return false;
+    ents[name].set(key, entConstructor[name]({ ...globalPos }));
+    return true;
 }
 function removeEnt(globalPos) {
     const posKey = `${globalPos.x}-${globalPos.y}`;

@@ -30,6 +30,13 @@ const ents: { [index: string]: Map<string, AssemblyMachine | StoneFurnace | Wood
   "burner_mining_drill": new Map<string, BurnerMiningDrill>(),
   "research_lab": new Map<string, ResearchLab>(),
 }
+const entConstructor: { [index: string]: CallableFunction } = {
+  "wood_chest": (pos: { x: number, y: number }) => new WoodChest({ ...pos }),
+  "stone_furnace": (pos: { x: number, y: number }) => new StoneFurnace({ ...pos }),
+  "assembly_machine": (pos: { x: number, y: number }) => new AssemblyMachine({ ...pos }),
+  "burner_mining_drill": (pos: { x: number, y: number }) => new BurnerMiningDrill({ ...pos }),
+  "research_lab": (pos: { x: number, y: number }) => new ResearchLab({ ...pos }),
+};
 //! key == a posição, value == [entType, entKey];
 //! TODO o problema é que esse map fica gigantesco muito rápido
 //* rework
@@ -139,32 +146,11 @@ function placeEnt(name: string, globalPos: { x: number, y: number }): boolean {
     }
   }
 
-  //finally place the ent
+  //finally create and place the ent
   const key = `${globalPos.x}-${globalPos.y}`;
-  switch (name) {
-    case "wood_chest": {
-      ents.wood_chest.set(key, new WoodChest({ ...globalPos }));
-      return true;
-    }
-    case "assembly_machine": {
-      ents.assembly_machine.set(key, new AssemblyMachine({ ...globalPos }));
-      return true;
-    }
-    case "stone_furnace": {
-      ents.stone_furnace.set(key, new StoneFurnace({ ...globalPos }));
-      return true;
-    }
-    case "burner_mining_drill": {
-      ents.burner_mining_drill.set(key, new BurnerMiningDrill({ ...globalPos }));
-      return true;
-    }
-    case "research_lab": {
-      ents.research_lab.set(key, new ResearchLab({ ...globalPos }));
-      return true;
-    }
-  }
+  ents[name].set(key, entConstructor[name]({ ...globalPos }));
 
-  return false;
+  return true;
 }
 function removeEnt(globalPos: { x: number, y: number }): undefined | string {
   const posKey = `${globalPos.x}-${globalPos.y}`;
