@@ -20,12 +20,12 @@ class PlayerInv extends Inventory {
       "Inventory", x, y, rows, cols, slotSize, w, h
     );
 
-    render.addResizeListener(() => {
-      this.moveTo(
-        (render.size.w / 2) - w - 5,
-        (render.size.h / 2) - (h / 2)
-      );
-    });
+    // render.addResizeListener(() => {
+    //   this.moveTo(
+    //     (render.size.w / 2) - w - 5,
+    //     (render.size.h / 2) - (h / 2)
+    //   );
+    // });
 
     //DEBUG
     this.depositStack(0, "copper_plate", 200, true);

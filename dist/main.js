@@ -10,6 +10,7 @@ import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
+import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
@@ -46,6 +47,7 @@ let delta = 0;
 let lastTime = 0;
 let state = "game";
 let secodWindowMode = "craft";
+let windowEnt = { name: "", key: "" };
 window.addEventListener("mousedown", (ev) => {
     const cursorGlobalPos = screenToWorld(cursor.x, cursor.y, true);
     if (playerInv.visible) {
@@ -58,19 +60,34 @@ window.addEventListener("mousedown", (ev) => {
             return;
         }
     }
-    if (ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
+    if (cursor.type === "item", ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
         cursor.itemStack.quant -= 1;
         cursor.checkStack();
+        return;
     }
     else if (ev.button === 2) {
         const name = removeEnt({ ...screenToWorld(cursor.x, cursor.y, true) });
         if (name !== undefined) {
             playerInv.depositStack(0, name, 1, true);
+            return;
+        }
+    }
+    if (cursor.type === "pointer") {
+        const entdata = getEntData(cursorGlobalPos.x, cursorGlobalPos.y);
+        if (entdata !== undefined) {
+            const ent = ents[entdata.entName].get(entdata.entKey);
+            if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+                secodWindowMode = "ent";
+                windowEnt = { name: entdata.entName, key: entdata.entKey };
+                playerInv.visible = !playerInv.visible;
+                return;
+            }
         }
     }
 });
 window.addEventListener("keydown", (ev) => {
     if (ev.key === "i" || ev.key === "Tab") {
+        secodWindowMode = "craft";
         playerInv.visible = !playerInv.visible;
     }
 });
@@ -125,6 +142,11 @@ function removeEnt(globalPos) {
         }
     }
     return undefined;
+}
+function getEntData(x, y) {
+    const mouseKey = `${x}-${y}`;
+    const mouseTile = gridData.get(mouseKey);
+    return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
 }
 function updateEnts() {
     Object.entries(ents).forEach((value) => {
@@ -215,7 +237,7 @@ function gameLoop() {
             craftMenu.draw();
         }
         else if (secodWindowMode === "ent") {
-            return;
+            render.drawPanel((render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", "drakBlue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 }));
         }
     }
     if (cursor.type === "item") {

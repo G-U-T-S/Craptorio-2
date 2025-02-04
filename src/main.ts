@@ -10,6 +10,8 @@ import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
+import BaseEntity from "./scripts/entities/base_entity.js";
+import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 
 
@@ -23,7 +25,7 @@ window.addEventListener("contextmenu", (ev) => {
 
 
 let tileSize = 8 * 4;
-const ents: { [index: string]: Map<string, AssemblyMachine | StoneFurnace | WoodChest | BurnerMiningDrill | ResearchLab> } = {
+const ents: { [index: string]: Map<string, BaseEntity> } = {
   "wood_chest": new Map<string, WoodChest>(),
   "stone_furnace": new Map<string, StoneFurnace>(),
   "assembly_machine": new Map<string, AssemblyMachine>(),
@@ -69,6 +71,7 @@ let lastTime: number = 0;
 type stateType = "start" | "game" | "help" | "firstLaunch";
 let state: stateType = "game";
 let secodWindowMode: "craft" | "ent" = "craft";
+let windowEnt: { name: string, key: string } = { name: "", key: "" }
 // let showTech: boolean = false;
 // let showHelp: boolean = false;
 // let showMiniMap: boolean = false;
@@ -89,21 +92,42 @@ window.addEventListener("mousedown", (ev) => {
     }
   }
 
-  if (ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
+  if (cursor.type === "item", ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
     cursor.itemStack.quant -= 1;
     cursor.checkStack();
+    return;
   }
   else if (ev.button === 2) {
     const name = removeEnt({ ...screenToWorld(cursor.x, cursor.y, true) });
 
     if (name !== undefined) {
       playerInv.depositStack(0, name, 1, true);
+      return;
+    }
+  }
+
+
+  if (cursor.type === "pointer") {
+    const entdata = getEntData(cursorGlobalPos.x, cursorGlobalPos.y);
+
+    if (entdata !== undefined) {
+      const ent = ents[entdata.entName].get(entdata.entKey) as BaseEntity;
+
+      if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+        secodWindowMode = "ent";
+        windowEnt = { name: entdata.entName, key: entdata.entKey };
+        playerInv.visible = !playerInv.visible;
+        return;
+      }
     }
   }
 });
 
 window.addEventListener("keydown", (ev) => {
+  //TODO talvez ev.preventDefault();
+
   if (ev.key === "i" || ev.key === "Tab") {
+    secodWindowMode = "craft";
     playerInv.visible = !playerInv.visible;
   }
 });
@@ -175,12 +199,12 @@ function removeEnt(globalPos: { x: number, y: number }): undefined | string {
 
   return undefined;
 }
-// function getEntData(globalPos: { x: number, y: number }): undefined | { entKey: string, entName: string } {
-//   const mouseKey = `${globalPos.x}-${globalPos.y}`;
-//   const mouseTile = gridData.get(mouseKey)
+function getEntData(x: number, y: number): undefined | { entName: string, entKey: string } {
+  const mouseKey = `${x}-${y}`;
+  const mouseTile = gridData.get(mouseKey)
 
-//   return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
-// }
+  return mouseTile !== undefined ? { entName: mouseTile[0], entKey: mouseTile[1] } : undefined;
+}
 function updateEnts(): void {
   Object.entries(ents).forEach((value) => {
     value[1].forEach((ent) => {
@@ -300,7 +324,9 @@ function gameLoop(): void {
       craftMenu.draw();
     }
     else if (secodWindowMode === "ent") {
-      return;
+      render.drawPanel(
+        (render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", "drakBlue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 })
+      );
     }
   }
 

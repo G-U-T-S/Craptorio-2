@@ -50,31 +50,31 @@ class Cursor {
   }
 
   rotate(dir: string): void {
-      this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
-      if (this.rot > 3) { this.rot = 0; }
-      if (this.rot < 0) { this.rot = 3; }
+    this.rot = (dir == 'r' && this.rot + 1) || (this.rot - 1);
+    if (this.rot > 3) { this.rot = 0; }
+    if (this.rot < 0) { this.rot = 3; }
 
-      //   local k = get_key(cursor.x, cursor.y)
-      //   local tile, cell_x, cell_y = get_world_cell(cursor.x, cursor.y)
-      //   if ENTS[k] then
-      //     if ENTS[k].type == 'transport_belt' and cursor.type == 'pointer' then
-      //       sound('rotate_' .. dir)
-      //       ENTS[k]:rotate(ENTS[k].rot + 1)
-      //       local tiles = {
-      //         [1] = {x = cell_x, y = cell_y - 1},
-      //         [2] = {x = cell_x + 1, y = cell_y},
-      //         [3] = {x = cell_x, y = cell_y + 1},
-      //         [4] = {x = cell_x - 1, y = cell_y}}
-      //       for i = 1, 4 do
-      //         local k = get_world_key(tiles[i].x, tiles[i].y)
-      //         if ENTS[k] and ENTS[k].type == 'transport_belt' then ENTS[k]:set_curved() end
-      //       end
-      //     end
-      //     if ENTS[k].type == 'inserter' and cursor.type == 'pointer' then
-      //       sound('rotate_' .. dir)
-      //       ENTS[k]:rotate(ENTS[k].rot + 1)
-      //     end
-      //   end
+    //   local k = get_key(cursor.x, cursor.y)
+    //   local tile, cell_x, cell_y = get_world_cell(cursor.x, cursor.y)
+    //   if ENTS[k] then
+    //     if ENTS[k].type == 'transport_belt' and cursor.type == 'pointer' then
+    //       sound('rotate_' .. dir)
+    //       ENTS[k]:rotate(ENTS[k].rot + 1)
+    //       local tiles = {
+    //         [1] = {x = cell_x, y = cell_y - 1},
+    //         [2] = {x = cell_x + 1, y = cell_y},
+    //         [3] = {x = cell_x, y = cell_y + 1},
+    //         [4] = {x = cell_x - 1, y = cell_y}}
+    //       for i = 1, 4 do
+    //         local k = get_world_key(tiles[i].x, tiles[i].y)
+    //         if ENTS[k] and ENTS[k].type == 'transport_belt' then ENTS[k]:set_curved() end
+    //       end
+    //     end
+    //     if ENTS[k].type == 'inserter' and cursor.type == 'pointer' then
+    //       sound('rotate_' .. dir)
+    //       ENTS[k]:rotate(ENTS[k].rot + 1)
+    //     end
+    //   end
 
     // if cursor.type == 'item' then sound('rotate_' + dir) end
   }

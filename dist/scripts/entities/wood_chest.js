@@ -1,14 +1,8 @@
-import RENDER from "../../engine/render.js";
-import { entities } from "../definitions.js";
-export default class WoodChest {
-    type = "wood_chest";
-    globalPos;
-    atlasCoord = entities[this.type].atlasCoord;
-    drawn = false;
-    isHovered = false;
+import BaseEntity from "./base_entity.js";
+export default class WoodChest extends BaseEntity {
     slots;
     constructor(globalPos) {
-        this.globalPos = { ...globalPos };
+        super("wood_chest", { ...globalPos });
         this.slots = new Map();
         let index = 0;
         for (let x = 0; x < 8; x++) {
@@ -17,8 +11,5 @@ export default class WoodChest {
                 index++;
             }
         }
-    }
-    draw() {
-        RENDER.drawSprite("sprite", 4, (this.globalPos.x - RENDER.topLeft.x), (this.globalPos.y - RENDER.topLeft.y), this.atlasCoord.x, this.atlasCoord.y, 8, 8);
     }
 }

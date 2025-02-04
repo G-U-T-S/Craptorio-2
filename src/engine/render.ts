@@ -24,7 +24,7 @@ class Render {
     this.spriteAtlas.src = "./assets/sprites.png";
     this.tilesAtlas = new Image();
     this.tilesAtlas.src = "./assets/tiles.png";
-    this.integerScale = true;
+    this.integerScale = false;
 
     window.addEventListener("resize", this.resizeCanvas.bind(this));
     this.resizeCanvas();
