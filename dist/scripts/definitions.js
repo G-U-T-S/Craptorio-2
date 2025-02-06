@@ -80,7 +80,7 @@ export const items = {
         }
     },
     "wood": {
-        fancyName: "Stone Brick",
+        fancyName: "Wood Planks",
         info: "Get by choping wood",
         stackSize: 100,
         type: "ingredient",
@@ -338,7 +338,6 @@ export const recipes = {
     "red_circuit": { outputQuant: 1, ingredients: [{ name: "copper_wire", quant: 4 }, { name: "green_circuit", quant: 2 }, { name: "plastic_bar", quant: 2 }] },
     "red_cience": { outputQuant: 1, ingredients: [{ name: "copper_plate", quant: 1 }, { name: "gear", quant: 1 }] },
     "green_cience": { outputQuant: 1, ingredients: [{ name: "inserter", quant: 1 }, { name: "transport_belt", quant: 1 }] },
-    "blue_cience": { outputQuant: 2, ingredients: [{ name: "red_circuit", quant: 3 }, { name: "engine_unit", quant: 2 }, { name: "sulfur", quant: 1 }] },
     "wood_chest": { outputQuant: 1, ingredients: [{ name: "wood", quant: 2 }] },
     "stone_furnace": { outputQuant: 1, ingredients: [{ name: "stone_ore", quant: 5 }] },
     "steel_furnace": { outputQuant: 1, ingredients: [{ name: "steel", quant: 6 }, { name: "stone_brick", quant: 10 }] },

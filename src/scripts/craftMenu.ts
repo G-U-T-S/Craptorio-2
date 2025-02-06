@@ -2,6 +2,7 @@ import cursor from "../engine/cursor.js";
 import render from "../engine/render.js";
 import playerInv from "./playerInv.js";
 import { items, recipes } from "./definitions.js";
+import Label from "./label.js";
 
 
 class ItemButton {
@@ -24,14 +25,14 @@ class ItemButton {
   }
 
   draw(spriteScale: number, border: boolean): void {
-    render.drawRect(this.x, this.y, this.w, this.h, "blue", "darkBlue");
+    // render.drawRect(this.x, this.y, this.w, this.h, "blue", "darkBlue");
 
     if (border) {
       render.drawEmptyRect(this.x, this.y, this.w, this.h, "white");
     }
 
     const x = this.x + (this.w / 2) - ((8 * spriteScale) / 2);
-    //! esse mais um é sacanagem;
+    //! esse +1 é sacanagem;
     const y = this.y + (this.h / 2) - ((8 * spriteScale) / 2) + 1;
 
     render.drawSprite(
@@ -47,7 +48,7 @@ class CraftMenu {
   public cols = 5; public rows = 7;
   public btnSize = 8 * 6;
   public w = this.btnSize * 7; public h = this.btnSize * 7;
-  public x = (render.size.w / 2) + 5;
+  public x = (render.size.w / 2) + 15;
   public y = (render.size.h / 2) - ((this.btnSize * 3) / 2);
   public craftButtons: Array<Array<ItemButton>> = [[], [], []];
   public tabButtons: Array<ItemButton> = [];
@@ -191,12 +192,13 @@ class CraftMenu {
   }
 
   draw(): void {
-    render.drawRect(
-      this.x, this.y - 24 * 4, this.w, this.h, "blue", "blue"
-    );
+    render.drawPanel(
+      this.x, this.y - 24 * 4, this.w, this.h, "blue", "darkBlue",
+      new Label("Crafting", "white", "white", { x: 1, y: 1 })
+    )
 
     this.tabButtons.forEach((tab) => {
-      tab.draw(7, true);
+      tab.draw(7, false);
     });
 
     this.craftButtons[this.actualTab].forEach((btn) => {
@@ -204,8 +206,50 @@ class CraftMenu {
     });
 
     render.drawGrid(
+      this.x, this.tabButtons[0].y, 1, 3, "white", "white", 112, 96
+    );
+    render.drawGrid(
       this.x, this.y, this.cols, this.rows, "white", "white", this.btnSize, this.btnSize
     );
+  }
+
+  drawRecipeWidget(hitX: number, hitY: number): void {
+    this.craftButtons[this.actualTab].forEach((btn) => {
+      if (btn.isHovered(hitX, hitY)) {
+        let largerSize = render.context.measureText(items[btn.name].fancyName).width + 10;
+
+        if (recipes[btn.name]) {
+          for (let index = 0; index < recipes[btn.name].ingredients.length; index++) {
+            if (render.context.measureText(`${items[recipes[btn.name].ingredients[index].name].fancyName}`).width + 10 + (4 * 8) > largerSize) {
+              largerSize = render.context.measureText(`${items[recipes[btn.name].ingredients[index].name].fancyName}`).width + 10 + (4 * 8);
+            }
+          }
+
+          render.drawPanel(
+            hitX + 20, hitY + 50,
+            largerSize, (recipes[btn.name].ingredients.length * 30),
+            "blue", "darkBlue",
+            new Label(items[btn.name].fancyName, "white", "white", { x: 1, y: 1 })
+          );
+
+          for (let index = 0; index < recipes[btn.name].ingredients.length; index++) {
+            render.drawText(
+              `${items[recipes[btn.name].ingredients[index].name].fancyName}`,
+              hitX + 22, hitY + 50 + (index * 30),
+              20, "white", "top", "left"
+            );
+
+            render.drawItemStack(
+              recipes[btn.name].ingredients[index].name,
+              3, hitX + 20 + largerSize - (3 * 8), hitY + 50 + (index * 30),
+              recipes[btn.name].ingredients[index].quant, true
+            );
+          }
+        }
+
+        return;
+      }
+    });
   }
 
   isHovered(x: number, y: number): boolean {

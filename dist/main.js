@@ -12,6 +12,7 @@ import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
 import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
+import keyboard from "./engine/keyboard.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -231,13 +232,22 @@ function gameLoop() {
         acumulator -= tickRate;
     }
     drawEnts();
+    const cursorGlobalPos = screenToWorld(cursor.x, cursor.y, true);
+    const entdata = getEntData(cursorGlobalPos.x, cursorGlobalPos.y);
+    if (keyboard.shift && entdata !== undefined) {
+        const ent = ents[entdata.entName].get(entdata.entKey);
+        if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+            ent.drawHoverWidget();
+        }
+    }
     if (playerInv.visible) {
         playerInv.draw();
         if (secodWindowMode === "craft") {
             craftMenu.draw();
+            craftMenu.drawRecipeWidget(cursor.x, cursor.y);
         }
         else if (secodWindowMode === "ent") {
-            render.drawPanel((render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", "drakBlue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 }));
+            render.drawPanel((render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 }));
         }
     }
     if (cursor.type === "item") {

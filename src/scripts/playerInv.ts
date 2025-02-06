@@ -12,7 +12,7 @@ const rows = 7;
 const slotSize = 8 * 6;
 const w = slotSize * cols;
 const h = slotSize * rows;
-const x = (render.size.w / 2) - w - 5;
+const x = (render.size.w / 2) - w - 15;
 const y = (render.size.h / 2) - (h / 2);
 class PlayerInv extends Inventory {
   constructor() {
@@ -30,8 +30,11 @@ class PlayerInv extends Inventory {
     //DEBUG
     this.depositStack(0, "copper_plate", 200, true);
     this.depositStack(0, "iron_plate", 200, true);
+    this.depositStack(0, "steel", 100, true);
+    this.depositStack(0, "stone_brick", 100, true);
     this.depositStack(0, "stone_ore", 50, true);
     this.depositStack(0, "wood", 50, true);
+    this.depositStack(0, "stone_furnace", 5, true);
     // this.depositStack(0, "steel", 150, true);
     // this.depositStack(0, "stone_brick", 50, true);
     // this.depositStack(0, "stone_furnace", 15, true);

@@ -13,6 +13,7 @@ import WoodChest from "./scripts/entities/wood_chest.js";
 import BaseEntity from "./scripts/entities/base_entity.js";
 import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
+import keyboard from "./engine/keyboard.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -64,7 +65,7 @@ let furnaceAnimTick: number = 0;
 // let crafterTick: number = 0;
 let crafterAnimTick: number = 0;
 let crafterAnimDir: number = 1;
-
+  
 let delta: number = 0;
 let lastTime: number = 0;
 
@@ -124,7 +125,7 @@ window.addEventListener("mousedown", (ev) => {
 });
 
 window.addEventListener("keydown", (ev) => {
-  //TODO talvez ev.preventDefault();
+  //! talvez ev.preventDefault();
 
   if (ev.key === "i" || ev.key === "Tab") {
     secodWindowMode = "craft";
@@ -260,10 +261,6 @@ function gameLoop(): void {
   //-------------------------DEBUG---------------------------//
 
   while (acumulator >= tickRate) {
-    // getVisibleEnts();
-
-    // dispatchInput();
-
     if (tick % TransportBelt.tickRate === 0) {
       beltTick += 1;
       if (beltTick > UndergroundBelt.maxTick) { beltTick = 0; }
@@ -309,6 +306,7 @@ function gameLoop(): void {
       }
     }
 
+    //todo just update if not updated?
     updateEnts();
 
     tick += 1;
@@ -317,15 +315,27 @@ function gameLoop(): void {
 
   drawEnts();
 
+  const cursorGlobalPos = screenToWorld(cursor.x, cursor.y, true);
+  const entdata = getEntData(cursorGlobalPos.x, cursorGlobalPos.y);
+
+  if (keyboard.shift && entdata !== undefined) {
+    const ent = ents[entdata.entName].get(entdata.entKey) as BaseEntity;
+
+    if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+      ent.drawHoverWidget();
+    }
+  }
+
   if (playerInv.visible) {
     playerInv.draw();
 
     if (secodWindowMode === "craft") {
       craftMenu.draw();
+      craftMenu.drawRecipeWidget(cursor.x, cursor.y);
     }
     else if (secodWindowMode === "ent") {
       render.drawPanel(
-        (render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", "drakBlue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 })
+        (render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 })
       );
     }
   }

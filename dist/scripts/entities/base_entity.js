@@ -1,4 +1,5 @@
 import render from "../../engine/render.js";
+import cursor from "../../engine/cursor.js";
 import { entities } from "../definitions.js";
 export default class BaseEntity {
     type;
@@ -26,4 +27,8 @@ export default class BaseEntity {
         }
         return false;
     }
+    drawHoverWidget() {
+        render.drawRect(cursor.x, cursor.y, 50, 50, "blue", "blue");
+    }
+    drawEntWindow() { }
 }

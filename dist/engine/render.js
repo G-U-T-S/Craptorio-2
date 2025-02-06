@@ -40,10 +40,11 @@ class Render {
         this.context.strokeStyle = strokeColor;
         this.context.strokeRect(x, y, w, h);
     }
-    drawPanel(x, y, w, h, bg, fg, shadowColor, label) {
-        this.drawRect(x, y, w, h, bg, bg);
+    drawPanel(x, y, w, h, bg, fg, label) {
+        this.drawRect(x - 10, y - 30, w + 20, h + 40, bg);
+        this.drawRect(x, y, w, h, fg);
         if (label) {
-            this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center");
+            this.drawText(label.text, x + (w / 2), y - 15, 20, "white", "middle", "center");
         }
     }
     drawGrid(x, y, rows, cols, bg, fg, sizeX, sizeY, border = false, rounded = false) {
@@ -58,7 +59,7 @@ class Render {
         this.drawSprite("sprite", scale, x, y, items[itemName].atlasCoord.normal.x, items[itemName].atlasCoord.normal.y);
         if (showQuant) {
             const text = `${quant}`;
-            this.drawText(text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right");
+            this.drawText(text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 17, "yellow", "bottom", "right");
         }
     }
     drawText(text, x, y, fontSize, color, baseLine, textAling) {

@@ -45,7 +45,7 @@ class Render {
     }
   }
 
-  drawRect(x: number, y: number, w: number, h: number, fillColor: string, strokeColor: string): void {
+  drawRect(x: number, y: number, w: number, h: number, fillColor: string, strokeColor?: string): void {
     // this.context.strokeStyle = strokeColor;
     this.context.fillStyle = fillColor;
     this.context.fillRect(x, y, w, h);
@@ -62,28 +62,13 @@ class Render {
   //   this.context.lineTo(x2, y2);
   // }
 
-  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, shadowColor: string, label?: Label): void {
-    this.drawRect(x, y, w, h, bg, bg); //-- background fill
-    // drawRect(x, y + 6, w, 3, fg); //-- header lower-fill
-    // drawRect(x + 2, y + h - 3, w - 4, 1, fg); //-- bottom footer fill
-    // drawRect(x + (w / 2), y - 15, 50, 4, fg); //--header fill
-
+  drawPanel(x: number, y: number, w: number, h: number, bg: string, fg: string, label?: Label): void {
+    this.drawRect(x - 10, y - 30, w + 20, h + 40, bg);
+    this.drawRect(x, y, w, h, fg);
 
     if (label) {
-      this.drawText(label.text, x + (w / 2), y - 15, 20, label.fg, "middle", "center"); // header
+      this.drawText(label.text, x + (w / 2), y - 15, 20, "white", "middle", "center"); // header
     }
-    //TODO drawText(label.text, x + (w / 2), (y - 15) + 2, 20, label.fg, "middle", "center");
-
-    //TODO drawRect(x + 6, y, w - 12, 2, fg); //-- top border
-    // drawRect(x, y + 6, 2, h - 12, fg); //-- left border
-    // drawRect(x + w - 2, y + 6, 2, h - 12, fg); //-- right border
-    // drawRect(x + 6, y + h - 2, w - 12, 2, fg); //-- bottom border
-
-    // TODO if (shadow_color === "") {
-    //   drawLine(x + 4, y + h, x + w - 3, y + h, shadow_color); //-- shadow
-    //   drawLine(x + w - 2, y + h - 1, x + w, y + h - 3, shadow_color); //-- shadow
-    //   drawLine(x + w, y + 4, x + w, y + h - 4, shadow_color); //- shadow
-    // }
   }
 
   drawGrid(x: number, y: number, rows: number, cols: number, bg: string, fg: string, sizeX: number, sizeY: number, border = false, rounded = false): void {
@@ -122,8 +107,9 @@ class Render {
 
     if (showQuant) {
       const text = `${quant}`;
+
       this.drawText(
-        text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 15, "yellow", "bottom", "right"
+        text, x + ((scale + 1) * 8) - 5, y + ((scale + 1) * 8), 17, "yellow", "bottom", "right"
       );
     }
   }

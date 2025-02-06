@@ -52,7 +52,7 @@ class Ui {
       w: 500, h: 300
     };
 
-    render.drawPanel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "white", "blue", "black", new Label("Controls", "black", "black", { x: 0, y: 0 }));
+    render.drawPanel(panelCoords.x, panelCoords.y, panelCoords.w, panelCoords.h, "darkBlue", "white", new Label("Controls", "black", "black", { x: 0, y: 0 }));
     for (let i = 0; i < info.length; i++) {
       render.drawText(info[i][1], panelCoords.x, panelCoords.y + (i * 20), 20, "black", "top", "left");
       render.drawText(info[i][0], panelCoords.x + panelCoords.w, panelCoords.y + (i * 20), 20, "black", "top", "right");
