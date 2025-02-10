@@ -14,6 +14,7 @@ import BaseEntity from "./scripts/entities/base_entity.js";
 import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 import keyboard from "./engine/keyboard.js";
+import playSound from "./engine/sounds.js";
 
 
 //! coisas na tela nao alteram de posiçao se
@@ -65,7 +66,7 @@ let furnaceAnimTick: number = 0;
 // let crafterTick: number = 0;
 let crafterAnimTick: number = 0;
 let crafterAnimDir: number = 1;
-  
+
 let delta: number = 0;
 let lastTime: number = 0;
 
@@ -90,6 +91,10 @@ window.addEventListener("mousedown", (ev) => {
     else if (craftMenu.isHovered(cursor.x, cursor.y)) {
       craftMenu.handleClick(cursor.x, cursor.y);
       return;
+    }
+    else {
+      playerInv.visible = false;
+      secodWindowMode = "craft";
     }
   }
 
@@ -131,6 +136,9 @@ window.addEventListener("keydown", (ev) => {
     secodWindowMode = "craft";
     playerInv.visible = !playerInv.visible;
   }
+  else if (ev.key === "q") {
+    pipette();
+  }
 });
 
 
@@ -146,13 +154,37 @@ function screenToWorld(x: number, y: number, snapToGrid: boolean): { x: number, 
 
   return { ...worldPos };
 }
+function pipette(): void {
+  const globalPos = screenToWorld(cursor.x, cursor.y, true);
+  const posKey = `${globalPos.x}-${globalPos.y}`;
+
+  if (gridData.has(posKey)) {
+    const mouseTile = gridData.get(posKey) as string[];
+
+    if (cursor.type === "pointer") {
+      //! esse 10000 harcoded é ruim;
+      const result = playerInv.removeStack(0, mouseTile[0], 10000, true);
+
+      if (result !== undefined) {
+        cursor.setStack({ name: result.itemName, quant: result.quant });
+      }
+    }
+    else if (cursor.type === "item") {
+      //todo swap if alredy has an item
+    }
+  }
+  else if (cursor.type === "item") {
+    playerInv.depositStack(0, cursor.itemStack.name, cursor.itemStack.quant, true);
+    cursor.setStack();
+  }
+}
 function placeEnt(name: string, globalPos: { x: number, y: number }): boolean {
   const ent = entities[name];
 
-  if (ent === undefined) {
+  if (ent === undefined || entConstructor[name] === undefined) {
     return false;
   }
-  // check if is a ent in there position
+  // check if is an ent in there position
   for (let x = 0; x < ent.sizeInTiles.w; x++) {
     for (let y = 0; y < ent.sizeInTiles.h; y++) {
       const key = `${globalPos.x + (x * tileSize)}-${globalPos.y + (y * tileSize)}`;
@@ -174,6 +206,7 @@ function placeEnt(name: string, globalPos: { x: number, y: number }): boolean {
   //finally create and place the ent
   const key = `${globalPos.x}-${globalPos.y}`;
   ents[name].set(key, entConstructor[name]({ ...globalPos }));
+  playSound("placing");
 
   return true;
 }
@@ -347,11 +380,15 @@ function gameLoop(): void {
         cursor.x, cursor.y, true
       );
 
+      render.context.globalAlpha = 0.5;
+      render.context.globalCompositeOperation = "lighter";
       render.drawSprite(
         "sprite", 4, pos.x, pos.y,
         ent.atlasCoord.x, ent.atlasCoord.y,
         ent.sizeInPixels.w, ent.sizeInPixels.h
       );
+      render.context.globalAlpha = 1;
+      render.context.globalCompositeOperation = "source-over";
     }
 
     else if (items[cursor.itemStack.name] !== undefined) {

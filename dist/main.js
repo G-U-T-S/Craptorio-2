@@ -13,6 +13,7 @@ import WoodChest from "./scripts/entities/wood_chest.js";
 import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 import keyboard from "./engine/keyboard.js";
+import playSound from "./engine/sounds.js";
 window.addEventListener("contextmenu", (ev) => {
     ev.preventDefault();
 });
@@ -60,6 +61,10 @@ window.addEventListener("mousedown", (ev) => {
             craftMenu.handleClick(cursor.x, cursor.y);
             return;
         }
+        else {
+            playerInv.visible = false;
+            secodWindowMode = "craft";
+        }
     }
     if (cursor.type === "item", ev.button === 0 && placeEnt(cursor.itemStack.name, { x: cursorGlobalPos.x, y: cursorGlobalPos.y })) {
         cursor.itemStack.quant -= 1;
@@ -91,6 +96,9 @@ window.addEventListener("keydown", (ev) => {
         secodWindowMode = "craft";
         playerInv.visible = !playerInv.visible;
     }
+    else if (ev.key === "q") {
+        pipette();
+    }
 });
 function screenToWorld(x, y, snapToGrid) {
     const worldPos = { x: x + render.topLeft.x, y: y + render.topLeft.y };
@@ -102,9 +110,28 @@ function screenToWorld(x, y, snapToGrid) {
     }
     return { ...worldPos };
 }
+function pipette() {
+    const globalPos = screenToWorld(cursor.x, cursor.y, true);
+    const posKey = `${globalPos.x}-${globalPos.y}`;
+    if (gridData.has(posKey)) {
+        const mouseTile = gridData.get(posKey);
+        if (cursor.type === "pointer") {
+            const result = playerInv.removeStack(0, mouseTile[0], 10000, true);
+            if (result !== undefined) {
+                cursor.setStack({ name: result.itemName, quant: result.quant });
+            }
+        }
+        else if (cursor.type === "item") {
+        }
+    }
+    else if (cursor.type === "item") {
+        playerInv.depositStack(0, cursor.itemStack.name, cursor.itemStack.quant, true);
+        cursor.setStack();
+    }
+}
 function placeEnt(name, globalPos) {
     const ent = entities[name];
-    if (ent === undefined) {
+    if (ent === undefined || entConstructor[name] === undefined) {
         return false;
     }
     for (let x = 0; x < ent.sizeInTiles.w; x++) {
@@ -123,6 +150,7 @@ function placeEnt(name, globalPos) {
     }
     const key = `${globalPos.x}-${globalPos.y}`;
     ents[name].set(key, entConstructor[name]({ ...globalPos }));
+    playSound("placing");
     return true;
 }
 function removeEnt(globalPos) {
@@ -254,7 +282,11 @@ function gameLoop() {
         if (entities[cursor.itemStack.name] !== undefined && !playerInv.visible) {
             const ent = entities[cursor.itemStack.name];
             const pos = screenToWorld(cursor.x, cursor.y, true);
+            render.context.globalAlpha = 0.5;
+            render.context.globalCompositeOperation = "lighter";
             render.drawSprite("sprite", 4, pos.x, pos.y, ent.atlasCoord.x, ent.atlasCoord.y, ent.sizeInPixels.w, ent.sizeInPixels.h);
+            render.context.globalAlpha = 1;
+            render.context.globalCompositeOperation = "source-over";
         }
         else if (items[cursor.itemStack.name] !== undefined) {
             render.drawItemStack(cursor.itemStack.name, 3, cursor.x, cursor.y, cursor.itemStack.quant, false);

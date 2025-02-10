@@ -97,6 +97,7 @@ export default class Inventory {
         return returnData;
     }
     removeStack(index, itemName, quant, force) {
+        const returnData = { itemName: itemName, quant: quant };
         const slot = this.slots.get(index);
         let remaining = quant;
         if (slot !== undefined && slot.itemName === itemName) {
@@ -123,6 +124,11 @@ export default class Inventory {
                 }
             });
         }
+        returnData.quant -= remaining;
+        if (returnData.quant <= 0) {
+            return undefined;
+        }
+        return returnData;
     }
     hasStack(itemName, quant) {
         let sum = 0;

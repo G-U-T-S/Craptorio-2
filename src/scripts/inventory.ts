@@ -132,7 +132,8 @@ export default class Inventory {
     return returnData;
   }
 
-  removeStack(index: number, itemName: string, quant: number, force: boolean) {
+  removeStack(index: number, itemName: string, quant: number, force: boolean): undefined | { itemName: string, quant: number } {
+    const returnData = { itemName: itemName, quant: quant };
     const slot = this.slots.get(index);
     let remaining = quant;
 
@@ -161,6 +162,14 @@ export default class Inventory {
         }
       });
     }
+
+    returnData.quant -= remaining
+
+    if (returnData.quant <= 0) {
+      return undefined;
+    }
+
+    return returnData;
   }
 
   hasStack(itemName: string, quant: number): boolean {
