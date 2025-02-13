@@ -11,7 +11,7 @@ import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
 import BaseEntity from "./scripts/entities/base_entity.js";
-import Label from "./scripts/label.js";
+// import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 import keyboard from "./engine/keyboard.js";
 import playSound from "./engine/sounds.js";
@@ -73,12 +73,7 @@ let lastTime: number = 0;
 type stateType = "start" | "game" | "help" | "firstLaunch";
 let state: stateType = "game";
 let secodWindowMode: "craft" | "ent" = "craft";
-let windowEnt: { name: string, key: string } = { name: "", key: "" }
-// let showTech: boolean = false;
-// let showHelp: boolean = false;
-// let showMiniMap: boolean = false;
-// let showTileWidget: boolean = false;
-// let altMode: boolean = false;
+let windowEnt: { name: string, key: string } = { name: "", key: "" };
 
 window.addEventListener("mousedown", (ev) => {
   const cursorGlobalPos = screenToWorld(cursor.x, cursor.y, true);
@@ -119,7 +114,7 @@ window.addEventListener("mousedown", (ev) => {
     if (entdata !== undefined) {
       const ent = ents[entdata.entName].get(entdata.entKey) as BaseEntity;
 
-      if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+      if (ent.showWindowCall !== undefined && ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
         secodWindowMode = "ent";
         windowEnt = { name: entdata.entName, key: entdata.entKey };
         playerInv.visible = !playerInv.visible;
@@ -136,7 +131,7 @@ window.addEventListener("keydown", (ev) => {
     secodWindowMode = "craft";
     playerInv.visible = !playerInv.visible;
   }
-  else if (ev.key === "q") {
+  else if (!playerInv.visible && ev.key === "q") {
     pipette();
   }
 });
@@ -251,7 +246,7 @@ function updateEnts(): void {
   });
 }
 function drawEnts(): void {
-  //TODO check inside screen
+  //TODO check if inside screen
 
   Object.entries(ents).forEach((value) => {
     value[1].forEach((ent) => {
@@ -274,7 +269,8 @@ function gameLoop(): void {
 
   //-------------------------DEBUG---------------------------//
   render.drawText(
-    `FPS: ${Number(1 / (delta / 1000)).toFixed(2)}`, 5, 5, 30, "white", "top", "left"
+    `FPS: ${Math.round(1 / (delta / 1000))}`, 5, 5, 30, "white", "top", "left"
+    // `FPS: ${Number(1 / (delta / 1000)).toFixed(2)}`, 5, 5, 30, "white", "top", "left"
   );
   render.drawText(
     `Cursor.Item: ${cursor.itemStack.name || "null"}, quant: ${cursor.itemStack.quant}`, 5, 35, 30, "white", "top", "left"
@@ -355,7 +351,7 @@ function gameLoop(): void {
     const ent = ents[entdata.entName].get(entdata.entKey) as BaseEntity;
 
     if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
-      ent.drawHoverWidget();
+      // ent.drawHoverWidget();
     }
   }
 
@@ -366,10 +362,13 @@ function gameLoop(): void {
       craftMenu.draw();
       craftMenu.drawRecipeWidget(cursor.x, cursor.y);
     }
+
     else if (secodWindowMode === "ent") {
-      render.drawPanel(
-        (render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 })
-      );
+      //todo draw the ent tab in here
+      const ent = ents[windowEnt.name].get(windowEnt.key);
+      if (ent !== undefined && ent.showWindowCall !== undefined) {
+        ent.showWindowCall();
+      }
     }
   }
 

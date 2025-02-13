@@ -10,7 +10,6 @@ import TransportBelt from "./scripts/entities/transport_belt.js";
 import AssemblyMachine from "./scripts/entities/assembly_machine.js";
 import ResearchLab from "./scripts/entities/research_lab.js";
 import WoodChest from "./scripts/entities/wood_chest.js";
-import Label from "./scripts/label.js";
 import { entities, items } from "./scripts/definitions.js";
 import keyboard from "./engine/keyboard.js";
 import playSound from "./engine/sounds.js";
@@ -82,7 +81,7 @@ window.addEventListener("mousedown", (ev) => {
         const entdata = getEntData(cursorGlobalPos.x, cursorGlobalPos.y);
         if (entdata !== undefined) {
             const ent = ents[entdata.entName].get(entdata.entKey);
-            if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
+            if (ent.showWindowCall !== undefined && ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
                 secodWindowMode = "ent";
                 windowEnt = { name: entdata.entName, key: entdata.entKey };
                 playerInv.visible = !playerInv.visible;
@@ -96,7 +95,7 @@ window.addEventListener("keydown", (ev) => {
         secodWindowMode = "craft";
         playerInv.visible = !playerInv.visible;
     }
-    else if (ev.key === "q") {
+    else if (!playerInv.visible && ev.key === "q") {
         pipette();
     }
 });
@@ -205,7 +204,7 @@ function gameLoop() {
     delta = now - lastTime;
     lastTime = now;
     acumulator += delta;
-    render.drawText(`FPS: ${Number(1 / (delta / 1000)).toFixed(2)}`, 5, 5, 30, "white", "top", "left");
+    render.drawText(`FPS: ${Math.round(1 / (delta / 1000))}`, 5, 5, 30, "white", "top", "left");
     render.drawText(`Cursor.Item: ${cursor.itemStack.name || "null"}, quant: ${cursor.itemStack.quant}`, 5, 35, 30, "white", "top", "left");
     let totalEnts = 0;
     Object.entries(ents).forEach((value) => {
@@ -265,7 +264,6 @@ function gameLoop() {
     if (keyboard.shift && entdata !== undefined) {
         const ent = ents[entdata.entName].get(entdata.entKey);
         if (ent.isHovered(cursorGlobalPos.x, cursorGlobalPos.y)) {
-            ent.drawHoverWidget();
         }
     }
     if (playerInv.visible) {
@@ -275,7 +273,10 @@ function gameLoop() {
             craftMenu.drawRecipeWidget(cursor.x, cursor.y);
         }
         else if (secodWindowMode === "ent") {
-            render.drawPanel((render.size.w / 2) + 5, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "blue", new Label(items[windowEnt.name].fancyName, "black", "white", { x: 1, y: 1 }));
+            const ent = ents[windowEnt.name].get(windowEnt.key);
+            if (ent !== undefined && ent.showWindowCall !== undefined) {
+                ent.showWindowCall();
+            }
         }
     }
     if (cursor.type === "item") {

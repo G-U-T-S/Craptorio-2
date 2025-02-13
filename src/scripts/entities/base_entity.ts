@@ -1,5 +1,5 @@
 import render from "../../engine/render.js";
-import cursor from "../../engine/cursor.js";
+// import cursor from "../../engine/cursor.js";
 import { entities } from "../definitions.js";
 
 
@@ -8,6 +8,8 @@ export default class BaseEntity {
   public globalPos: { x: number, y: number };
   public size: { w: number, h: number };
   public atlasCoord: { x: number, y: number };
+  public showWindowCall: undefined | CallableFunction = undefined;
+  public showWidgetCall: undefined | CallableFunction = undefined;
   public updated = false;
   public drawn = false;
 
@@ -18,9 +20,7 @@ export default class BaseEntity {
     this.atlasCoord = entities[type].atlasCoord;
   }
 
-  public update(): void {
-    this.updated = true;
-  }
+  public update(): void { }
 
   public draw(): void {
     render.drawSprite(
@@ -39,9 +39,7 @@ export default class BaseEntity {
     return false;
   }
 
-  public drawHoverWidget(): void {
-    render.drawRect(cursor.x, cursor.y, 50, 50, "blue", "blue");
-  }
-
-  public drawEntWindow(): void { }
+  // public drawHoverWidget(): void {
+  //   render.drawRect(cursor.x, cursor.y, 50, 50, "blue", "blue");
+  // }
 }

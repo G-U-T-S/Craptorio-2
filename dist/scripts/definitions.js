@@ -7,7 +7,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 8, y: 32 },
             small: { x: 8, y: 40 }
-        }
+        },
+        smeltedName: "copper_plate"
     },
     "iron_ore": {
         fancyName: "Iron Ore",
@@ -17,7 +18,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 16, y: 32 },
             small: { x: 16, y: 40 }
-        }
+        },
+        smeltedName: "iron_plate"
     },
     "stone_ore": {
         fancyName: "Stone Ore",
@@ -27,7 +29,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 0, y: 32 },
             small: { x: 0, y: 40 }
-        }
+        },
+        smeltedName: "stone_brick"
     },
     "coal_ore": {
         fancyName: "Coal Ore",
@@ -37,7 +40,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 24, y: 32 },
             small: { x: 24, y: 40 }
-        }
+        },
+        fuelTime: 60 * 15,
     },
     "uranium_ore": {
         fancyName: "Uranium Ore",
@@ -53,11 +57,11 @@ export const items = {
         fancyName: "Copper Plate",
         info: "Made by smelting copper",
         stackSize: 100,
-        type: "ingredient",
+        type: "ore",
         atlasCoord: {
             normal: { x: 0, y: 0 },
             small: { x: 0, y: 8 }
-        }
+        },
     },
     "iron_plate": {
         fancyName: "Iron Plate",
@@ -67,7 +71,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 8, y: 0 },
             small: { x: 8, y: 8 }
-        }
+        },
+        smeltedName: "steel"
     },
     "stone_brick": {
         fancyName: "Stone Brick",
@@ -87,7 +92,8 @@ export const items = {
         atlasCoord: {
             normal: { x: 24, y: 0 },
             small: { x: 24, y: 8 }
-        }
+        },
+        fuelTime: 60,
     },
     "gear": {
         fancyName: "Gear",
