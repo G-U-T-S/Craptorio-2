@@ -214,6 +214,8 @@ function gameLoop() {
     render.drawText(`Total Ents: ${totalEnts}`, 5, 65, 30, "white", "top", "left");
     const totalGridData = gridData.size;
     render.drawText(`Total Grid Data: ${totalGridData}`, 5, 95, 30, "white", "top", "left");
+    const mPos = screenToWorld(cursor.x, cursor.y, true);
+    render.drawText(`MousePos (snaped); X: ${mPos.x}, Y: ${mPos.y}`, 5, 125, 30, "white", "top", "left");
     while (acumulator >= tickRate) {
         if (tick % TransportBelt.tickRate === 0) {
             beltTick += 1;
@@ -295,6 +297,7 @@ function gameLoop() {
     }
 }
 function BOOT() {
+    placeEnt("stone_furnace", { x: 544, y: 288 });
     TIC();
 }
 function TIC() {

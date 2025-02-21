@@ -12,7 +12,7 @@ export default class StoneFurnace extends BaseEntity {
   static readonly smeltTime = 3 * 60;
 
   public fuelBuffer = { name: "", quant: 0 };
-  public inputBuffer = { name: "", quant: 0 };
+  public inputBuffer = { name: "iron_ore", quant: 10 };
   public outputBuffer = { name: "", quant: 0 };
   public fuelTime = 0;
   public smeltTimer = 0;
@@ -100,23 +100,24 @@ export default class StoneFurnace extends BaseEntity {
     }
   }
 
-  public draw() {
-    //   --trace('drawing furnace UI')
-    //   local bg, fg = 8, 9
-    //   local ent = ENTS[self.ent_key]
-    //   if not ent then return end
-    //   local input, output, fuel = ent.input_buffer, ent.output_buffer, ent.fuel_buffer
-    //   local x, y, w, h = self.x, self.y, self.width, self.height
+  public showWindow() {
+    const panelSize = 8 * 6 * 7;
+    const panelPos = {
+      x: (render.size.w / 2) + 15, y: (render.size.h / 2) - (panelSize / 2)
+    };
+
     //   local fx, fy = x + (w / 2) - 8, y + 19 --furnace icon screen pos
     //   --background window and border
-    //   ui.draw_panel(x, y, w, h, bg, fg, 'Stone Furnace', UI_BG)
+    render.drawPanel(
+      panelPos.x, panelPos.y, panelSize, panelSize, "blue", "darkBlue", new Label(items[this.type].fancyName, "black", "white", { x: 1, y: 1 })
+    );
     //   -- --close button
     //    sspr(CLOSE_ID, x + w - 9, y + 2, 15)
     //   --input slot
-    //   box(self.input.x + self.x, self.input.y + self.y, self.input.w, self.input.h, 0, 9)
-    //   if ent.input_buffer.count > 0 then
-    //     draw_item_stack(self.input.x + self.x + 1, self.input.y + self.y + 1, ent.input_buffer)
-    //   end
+    render.drawRect(panelPos.x, panelPos.y, 8 * 6, 8 * 6, "black");
+    if (this.inputBuffer.quant > 0) {
+      render.drawItemStack(this.inputBuffer.name, 5, panelPos.x + ((8 * 5) / 5), panelPos.y + ((8 * 5) / 5), this.inputBuffer.quant, true);
+    }
     //    --self.input:draw(self.x, self.y, ent.input_buffer)
     //    --box(x + 4, y + 45, 10, 10, 0, fg)
     //    --prints(input.count .. '/' .. FURNACE_BUFFER_INPUT, x + 4, y + 57, 0, 4)
@@ -194,11 +195,5 @@ export default class StoneFurnace extends BaseEntity {
     //   end
 
     // end
-  }
-
-  private showWindow(): void {
-    render.drawPanel(
-      (render.size.w / 2) + 15, (render.size.h / 2) - ((8 * 6 * 7) / 2), (8 * 6 * 7), (8 * 6 * 7), "blue", "darkBlue", new Label(items[this.type].fancyName, "black", "white", { x: 1, y: 1 })
-    );
   }
 }
