@@ -1,7 +1,15 @@
 import render from "../../engine/render.js";
 import Label from "../label.js";
-import { items } from "../definitions.js";
 import BaseEntity from "./base_entity.js";
+import itemSlot from "../itemSlot.js";
+import { items } from "../definitions.js";
+
+//todo! this need to be in other place
+function map(value: number, inMin: number, inMax: number, outMin: number, outMax: number): number {
+  let mapped = ((value - inMin) / (inMax - inMin)) * (outMax - outMin) + outMin;
+  return Math.min(Math.max(mapped, outMin), outMax);
+}
+//-----------------------------------------------------------------
 
 
 export default class StoneFurnace extends BaseEntity {
@@ -11,13 +19,13 @@ export default class StoneFurnace extends BaseEntity {
   static readonly bufferOuput = 100;
   static readonly smeltTime = 3 * 60;
 
-  public fuelBuffer = { name: "", quant: 0 };
-  public inputBuffer = { name: "iron_ore", quant: 10 };
-  public outputBuffer = { name: "", quant: 0 };
+  public fuelBuffer = new itemSlot(0, 0, 8 * 6, 8 * 6, "coal_ore", 50);
+  public inputBuffer = new itemSlot(0, 0, 8 * 6, 8 * 6, "iron_ore", 99);
+  public outputBuffer = new itemSlot(0, 0, 8 * 6, 8 * 6);
   public fuelTime = 0;
   public smeltTimer = 0;
   public lastFuel = "";
-  public oreType = "";
+  // public oreType = "";
   public isSmelting = false;
 
   constructor(globalPos: { x: number, y: number }) {
@@ -27,6 +35,10 @@ export default class StoneFurnace extends BaseEntity {
   }
 
   public update(): void {
+    if (items[this.inputBuffer.name].smeltedName === undefined) {
+      return;
+    }
+
     //   --update fuel ticks
     if (this.fuelTime > 0) {
       this.fuelTime -= StoneFurnace.tickRate;
@@ -96,7 +108,7 @@ export default class StoneFurnace extends BaseEntity {
     if (this.inputBuffer.quant == 0 && this.outputBuffer.quant == 0) {
       this.inputBuffer.name = "";
       this.outputBuffer.name = "";
-      this.oreType = "";
+      // this.oreType = "";
     }
   }
 
@@ -106,6 +118,13 @@ export default class StoneFurnace extends BaseEntity {
       x: (render.size.w / 2) + 15, y: (render.size.h / 2) - (panelSize / 2)
     };
 
+    this.inputBuffer.pos.x = panelPos.x + ((8 * 5) / 5);
+    this.inputBuffer.pos.y = panelPos.y + ((8 * 5) / 5) + panelSize - (8 * 20);
+    this.outputBuffer.pos.x = panelPos.x + ((8 * 5) / 5) + panelSize - (8 * 8);
+    this.outputBuffer.pos.y = panelPos.y + ((8 * 5) / 5) + panelSize - (8 * 20);
+    this.fuelBuffer.pos.x = panelPos.x + ((8 * 5) / 5);
+    this.fuelBuffer.pos.y = panelPos.y + ((8 * 5) / 5) + panelSize - (8 * 8);
+
     //   local fx, fy = x + (w / 2) - 8, y + 19 --furnace icon screen pos
     //   --background window and border
     render.drawPanel(
@@ -114,21 +133,38 @@ export default class StoneFurnace extends BaseEntity {
     //   -- --close button
     //    sspr(CLOSE_ID, x + w - 9, y + 2, 15)
     //   --input slot
-    render.drawRect(panelPos.x, panelPos.y, 8 * 6, 8 * 6, "black");
-    if (this.inputBuffer.quant > 0) {
-      render.drawItemStack(this.inputBuffer.name, 5, panelPos.x + ((8 * 5) / 5), panelPos.y + ((8 * 5) / 5), this.inputBuffer.quant, true);
-    }
+
+    this.inputBuffer.draw();
+    this.outputBuffer.draw();
+    this.fuelBuffer.draw();
+
     //    --self.input:draw(self.x, self.y, ent.input_buffer)
     //    --box(x + 4, y + 45, 10, 10, 0, fg)
     //    --prints(input.count .. '/' .. FURNACE_BUFFER_INPUT, x + 4, y + 57, 0, 4)
     //   if input.count > 0 then
     //     --sspr(ITEMS[input.id].sprite_id, x + 5, y + 46, ITEMS[input.id].color_key)
-    //   end
+    //   end    
+
     //   --smelting progress bar
     //   box(x + 16, y + 47, 42, 5, 0, fg)
     //   if ent.smelt_timer > 0 then
     //     rect(x + 17, y + 48, 40 - remap(ent.smelt_timer, 0, FURNACE_SMELT_TIME, 0, 40), 3, 6)
     //   end
+
+    //--fuel progress bar
+    render.drawEmptyRect(
+      this.fuelBuffer.pos.x + this.fuelBuffer.size.w + 15,
+      this.fuelBuffer.pos.y + (this.fuelBuffer.size.h / 2),
+      150, 15, "white"
+    );
+    if (this.smeltTimer > 0) {
+      render.drawRect(
+        this.fuelBuffer.pos.x + this.fuelBuffer.size.w + 15,
+        this.fuelBuffer.pos.y + (this.fuelBuffer.size.h / 2),
+        map(this.fuelTime, 0, items[this.fuelBuffer.name].fuelTime as number, 0, 150),
+        15, "red"
+      );
+    }
     //   --output slot
     //   box(self.output.x + self.x, self.output.y + self.y, self.output.w, self.output.h, 0, 9)
     //   if ent.output_buffer.count > 0 then

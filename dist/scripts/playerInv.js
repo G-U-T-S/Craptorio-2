@@ -19,6 +19,7 @@ class PlayerInv extends Inventory {
         this.depositStack(0, "stone_ore", 50, true);
         this.depositStack(0, "wood", 50, true);
         this.depositStack(0, "stone_furnace", 5, true);
+        this.depositStack(0, "coal_ore", 50, true);
     }
     handleClick(x, y) {
         const slot = this.getHoveredSlot(x, y);

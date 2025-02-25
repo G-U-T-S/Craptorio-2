@@ -35,7 +35,7 @@ class PlayerInv extends Inventory {
     this.depositStack(0, "stone_ore", 50, true);
     this.depositStack(0, "wood", 50, true);
     this.depositStack(0, "stone_furnace", 5, true);
-    // this.depositStack(0, "steel", 150, true);
+    this.depositStack(0, "coal_ore", 50, true);
     // this.depositStack(0, "stone_brick", 50, true);
     // this.depositStack(0, "stone_furnace", 15, true);
   }

@@ -56,8 +56,11 @@ window.addEventListener("mousedown", (ev) => {
             playerInv.handleClick(cursor.x, cursor.y);
             return;
         }
-        else if (craftMenu.isHovered(cursor.x, cursor.y)) {
+        else if (secodWindowMode === "craft" && craftMenu.isHovered(cursor.x, cursor.y)) {
             craftMenu.handleClick(cursor.x, cursor.y);
+            return;
+        }
+        else if (secodWindowMode === "ent" && craftMenu.isHovered(cursor.x, cursor.y)) {
             return;
         }
         else {
